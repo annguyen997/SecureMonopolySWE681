@@ -2,54 +2,68 @@
 from random import randint
 
 class TwoDice:
+    dice1 = -1
+    dice2 = -1
+    total = 0
+    double = False
+    doubleOccurrence = 0
 
+    """
     def __init__(self):
         self.dice1 = -1
         self.dice2 = -1
         self.total = 0
         self.double = False
+    """
     
     def rollDice(self):
+        #Reset the total to zero
+        total = 0 
+
         #Roll the two dice  
-        self.dice1 = randint(1,6)
-        self.dice2 = randint(1,6)
+        dice1 = randint(1,6)
+        dice2 = randint(1,6)
         
         #Calculate the total 
         total = dice1 + dice2
 
         #Check if double have occurred
         if (dice1 == dice2): 
-            self.double = True 
+            double = True 
 
-        #Return the total for the game
+        #Return the total for the player to move
         return total 
     
     #Get the value of first die
     def getFirstDice(self): 
-        return self.dice1
+        return dice1
     
     #Get the value of the second die
     def getSecondDice(self): 
-        return self.dice2
+        return dice2
 
     #Get the value of both dice 
     def getTotal(self):
-        return self.total 
+        return total 
 
-    def double(self): 
-        double = 1
-
-        while self.double:
+    #Calculate mechanism if player gets a double
+    def rolledDouble(self): 
+        if TwoDice.double:
+            TwoDice.doubleOccurrence += 1
             total = rollDice()
 
-            if self.dice1 == dice2: 
-                double += 1
-            else: 
-                self.double = False
+            if dice1 != dice2: 
+                TwoDice.double = False
+                TwoDice.doubleOccurrence = 0
 
-            if double == 3:
-                print("Go to jail!"); 
-                self.oduble = False  
+            if TwoDice.doubleOccurrence == 3:
+                TwoDice.double = False
+                TwoDice.doubleOccurrence = 0
+
+                #Return value indicating go to JAIL
+                return 0
+        
+        return total 
 
             
             
