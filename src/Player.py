@@ -9,8 +9,9 @@ class Player():
         self.id = id
         self.name = name
         self.money = 0  #Revision for later - each player gets $1500
-        self.position = 0
-        self.double = 0
+        self.position = 0 #Start at "Go" tile
+        self.double = 0 #Start with no doubles 
+        self.cards = [] #Start with no cards
 
     #Get the monetary value of the player
     def getMonetaryValue(self): 
