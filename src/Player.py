@@ -3,7 +3,10 @@ import Board
 
 class Player():
 
-    PLAYER_TITLES = ["Regular", "Banker", "Auctioneer"]
+    PLAYER_TITLES = ["Regular", "Banker/Auctioneer"]
+    PLAYER_MINIMUM = 2
+    PLAYER_MAXIMUM = 8 
+    PLAYER_BANKER_LIMIT = 5 #If there are more than 5 players in game, one person must be Banker/Auctioneer only 
 
     def __init__(self, id, name):
         self.id = id
