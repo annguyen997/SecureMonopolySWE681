@@ -27,11 +27,16 @@ class Game:
             self.currentPlayer["Player"] = self.currentPlayer[newIndex-1]
             self.currentPlayer["Index"] = newIndex
 
-    #Add Player to the game
+    #Add player to the game - if players are added post-roll, they are included at the end
     def addPlayer(self, id, name): 
         if (len(self.player) < Player.PLAYER_MAXIMUM):
-            self.players.append(Player(id, name)) 
-    
+            self.players.append(Player(id, name))
+
+    #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
+    #This would not affect the ordering of other players post-roll
+    def removePlayer(self, id): 
+        pass
+
     #Determine the player as banker
     def setBanker(self, player):
         if (len(self.players) <= Player.PLAYER_BANKER_LIMIT):
