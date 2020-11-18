@@ -3,20 +3,21 @@ import Board
 
 class Player():
 
-    PLAYER_TITLES = ["Regular", "Banker/Auctioneer"]
+    PLAYER_TITLES = ["Regular", "Banker/Auctioneer", "Dual"]  #Dual means both Regular and Banker, used only if there are less than 5 players
     PLAYER_MINIMUM = 2
     PLAYER_MAXIMUM = 8 
     PLAYER_BANKER_LIMIT = 5 #If there are more than 5 players in game, one person must be Banker/Auctioneer only 
 
     def __init__(self, id, name):
-        self.id = id            #Identification Number
-        self.name = name        #Name of player
-        self.money = 0          #Cash on hand - starts with 1500
-        self.position = 0       #Start at "Go" tile
-        self.properties = []    #Start with no properties
-        self.jail_cards = 0     #Number of "Get Out of Jail Free" cards
-        self.jail_turns = 0     #Number of remaining turns in jail
-        self.bankrupt = False   #Bankrupt status
+        self.id = id                            #Identification Number
+        self.name = name                        #Name of player
+        self.money = 0                          #Cash on hand - starts with 1500
+        self.position = 0                       #Start at "Go" tile
+        self.properties = []                    #Start with no properties
+        self.jail_cards = 0                     #Number of "Get Out of Jail Free" cards
+        self.jail_turns = 0                     #Number of remaining turns in jail
+        self.bankrupt = False                   #Bankrupt status
+        self.title = PLAYER_TITLES["Regular"]   #Title of player - Default is Regular
 
         self.double = 0         #Start with no doubles 
         self.order = None       #Determine the order of play in game.
@@ -24,7 +25,7 @@ class Player():
     #Get the id of user
     def getuserID(self): 
         return self.id 
-        
+
     #Get the monetary value of the player
     def getMonetaryValue(self): 
         return self.money 
@@ -40,6 +41,14 @@ class Player():
     #Set the order of play for player
     def setOrder(self, order): 
         self.order = order 
+    
+    #Get the title of the player
+    def getTitle(self):
+        return self.title
+    
+    #Set the title of the player
+    def setTitle(self, title):
+        self.title = PLAYER_TITLES[title] 
     
     #Move the player across the board when it is their turn 
     def move(self):

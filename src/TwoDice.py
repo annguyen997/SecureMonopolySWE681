@@ -16,6 +16,7 @@ class TwoDice:
         self.double = False
     """
     
+    #Roll dice to move in the game or to determine player order
     def rollDice(self):
         #Reset the total to zero
         total = 0 
@@ -32,8 +33,20 @@ class TwoDice:
             double = True 
 
         #Return the total for the player to move
-        return total 
-    
+        return total
+
+    #Roll dice to break ties in player order 
+    def rollDiceBreakTie(self):
+        round1 = rollDice()
+        round2 = rollDice()
+        
+        #If rolling dice second time is same as the first, roll again 
+        while (round1 == round2):
+            round2 = rollDice() 
+        
+        #Return the sum of two dice rounds
+        return round1 + round2
+
     #Get the value of first die
     def getFirstDice(self): 
         return dice1
