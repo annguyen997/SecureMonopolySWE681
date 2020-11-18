@@ -9,13 +9,22 @@ class Player():
     PLAYER_BANKER_LIMIT = 5 #If there are more than 5 players in game, one person must be Banker/Auctioneer only 
 
     def __init__(self, id, name):
-        self.id = id
-        self.name = name
-        self.money = 0  #Revision for later - each player gets $1500
-        self.position = 0 #Start at "Go" tile
-        self.double = 0 #Start with no doubles 
-        self.cards = [] #Start with no cards
+        self.id = id            #Identification Number
+        self.name = name        #Name of player
+        self.money = 0          #Cash on hand - starts with 1500
+        self.position = 0       #Start at "Go" tile
+        self.properties = []    #Start with no properties
+        self.jail_cards = 0     #Number of "Get Out of Jail Free" cards
+        self.jail_turns = 0     #Number of remaining turns in jail
+        self.bankrupt = False   #Bankrupt status
 
+        self.double = 0         #Start with no doubles 
+        self.order = None       #Determine the order of play in game.
+
+    #Get the id of user
+    def getuserID(self): 
+        return self.id 
+        
     #Get the monetary value of the player
     def getMonetaryValue(self): 
         return self.money 
@@ -23,9 +32,23 @@ class Player():
     #Get the position of the player on the board
     def getPosition(self): 
         return self.position 
+
+    #Get the order of play of player
+    def getOrder(self):
+        return self.order 
+
+    #Set the order of play for player
+    def setOrder(self, order): 
+        self.order = order 
     
     #Move the player across the board when it is their turn 
     def move(self):
+
+        #Check if the user is in jail 
+        #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
+        if (self.jail_turns > 0):
+            return 0
+        
         #Roll the dice to move the player 
         self.position += TwoDice.rollDice() 
 

@@ -1,28 +1,23 @@
 class Bank: 
-    TOTAL_MONETARY = 20580
-
-    #Dollar amounts available 
+    #Dollar Demoniations Avaiable - traditionally there are 30 bills each 
+    DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
+    #Typically about 20580, but this is not a hard number.  
 
     #Create a new bank
     def __init__(self): 
-        self.currentAmount = TOTAL_MONETARY
+        pass
     
     #Add money to the bank 
     def add(self, amount): 
-        
-        #Check if added amount exceeds total monetary value available
-        if (amount + self.currentAmount > TOTAL_MONETARY):
-            return "Invalid amount reported. No changes." 
-
-        self.currentAmount += amount
+       pass
 
     #Subtract money from the bank
     def subtract(self, amount):
-        #Check if requested amount results in insufficient funds in bank
-        if (amount + self.currentAmount < 0):
-            return "Supplied amount results in insufficient funds. No changes." 
+        pass
 
-        self.currentAmount -= amount
+    #Perform a transaction between two accounts
+    def transaction(self, amount, receiver): 
+        pass 
     
     
     

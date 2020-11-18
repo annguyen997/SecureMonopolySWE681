@@ -21,8 +21,8 @@ class TwoDice:
         total = 0 
 
         #Roll the two dice  
-        dice1 = randint(1,6)
-        dice2 = randint(1,6)
+        dice1 = randint(1,7)
+        dice2 = randint(1,7)
         
         #Calculate the total 
         total = dice1 + dice2

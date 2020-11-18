@@ -7,7 +7,16 @@ class Card(object):
         self.value = value 
     
     def __str__(self):
-        return "%s(Kind: %s\tValue: %s)" % (self.cardType, self.kind, str(self.value))
+        return "%s(Kind: %s, Value: %s)" % (self.cardType, self.kind, str(self.value))
+
+	def getCardType(self):
+		return self.cardType 
+
+	def getKind(self): 
+		return self.kind
+	
+	def getValue(self): 
+		return self.Value
 
 #Chance Cards
 class ChanceCards: 
@@ -54,7 +63,22 @@ class ChanceCards:
 
         #Return the card that was on top of pile to user
         return self.CHANCE_CARDS[card]
-    
+	
+	#Return the Jail Free Card back to the pile 
+	def returnJailFreeCard(self, jailFreeCard): 
+		#Verify if the card returned is a Jail Free Card
+		if (jailFreeCard.getValue() != "Escape Jail"):
+			return None 
+		
+		#Generate new pile with return card placed at the bottom 
+		newPile = [None] * len(self.pile)
+        for i in range(0, len(self.pile) - 1):
+            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+
+        #Set the new pile as the game pile
+        self.pile = newPile
+
     def __str__(self):
 		# Start with calling that is a pile of cards
 		string = "PILE OF CHANCE CARDS:\n"
@@ -73,23 +97,23 @@ class CommunityCards:
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards. 
     
     COMMUNITY_CARDS = [
-        Card("Advance", 0),
-		Card("Cash", 200),
-		Card("Cash", -50),
-		Card("Cash", 50),
-		Card("Escape Jail", None),
-		Card("Advance", 11),
-		Card("Receive", 50), # from every player
-		Card("Cash", 100),
-		Card("Cash", 20),
-		Card("Receive", 10), # from every player
-		Card("Cash", 100),
-		Card("Cash", -100),
-		Card("Cash", -150),
-		Card("Cash", 25),
-		Card("Tax", [-40, -115]), # for each [house, hotel]
-		Card("Cash", 10),
-		Card("Cash", 100)
+        Card("Community", "Advance", 0),
+		Card("Community", "Cash", 200),
+		Card("Community", "Cash", -50),
+		Card("Community", "Cash", 50),
+		Card("Community", "Escape Jail", None),
+		Card("Community", "Advance", 11),
+		Card("Community", "Receive", 50), # from every player
+		Card("Community", "Cash", 100),
+		Card("Community", "Cash", 20),
+		Card("Community", "Receive", 10), # from every player
+		Card("Community", "Cash", 100),
+		Card("Community", "Cash", -100),
+		Card("Community", "Cash", -150),
+		Card("Community", "Cash", 25),
+		Card("Community", "Tax", [-40, -115]), # for each [house, hotel]
+		Card("Community", "Cash", 10),
+		Card("Community", "Cash", 100)
 	]
     
     def __init__(self): 
@@ -114,6 +138,21 @@ class CommunityCards:
         #Return the card that was on top of pile to user
         return self.COMMUNITY_CARDS[card]
     
+	#Return the Jail Free Card back to the pile 
+	def returnJailFreeCard(self, jailFreeCard): 
+		#Verify if the card returned is a Jail Free Card
+		if (jailFreeCard.getValue() != "Escape Jail"):
+			return None 
+		
+		#Generate new pile with return card placed at the bottom 
+		newPile = [None] * len(self.pile)
+        for i in range(0, len(self.pile) - 1):
+            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+
+        #Set the new pile as the game pile
+        self.pile = newPile
+		
     def __str__(self):
 		# Start with calling that is a pile of cards
 		string = "PILE OF COMMUNITY CARDS:\n"
