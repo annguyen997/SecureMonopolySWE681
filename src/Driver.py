@@ -21,3 +21,5 @@ class Driver:
     #Create new user
 
     #Pull existing user 
+
+    #Determine timer

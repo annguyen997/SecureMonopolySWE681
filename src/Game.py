@@ -33,7 +33,7 @@ class Game:
             self.players.append(Player(id, name))
 
     #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
-    #This would not affect the ordering of other players post-roll
+    #This would not affect the ordering of other players.
     def removePlayer(self, id): 
         pass
 
@@ -86,8 +86,9 @@ class Game:
         #Reset double class variable should value have changed 
         TwoDice.double = False
 
-        
-
+    #Determine winner of the game   
+    def determineWinner(self, timerExpired = false):
+        pass
 
         
 

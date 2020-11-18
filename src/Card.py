@@ -55,8 +55,8 @@ class ChanceCards:
         #Generate new pile with picked card placed at the bottom
         newPile = [None] * len(self.pile)
         for i in range(0, len(self.pile) - 1):
-            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
-        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+            newPile[i] = self.pile[i+1] 			#Shift all cards to one card higher
+        newPile[len(newPile) - 1] = card 			#Place recently picked card to the bottom
 
         #Set the new pile as the game pile
         self.pile = newPile
