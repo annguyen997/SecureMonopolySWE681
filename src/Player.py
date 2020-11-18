@@ -7,7 +7,7 @@ class Player():
     PLAYER_MINIMUM = 2
     PLAYER_MAXIMUM = 8 
     PLAYER_BANKER_LIMIT = 5 #If there are more than 5 players in game, one person must be Banker/Auctioneer only 
-
+    
     def __init__(self, id, name):
         self.id = id                            #Identification Number
         self.name = name                        #Name of player
@@ -20,7 +20,7 @@ class Player():
         self.title = PLAYER_TITLES["Regular"]   #Title of player - Default is Regular
 
         self.double = 0         #Start with no doubles 
-        self.order = None       #Determine the order of play in game.
+        self.order = None       #Determine the order of play in game - default is None. 
 
     #Get the id of user
     def getuserID(self): 
@@ -49,6 +49,9 @@ class Player():
     #Set the title of the player
     def setTitle(self, title):
         self.title = PLAYER_TITLES[title] 
+
+        if (self.getTitle() == "Banker/Auctioneer"):
+            self.setOrder(0)
     
     #Move the player across the board when it is their turn 
     def move(self):

@@ -16,4 +16,8 @@ class Driver:
 
     #Join existing game that needs players
     def joinExistingGame(self, game): 
-        pass 
+        pass
+
+    #Create new user
+
+    #Pull existing user 

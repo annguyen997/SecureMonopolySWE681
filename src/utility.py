@@ -1,6 +1,7 @@
 import TwoDice 
 
-#Utility methods regarding the order of the player list
+"""Utility methods regarding the order of the player list"""
+#Determine the method of ordering of players in list
 def rollOrder(self, element): 
     return element['order']
 
@@ -35,7 +36,7 @@ def checkTies(playerListOrder):
             #Add the current object being compared to the list
             playerTies.append(current)
         
-        #If there is no tie with current player with previous player of main list, start roll new dice values, and the set the new player positions in main list 
+        #If there is no tie with current player with previous player of main list, start roll new dice values, and the set the new player positions in main list resolving the ties
         elif (value != 0): 
             value = 0  #Reset the value to zero
             
@@ -74,7 +75,7 @@ def checkTies(playerListOrder):
                 tiedStartIndex = 0 
                 playerTies = []
 
-        #Replace previous element with current element. That element would then be checked with the next element
+        #Replace previous element with current element. That element would then be checked with the next element. This is the default set of code
         previous = current
         index += 1 
     
