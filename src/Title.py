@@ -1,5 +1,5 @@
-class Tile(object):
-    def __init__(self, cardType, kind, value):
+class Title(object):
+    def __init__(self, tileType, name, rent, homes, hotel, mortgage, ):
         self.cardType = cardType
         self.kind = kind
         self.value = value 
@@ -7,7 +7,7 @@ class Tile(object):
 class Property:
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
     PROPERTY_CARDS = [
-        Tile("Property", "Advance", 0),
+        Tile("Property", "Mediterranean Avenue", 0),
 		Tile("Property", "Cash", 200),
 		Tile("Property", "Cash", -50),
 		Tile("Property", "Cash", 50),
