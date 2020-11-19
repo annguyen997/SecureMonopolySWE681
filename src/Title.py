@@ -64,35 +64,47 @@ class Property:
     DOUBLE_RENT = 2 
 
     #Number of properties permitted
-    HOMES = [1, 2, 3, 4]
-    HOTEL = [1] 
+    HOMES_RENT = [1, 2, 3, 4]
+    HOTEL_RENT = [1]            #This would be the value '5' in the rent costs list 
 
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
     PROPERTY_CARDS = [
         Title("Property", "Mediterranean Avenue", 60, 2, 30, [10, 30, 90, 160, 250], [50, 50], 'BROWN'),
 		Title("Property", "Baltic Avenue", 60, 4, 30, [20, 60, 180, 320, 450], [50, 50], 'BROWN'),
+
 		Title("Property", "Oriental Avenue", 100, 6, 50, [30, 90, 270, 400, 550], [50, 50], 'LIGHT_BLUE'),
 		Title("Property", "Vermont Avenue", 100, 6, 50, [30, 90, 270, 400, 550], [50, 50], 'LIGHT_BLUE'),
 		Title("Property", "Connecticut Avenue", 120, 8, 60, [40, 100, 300, 450, 600], [50, 50], 'LIGHT_BLUE'),
+
 		Title("Property", "St. Charles Place", 140, 10, 70, [50, 150, 450, 625, 750], [100, 100], 'PINK'),
 		Title("Property", "States Avenue", 140, 10, 70, [50, 150, 450, 625, 750], [100, 100], 'PINK'),
 		Title("Property", "Virginia Avenue", 160, 12, 80, [60, 180, 500, 700, 900], [100, 100], 'PINK'),
+
 		Title("Property", "St. James Place", 180, 14, 90, [70, 200, 550, 750, 950], [100, 100], 'ORANGE'),
 		Title("Property", "Tennessee Avenue", 180, 14, 90, [70, 200, 550, 750, 950], [100, 100], 'ORANGE'),
 		Title("Property", "New York Avenue", 200, 16, 100, [80, 220, 600, 800, 1000], [100, 100], 'ORANGE'),
-		Title("Property", "Cash", -100),
-		Title("Property", "Cash", -150),
-		Title("Property", "Cash", 25),
-		Title("Property", "Tax", [-40, -115]), # for each [house, hotel]
-		Title("Property", "Cash", 10),
-		Title("Property", "Cash", 100)
-	]
 
+		Title("Property", "Kentucky Avenue", 220, 18, 110, [90, 250, 700, 875, 1050], [150, 150], 'RED'),
+		Title("Property", "Indiana Avenue", 220, 18, 110, [90, 250, 700, 875, 1050], [150, 150], 'RED'),
+		Title("Property", "Illinois Avenue", 240, 20, 120, [100, 300, 750, 925, 1100], [150, 150], 'RED'),
+
+		Title("Property", "Atlantic Avenue", 260, 22, 130, [110, 330, 800, 975, 1150], [150, 150], 'YELLOW'),
+		Title("Property", "Ventnor Avenue", 260, 22, 130, [110, 330, 800, 975, 1150], [150, 150], 'YELLOW'),
+		Title("Property", "Marvin Gardens", 280, 24, 140, [120, 360, 850, 1025, 1200], [150, 150], 'YELLOW'),
+
+        Title("Property", "Pacific Avenue", 300, 26, 150, [130, 390, 900, 1100, 1275], [200, 200], 'GREEN'),
+		Title("Property", "North Carolina Avenue", 300, 26, 150, [130, 390, 900, 1100, 1275], [200, 200], 'GREEN'),
+		Title("Property", "Pennsylvania Avenue", 320, 28, 160, [150, 450, 1000, 1200, 1400], [200, 200], 'GREEN'),
+
+        Title("Property", "Park Place", 350, 35, 175, [175, 500, 1100, 1300, 1500], [200, 200], 'DARK_BLUE'),
+		Title("Property", "Boardwalk", 400, 50, 200, [200, 600, 1400, 1700, 2000], [200, 200], 'DARK_BLUE')
+	]
 
 class Utility: 
     UTILITY = ["Electric Company", "Water Works"]
 
     UTILITY_CARDS = [
+        #Utilies do not have buildings and the associated rental costs and do not have a color group
         Title("Utility", "Electric Company", 150, [4, 10], 75),
 		Title("Property", "Water Works", 150, [4, 10], 75)
     ]
@@ -101,6 +113,7 @@ class Transports:
     TRANSPORTS = ["Reading Railroad", "Pennsylvania Railroad", "B. & O. Railroad", "Short Line"]
 
     TRANSPORTS_CARDS = [
+        #Transports do not have buildings and a color group, but do have tiered rental amounts
         Title("Transports", "Reading Railroad", 200, [25, 50, 100, 200], 100),
         Title("Transports", "Pennsylvania Railroad", 200, [25, 50, 100, 200], 100), 
         Title("Transports", "B. & O. Railroad", 200, [25, 50, 100, 200], 100), 
