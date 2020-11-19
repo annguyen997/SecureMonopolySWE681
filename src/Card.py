@@ -94,8 +94,7 @@ class ChanceCards:
 
 #Community Cards 
 class CommunityCards:
-    #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards. 
-    
+    #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
     COMMUNITY_CARDS = [
         Card("Community", "Advance", 0),
 		Card("Community", "Cash", 200),
