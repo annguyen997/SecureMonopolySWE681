@@ -1,8 +1,10 @@
 class Bank: 
     #Dollar Demoniations Avaiable - traditionally there are 30 bills each 
-    DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
     #Typically about 20580, but this is not a hard number.  
-
+    DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
+   
+    #TODO: May need to add logic regarding timing the auction 
+    
     #Create a new bank
     def __init__(self): 
         pass
