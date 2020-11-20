@@ -18,9 +18,10 @@ class Player():
         self.jail_turns = 0                     #Number of remaining turns in jail
         self.bankrupt = False                   #Bankrupt status
         self.title = PLAYER_TITLES["Regular"]   #Title of player - Default is Regular
+        self.inJail = False                     #Check if user is in jail 
 
-        self.double = 0         #Start with no doubles 
-        self.order = None       #Determine the order of play in game - default is None. 
+        self.consecutiveDoubles = 0             #Start with no doubles 
+        self.order = None                       #Determine the order of play in game - default is None. 
 
     #Get the id of user
     def getuserID(self): 
@@ -52,36 +53,55 @@ class Player():
 
         if (self.getTitle() == "Banker/Auctioneer"):
             self.setOrder(0)
+
+    #Get the status of player in jail
+    def getInJail(self):
+        return self.inJail
     
     #Move the player across the board when it is their turn 
-    def move(self):
+    def move(self, moveNum):
 
         #Check if the user is in jail 
         #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
         if (self.jail_turns > 0):
             return 0
-        
-        #Roll the dice to move the player 
-        self.position += TwoDice.rollDice() 
 
         #Check if player rolled doubles 
-        while TwoDice.double:
-            self.double += 1
-            add_total = TwoDice.rolledDouble() 
+        if TwoDice.double: 
+            self.consecutiveDoubles += 1
 
-            #Check if the return total is zero, indicating player needs to go to jail
-            if (add_total == 0): 
+            #Check if user goes to jail if 3 doubles in a row
+            if self.consecutiveDoubles >= 3: 
+                self.inJail = True
                 self.position = Board.TILES_JAIL[0]
-                break
-            else: 
-                self.position += add_total
+                self.consecutiveDoubles = 0 
+                return #If going to jail, end the turn right here
+
+        else: 
+            #Reset consecutive doubles if different numbers are rolled
+            self.consecutiveDoubles = 0 
+        
+        #Calculate new position of player
+        newPosition = self.position + moveNum 
 
         #Check if player has cycled through the board
-        if (self.position > len(Board.TILES_LIST)):
-            self.position = self.position - len(Board.TILES_LIST)
+        if (newPosition > len(Board.TILES_LIST)):
+            newPosition -= len(Board.TILES_LIST)
                 
-            #Collect more money 
+            #Collect more money
         
+        #Add one to position if went past jail, assuming player was either starting next to jail 
+        #Number 35 is the highest possible new position if user rolled doubles twice and was closest to jail by one spot
+        if (newPosition >= Board.TILES_JAIL[0] and newPosition < 35) and (self.position < Board.TILES_JAIL[0] or self.position > 35):
+            newPosition += 1
+        
+        #Apply new position 
+        self.position = newPosition
+
+    #Add a property/title deed to player's possession
+    def addProperty(self, titleDeed): 
+        self.properties.append(titleDeed)
+    
 
     
 

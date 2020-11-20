@@ -1,5 +1,5 @@
 import TwoDice, utility
-import Player 
+import Player, Board, Card
 
 class Game:
 
@@ -7,6 +7,8 @@ class Game:
     def __init__(self):
         self.players = []
         self.currentPlayer = None
+        self.board = Board() 
+        self.chancePile = Card.ChanceCards() 
 
     #Return first player of game based on the rolling
     def firstPlayer(self): 
@@ -17,7 +19,7 @@ class Game:
         return self.currentPlayer
     
     #Go to the next player in game, or set first player if new game
-    def setNextPlayer(self, newGame = False): 
+    def goToNextPlayer(self, newGame = False): 
         if ((newGame) or self.currentPlayer["Index"] == len(self.players)):
             #Go to first player if new game or complete round 
             self.currentPlayer = {"Player": firstPlayer(), "Index": 1}
@@ -90,6 +92,28 @@ class Game:
     def determineWinner(self, timerExpired = false):
         pass
 
+    #Conduct the turn of a player
+    def turn(self, player): 
+        
+        #Get the number of eyes on dice for movement
+        moveNum = TwoDice.rollDice()
+
+        #Move the player to new position 
+        player.move(moveNum)
+
+        #Get the tile based on player position 
+
+        #Check if player went to jail 
+        if (player.getInJail()):
+            player.pos
+
+        #Get chance card if player landed on chance tile
+
+        #Get community card if player landed on community chest tile
+
+        #Go again if not on jail and has thrown double
+        if (not player.getInJail() and TwoDice.double):
+            turn(player) 
         
 
 

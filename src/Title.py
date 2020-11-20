@@ -100,6 +100,9 @@ class Property:
 		Title("Property", "Boardwalk", 400, 50, 200, [200, 600, 1400, 1700, 2000], [200, 200], 'DARK_BLUE')
 	]
 
+    def __init__(self): 
+        self.properties = PROPERTY_CARDS
+
 class Utility: 
     UTILITY = ["Electric Company", "Water Works"]
 
@@ -108,6 +111,9 @@ class Utility:
         Title("Utility", "Electric Company", 150, [4, 10], 75),
 		Title("Property", "Water Works", 150, [4, 10], 75)
     ]
+
+    def __init__(self): 
+        self.utilities = UTILITY_CARDS
 
 class Transports:
     TRANSPORTS = ["Reading Railroad", "Pennsylvania Railroad", "B. & O. Railroad", "Short Line"]
@@ -119,3 +125,6 @@ class Transports:
         Title("Transports", "B. & O. Railroad", 200, [25, 50, 100, 200], 100), 
         Title("Transports", "Short Line", 200, [25, 50, 100, 200], 100)
     ]
+
+    def __init__(self): 
+        self.transports = TRANSPORTS_CARDS

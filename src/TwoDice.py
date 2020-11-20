@@ -6,7 +6,6 @@ class TwoDice:
     dice2 = -1
     total = 0
     double = False
-    doubleOccurrence = 0
 
     """
     def __init__(self):
@@ -30,7 +29,9 @@ class TwoDice:
 
         #Check if double have occurred
         if (dice1 == dice2): 
-            double = True 
+            double = True
+        else: 
+            double = False 
 
         #Return the total for the player to move
         return total
@@ -58,25 +59,5 @@ class TwoDice:
     #Get the value of both dice 
     def getTotal(self):
         return total 
-
-    #Calculate mechanism if player gets a double
-    def rolledDouble(self): 
-        if TwoDice.double:
-            TwoDice.doubleOccurrence += 1
-            total = rollDice()
-
-            if dice1 != dice2: 
-                TwoDice.double = False
-                TwoDice.doubleOccurrence = 0
-
-            if TwoDice.doubleOccurrence == 3:
-                TwoDice.double = False
-                TwoDice.doubleOccurrence = 0
-
-                #Return value indicating go to JAIL
-                return 0
-        
-        return total 
-
             
             
