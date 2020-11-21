@@ -5,7 +5,7 @@ import TwoDice
 def rollOrder(self, element): 
     return element['order']
 
-def checkTies(playerListOrder): 
+def checkTies(playerListOrder, dice): 
     #Check for ties in the rolling order of each player in game 
 
     playerTies = []         #List of players that are tied
@@ -48,7 +48,7 @@ def checkTies(playerListOrder):
                 while (not tieBroken):
                     #Roll the dice again for each player with a tie
                     for player in playerTies: 
-                        player['order'] = TwoDice.rollDiceBreakTie()
+                        player['order'] = dice.rollDiceBreakTie()
                     
                     #Check if there are new unlikely ties in the new rolling
                     previous = None

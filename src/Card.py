@@ -1,4 +1,5 @@
 import random
+import Board
 
 class Card(object): 
     def __init__(self, cardType, kind, value):
@@ -22,23 +23,22 @@ class Card(object):
 class ChanceCards: 
     #Listing of all CHANCE cards in Monopoly. There are 16 chance cards. 
     CHANCE_CARDS = [
-		Card("Chance", "Advance", 0),
-		Card("Chance", "Cash", 200),
-		Card("Chance", "Cash", -50),
-		Card("Chance", "Cash", 50),
-		Card("Chance", "Escape Jail", None),
-		Card("Chance", "Advance", 11),
-		Card("Chance", "Receive", 50), # from every player
-		Card("Chance", "Cash", 100),
-		Card("Chance", "Cash", 20),
-		Card("Chance", "Receive", 10), # from every player
-		Card("Chance", "Cash", 100),
-		Card("Chance", "Cash", -100),
-		Card("Chance", "Cash", -150),
-		Card("Chance", "Cash", 25),
-		Card("Chance", "Tax", [-40, -115]), # for each [house, hotel]
-		Card("Chance", "Cash", 10),
-		Card("Chance", "Cash", 100)
+		Card("Chance", "Advance", "Go"),  						#Advance to Go, collect 200
+		Card("Chance", "Advance", "Illinois Avenue"),   		#If pass Go, collect 200
+		Card("Chance", "Advance", "St. Charles Place"),			#If pass Go, collect 200
+		Card("Chance", "Advance", "Utility"),					#Advance to nearest utility
+		Card("Chance", "Advance", "Transports"), 				#Advance to nearest transport
+		Card("Chance", "Credit", 50), 							#Bank dividends
+		Card("Chance", "Escape Jail", None),					#Keep card until needed or traded 
+		Card("Chance", "Advance", -3), 							#Go back 3 spaces
+		Card("Chance", "Advance", "Go to Jail"),  				#Go directly to jail; do not collect cash (200)
+		Card("Chance", "Debit", [-25, -100]), 					#Make repairs on all property, pay each: [house, hotel]
+		Card("Chance", "Debit", -15),							#Pay tax to poor of 15
+		Card("Chance", "Advance", "Reading Railroad"),			#If pass Go, collect 200
+		Card("Chance", "Advance", "Boardwalk"), 				#Advance to Boardwalk, no collecting 200
+		Card("Chance", "Debit", -50), 							#Pay each player 50
+		Card("Chance", "Credit", 150),							#Building and loan matures
+		Card("Chance", "Credit", 100)							#Crossword win 
 	]
 
     def __init__(self): 
@@ -96,23 +96,23 @@ class ChanceCards:
 class CommunityCards:
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
     COMMUNITY_CARDS = [
-        Card("Community", "Advance", 0),
-		Card("Community", "Cash", 200),
-		Card("Community", "Cash", -50),
-		Card("Community", "Cash", 50),
-		Card("Community", "Escape Jail", None),
-		Card("Community", "Advance", 11),
-		Card("Community", "Receive", 50), # from every player
-		Card("Community", "Cash", 100),
-		Card("Community", "Cash", 20),
-		Card("Community", "Receive", 10), # from every player
-		Card("Community", "Cash", 100),
-		Card("Community", "Cash", -100),
-		Card("Community", "Cash", -150),
-		Card("Community", "Cash", 25),
-		Card("Community", "Tax", [-40, -115]), # for each [house, hotel]
-		Card("Community", "Cash", 10),
-		Card("Community", "Cash", 100)
+        Card("Community", "Advance", "Go"),  					#Advance to Go, collect 200
+		Card("Community", "Credit", 200),						#Bank error - collect 200
+		Card("Community", "Debit", -50),						#Doctor's fee 
+		Card("Community", "Credit", 50),						#Capital gain from stock
+		Card("Community", "Escape Jail", None),					#Keep card until needed or traded 
+		Card("Community", "Advance", "Go to Jail"),  			#Go directly to jail; do not collect cash (200)
+		Card("Community", "Credit", 50), 						#Collect 50 per player for opening night seats
+		Card("Community", "Credit", 100),						#Holiday Fund matures - collect 100
+		Card("Community", "Credit", 20),						#Refund from income tax
+		Card("Community", "Credit", 10), 						#Birthday - collect 10
+		Card("Community", "Credit", 100),						#Life insurance matures - collect $100
+		Card("Community", "Debit", -100),						#Pay hospital fees of 100
+		Card("Community", "Debit", -150),						#Pay school feeds of 150
+		Card("Community", "Credit", 25),						#Receive consultancy fee
+		Card("Community", "Debit", [-40, -115]), 				#Make street repairs on all property, pay each: [house, hotel]
+		Card("Community", "Credit", 10),						#Won second prize in beauty contest - collect 10
+		Card("Community", "Credit", 100)						#Inherited 100
 	]
     
     def __init__(self): 

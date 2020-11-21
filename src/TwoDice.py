@@ -2,18 +2,12 @@
 from random import randint
 
 class TwoDice:
-    dice1 = -1
-    dice2 = -1
-    total = 0
-    double = False
 
-    """
     def __init__(self):
         self.dice1 = -1
         self.dice2 = -1
         self.total = 0
         self.double = False
-    """
     
     #Roll dice to move in the game or to determine player order
     def rollDice(self):
@@ -38,12 +32,12 @@ class TwoDice:
 
     #Roll dice to break ties in player order 
     def rollDiceBreakTie(self):
-        round1 = rollDice()
-        round2 = rollDice()
+        round1 = self.rollDice()
+        round2 = self.rollDice()
         
         #If rolling dice second time is same as the first, roll again 
         while (round1 == round2):
-            round2 = rollDice() 
+            round2 = self.rollDice() 
         
         #Return the sum of two dice rounds
         return round1 + round2

@@ -1,5 +1,5 @@
-import TwoDice, utility
-import Player, Board, Card
+import utility
+import TwoDice, Player, Board, Card, Bank
 
 class Game:
 
@@ -9,6 +9,9 @@ class Game:
         self.currentPlayer = None
         self.board = Board() 
         self.chancePile = Card.ChanceCards() 
+        self.communityPile = Card.CommunityCards()
+        self.dice = TwoDice() 
+        self.bank = Bank() 
 
     #Return first player of game based on the rolling
     def firstPlayer(self): 
@@ -23,6 +26,9 @@ class Game:
         if ((newGame) or self.currentPlayer["Index"] == len(self.players)):
             #Go to first player if new game or complete round 
             self.currentPlayer = {"Player": firstPlayer(), "Index": 1}
+
+            #Generate more money in the bank 
+            self.bank.generateCash()
         else: 
             #If game in progress and no need to begin new round, set next player via indexing
             newIndex = self.currentPlayer["Index"] + 1 
@@ -60,14 +66,14 @@ class Game:
                 continue 
 
             userID = player.getuserID()
-            rollNumber = TwoDice.rollDice() 
+            rollNumber = self.dice.rollDice() 
             playerListOrder.append({'userID': userID, 'order' : rollNumber})
 
         #Order the players by the set order
         playerListOrder.sort(key=utility.rollOrder)
 
         #Check if list order has ties based on the new order
-        playerListOrder = utility.checkTies(playerListOrder)
+        playerListOrder = utility.checkTies(playerListOrder, self.dice)
 
         #Order the main players list (self.players) based on player order 
         newPlayersList = [] #Temporary list
@@ -86,7 +92,7 @@ class Game:
         self.playerList = newPlayersList
 
         #Reset double class variable should value have changed 
-        TwoDice.double = False
+        self.dice.double = False
 
     #Determine winner of the game   
     def determineWinner(self, timerExpired = false):
@@ -94,22 +100,47 @@ class Game:
 
     #Conduct the turn of a player
     def turn(self, player): 
-        
+        #Check if player is in jail 
+        if (player.getInJailStatus()):
+            pass 
+
         #Get the number of eyes on dice for movement
-        moveNum = TwoDice.rollDice()
+        moveNum = self.dice.rollDice()
 
         #Move the player to new position 
-        player.move(moveNum)
+        player.move(moveNum, dice, bank)
 
-        #Get the tile based on player position 
+        #Get the board tile based on player position 
+        boardTile = self.board.getTileType(player.getPosition())
 
-        #Check if player went to jail 
-        if (player.getInJail()):
-            player.pos
+        #Set to go to jail if landed on 'Go To Jail' tile on board
+        if boardTile == "Go to Jail": 
+            player.setInJailStatus(True)
+
+        #Check if player went to jail because of tile or rolling three doubles in a row
+        if (player.getInJailStatus()):
+            player.position = Board.TILES_JAIL[0]
+            return #End the turn here
+
+        #Get property card if player landed on property tile
+        if boardTile == "Property":
+            pass
+
+        #Get utility card if player landed on utility tile
+        if boardTile == "Utility":
+            pass
+
+        #Get transports card if player landed on transports tile
+        if boardTile == "Transports":
+            pass
 
         #Get chance card if player landed on chance tile
+        if boardTile == "Chance Card":
+            player.doChanceCard(self.chancePile.pullCard(), bank)
 
         #Get community card if player landed on community chest tile
+        if boardTile == "Community Card":
+            player.doCommunityCard(self.communityPile.pullCard(), bank)
 
         #Go again if not on jail and has thrown double
         if (not player.getInJail() and TwoDice.double):
