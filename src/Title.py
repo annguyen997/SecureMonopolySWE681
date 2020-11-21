@@ -11,6 +11,9 @@ class Title(object):
         self.buildingCosts = buildingCosts      #The building costs associated with title deed, pending on home/hotel 
         self.colorGroup = colorGroup            #Color group of the title deed (Property cards only)
 
+        #Set the owner of the title deed
+        self.owner = None
+
         def getTitleType(self):
             return self.titleType
         
@@ -34,6 +37,12 @@ class Title(object):
         
         def getColorGroup(self):
             return self.colorGroup
+        
+        def getOwner(self):
+            return self.owner
+        
+        def setOwner(self, player): 
+            self.owner = player 
 
         """
         Notes: 

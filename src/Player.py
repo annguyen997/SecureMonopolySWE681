@@ -2,6 +2,7 @@ import Board, Bank
 
 class Player():
 
+    #It is possible to remove the titles; the bank itself can act as a player in an automated environment 
     PLAYER_TITLES = ["Regular", "Banker/Auctioneer", "Dual"]  #Dual means both Regular and Banker, used only if there are less than 5 players
     PLAYER_MINIMUM = 2
     PLAYER_MAXIMUM = 8 
@@ -43,7 +44,7 @@ class Player():
         return self.position 
 
     #Set the position of player on board
-    def setPosition (self, position): 
+    def setPosition(self, position): 
         self.position = position 
 
     #Get the order of play of player
@@ -65,13 +66,27 @@ class Player():
         if (self.getTitle() == "Banker/Auctioneer"):
             self.setOrder(0)
 
+    #Get the list of properties of player
+    def getProperties(self): 
+        return self.properties
+    
     #Get the status of player in jail
     def getInJailStatus(self):
         return self.inJail
     
+    #Set the in jail status
     def setInJailStatus(self, status): 
         self.inJail = status
-    
+
+    #Add a jail-free card to player's possesssion 
+    def addEscapeJailCard(self, card): 
+        self.jail_cards.append(card)
+
+    #Remove a jail-free card from player's possession, starting with the most recent card first
+    def removeEscapeJailCard(self):
+        card = self.jail_cards.pop()
+        return card
+
     #Move the player across the board when it is their turn 
     def move(self, moveNum, dice, bank):
 
@@ -97,17 +112,19 @@ class Player():
         
         #Calculate new position of player
         newPosition = self.getPosition() + moveNum 
-
-        #Check if player has cycled through the board
-        if (newPosition > len(Board.TILES_LIST)):
-            newPosition -= len(Board.TILES_LIST)
-                
-            #Collect more money
         
-        #Add one to position if went past jail, assuming player was either starting next to jail 
+        #Add one to position if went past jail, assuming player was starting next to jail at minimum.
         #Number 35 is the highest possible new position if user rolled doubles twice and was closest to jail by one spot
         if (newPosition >= Board.TILES_JAIL[0] and newPosition < 35) and (self.getPosition() < Board.TILES_JAIL[0] or self.getPosition() > 35):
             newPosition += 1
+
+        #Check if player has cycled through the board, assuming player does not go to jail directly
+        if (newPosition > len(Board.TILES_LIST)):
+            newPosition -= len(Board.TILES_LIST)
+                
+            #Collect more money by passing GO
+            self.changeMonetaryValue(Bank.PASS_GO)
+            bank.subtract(Bank.PASS_GO)
         
         #Apply new position 
         self.setPosition(newPosition)
@@ -166,8 +183,25 @@ class Player():
                 self.setPosition(newPosition)
 
             elif cardValue == "Go to Jail": 
-                pass
-        
+                #Player goes to jail directly, do not collect amount of passing GO
+                self.setInJailStatus(True)
+                self.setPosition(Board.TILES_JAIL[0])
+            
+            else: 
+                #Advance to the spot on the board; collect 200 if necessary
+                newPosition = cardValue + self.getPosition()
+
+                #If player cycles through the board, re-calibrate the position number
+                if (newPosition > len(Board.TILES_LIST)):
+                    newPosition -= len(Board.TILES_LIST)
+                
+                    #Collect more money by passing GO
+                    self.changeMonetaryValue(Bank.PASS_GO)
+                    bank.subtract(Bank.PASS_GO)
+                
+                #Set new position
+                self.setPosition(newPosition)
+
         elif cardKind == "Credit": 
             bank.subtract(cardValue)
             self.changeMonetaryValue(cardValue)
@@ -179,10 +213,9 @@ class Player():
                 self.changeMonetaryValue(cardValue)
                 bank.add(cardValue) 
         elif cardKind == "Escape Jail":
-            pass
-            #TODO: Get possession of the card for user to hold
+            self.addEscapeJailCard(card)
     
-     #Read and do the chance card 
+    #Read and do the community card 
     def doCommunityCard(self, card, bank): 
         #Get user's position 
         position = self.getPosition() 
@@ -199,7 +232,8 @@ class Player():
                 #Collect money
             
             elif cardValue == "Go to Jail": 
-                pass
+                self.setInJailStatus(True)
+                self.setPosition(Board.TILES_JAIL[0])
             
         elif cardKind == "Credit": 
             bank.subtract(cardValue)
@@ -212,9 +246,8 @@ class Player():
                 self.changeMonetaryValue(cardValue)
                 bank.add(cardValue) 
         elif cardKind == "Escape Jail":
-            pass
-            #TODO: Get possession of the card for user to hold
-    
+            self.addEscapeJailCard(card)
+
     #User pays tax if lands on a tax tile
     def payTax(self, bank): 
         #Get position of player to get tax type, and create value to hold tax amount
@@ -235,6 +268,7 @@ class Player():
     def addProperty(self, titleDeed): 
         self.properties.append(titleDeed)
     
+    #Add money to auction - this requires inputting valid dollar amount
 
     
 

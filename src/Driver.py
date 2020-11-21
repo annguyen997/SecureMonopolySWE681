@@ -20,6 +20,6 @@ class Driver:
 
     #Create new user
 
-    #Pull existing user 
+    #Authenticate existing user 
 
     #Determine timer

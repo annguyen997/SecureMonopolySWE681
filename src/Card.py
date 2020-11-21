@@ -23,63 +23,30 @@ class Card(object):
 class ChanceCards: 
     #Listing of all CHANCE cards in Monopoly. There are 16 chance cards. 
     CHANCE_CARDS = [
-		Card("Chance", "Advance", "Go"),  						#Advance to Go, collect 200
-		Card("Chance", "Advance", "Illinois Avenue"),   		#If pass Go, collect 200
-		Card("Chance", "Advance", "St. Charles Place"),			#If pass Go, collect 200
-		Card("Chance", "Advance", "Utility"),					#Advance to nearest utility
-		Card("Chance", "Advance", "Transports"), 				#Advance to nearest transport
-		Card("Chance", "Credit", 50), 							#Bank dividends
-		Card("Chance", "Escape Jail", None),					#Keep card until needed or traded 
-		Card("Chance", "Advance", -3), 							#Go back 3 spaces
-		Card("Chance", "Advance", "Go to Jail"),  				#Go directly to jail; do not collect cash (200)
-		Card("Chance", "Debit", [-25, -100]), 					#Make repairs on all property, pay each: [house, hotel]
-		Card("Chance", "Debit", -15),							#Pay tax to poor of 15
-		Card("Chance", "Advance", "Reading Railroad"),			#If pass Go, collect 200
-		Card("Chance", "Advance", "Boardwalk"), 				#Advance to Boardwalk, no collecting 200
-		Card("Chance", "Debit", -50), 							#Pay each player 50
-		Card("Chance", "Credit", 150),							#Building and loan matures
-		Card("Chance", "Credit", 100)							#Crossword win 
+		Card("Chance", "Advance", "Go"),  										#Advance to Go, collect 200
+		Card("Chance", "Advance", Board.TILES_LIST.index("Illinois Avenue")),   #If pass Go, collect 200
+		Card("Chance", "Advance", Board.TILES_LIST.index("St. Charles Place")),	#If pass Go, collect 200
+		Card("Chance", "Advance", "Utility"),									#Advance to nearest utility
+		Card("Chance", "Advance", "Transports"), 								#Advance to nearest transport
+		Card("Chance", "Credit", 50), 											#Bank dividends
+		Card("Chance", "Escape Jail", None),									#Keep card until needed or traded 
+		Card("Chance", "Advance", -3), 											#Go back 3 spaces
+		Card("Chance", "Advance", "Go to Jail"),  								#Go directly to jail; do not collect cash (200)
+		Card("Chance", "Debit", [-25, -100]), 									#Make repairs on all property, pay each: [house, hotel]
+		Card("Chance", "Debit", -15),											#Pay tax to poor of 15
+		Card("Chance", "Advance", Board.TILES_LIST.index("Reading Railroad")),	#If pass Go, collect 200
+		Card("Chance", "Advance", Board.TILES_LIST.index("Boardwalk")), 		#Advance to Boardwalk, no collecting 200
+		Card("Chance", "Debit", -50), 											#Pay each player 50
+		Card("Chance", "Credit", 150),											#Building and loan matures
+		Card("Chance", "Credit", 100)											#Crossword win 
 	]
 
     def __init__(self): 
         #Generate the random order of the CHANCE cards
         self.pile = random.sample(range(0, len(self.CHANCE_CARDS)), len(self.CHANCE_CARDS))
         self.jailFreeUsed = False 
-
-    def pullCard(self): 
-        #Get the card that is currently at top of pile
-        card = self.pile[0]
-
-        #TODO: Add logic regarding if the Jail-Free card was selected 
-
-        #Generate new pile with picked card placed at the bottom
-        newPile = [None] * len(self.pile)
-        for i in range(0, len(self.pile) - 1):
-            newPile[i] = self.pile[i+1] 			#Shift all cards to one card higher
-        newPile[len(newPile) - 1] = card 			#Place recently picked card to the bottom
-
-        #Set the new pile as the game pile
-        self.pile = newPile
-
-        #Return the card that was on top of pile to user
-        return self.CHANCE_CARDS[card]
 	
-	#Return the Jail Free Card back to the pile 
-	def returnJailFreeCard(self, jailFreeCard): 
-		#Verify if the card returned is a Jail Free Card
-		if (jailFreeCard.getValue() != "Escape Jail"):
-			return None 
-		
-		#Generate new pile with return card placed at the bottom 
-		newPile = [None] * len(self.pile)
-        for i in range(0, len(self.pile) - 1):
-            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
-        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
-
-        #Set the new pile as the game pile
-        self.pile = newPile
-
-    def __str__(self):
+	def __str__(self):
 		# Start with calling that is a pile of cards
 		string = "PILE OF CHANCE CARDS:\n"
 
@@ -91,6 +58,38 @@ class ChanceCards:
 
 		# Return the generated string
 		return string
+
+	def pullCard(self): 
+		#Get the card that is currently at top of pile
+		card = self.pile[0]
+
+		#Create a new pile for the cards
+		newPile = [None] * len(self.pile)
+		for i in range(0, len(self.pile) - 1):
+			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+			
+		if (card.getKind() != "Escape Jail"):
+			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+
+        #Set the new pile as the game piles
+		self.pile = newPile
+
+        #Return the card that was on top of pile to user
+		return self.CHANCE_CARDS[card]
+	
+	#Return the Jail Free Card back to the pile
+	def returnJailFreeCard(self, jailFreeCard): #Verify if the card returned is a Jail Free Card
+		if (jailFreeCard.getKind() != "Escape Jail"):
+			return None
+		
+		#Create a new pile for the cards
+		newPile = [None] * len(self.pile)
+		for i in range(0, len(self.pile) - 1):
+			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+
+		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
+
+		self.pile = newPile
 
 #Community Cards 
 class CommunityCards:
@@ -119,40 +118,8 @@ class CommunityCards:
         #Generate the random order of the CHANCE cards
         self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
         self.jailFreeUsed = False 
-
-    def pullCard(self): 
-        #Get the card that is currently at top of pile
-        card = self.pile[0]
-
-         #TODO: Add logic regarding if the Jail-Free card was selected 
-        #Generate new pile with picked card placed at the bottom
-        newPile = [None] * len(self.pile)
-        for i in range(0, len(self.pile) - 1):
-            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
-        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
-
-        #Set the new pile as the game pile
-        self.pile = newPile
-
-        #Return the card that was on top of pile to user
-        return self.COMMUNITY_CARDS[card]
-    
-	#Return the Jail Free Card back to the pile 
-	def returnJailFreeCard(self, jailFreeCard): 
-		#Verify if the card returned is a Jail Free Card
-		if (jailFreeCard.getValue() != "Escape Jail"):
-			return None 
-		
-		#Generate new pile with return card placed at the bottom 
-		newPile = [None] * len(self.pile)
-        for i in range(0, len(self.pile) - 1):
-            newPile[i] = self.pile[i+1] #Shift all cards to one card higher
-        newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
-
-        #Set the new pile as the game pile
-        self.pile = newPile
-		
-    def __str__(self):
+	
+	def __str__(self):
 		# Start with calling that is a pile of cards
 		string = "PILE OF COMMUNITY CARDS:\n"
 
@@ -164,3 +131,36 @@ class CommunityCards:
 
 		# Return the generated string
 		return string
+	
+	def pullCard(self): 
+		#Get the card that is currently at top of pile
+		card = self.pile[0]
+
+		#Create a new pile for the cards
+		newPile = [None] * len(self.pile)
+		for i in range(0, len(self.pile) - 1):
+			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+			
+		if (card.getKind() != "Escape Jail"):
+			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+
+        #Set the new pile as the game piles
+		self.pile = newPile
+
+        #Return the card that was on top of pile to user
+		return self.COMMUNITY_CARDS[card]
+
+	#Return the Jail Free Card back to the pile
+	def returnJailFreeCard(self, jailFreeCard): #Verify if the card returned is a Jail Free Card
+		if (jailFreeCard.getKind() != "Escape Jail"):
+			return None
+		
+		#Create a new pile for the cards
+		newPile = [None] * len(self.pile)
+		for i in range(0, len(self.pile) - 1):
+			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+
+		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
+
+		self.pile = newPile 
+	

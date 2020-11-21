@@ -55,8 +55,8 @@ class Board:
 	TILES_GO = [0]
 
 	def __init__(self): 
-		#self.numberTiles = self.getNumberofTiles()
-		pass
+		self.numberTiles = self.getNumberofTiles()		#Get the number of tiles in game
+		self.hits = [0] * self.numberTiles           	#Keep track of the number of times a player arrives at a particular tile on board
 
 	def getNumberofTiles(self):
 		return (len(Board.TILES_REAL_ESTATE) + len(Board.TILES_CHANCE) +
@@ -87,5 +87,14 @@ class Board:
 			return "Go"
 		else:
 			return "None"
+	
+	#Track the number of times players arrive in that tile (using the array)
+	def hit(self, tileNum): 
+		self.hits[tileNum] += 1
+	
+	#Get the number of times a tile has been reached, for purposes like property purchasing.
+	def getNumberofHits(self, tileNum): 
+		return self.hits[tileNum]
+	
 
     

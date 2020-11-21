@@ -1,4 +1,4 @@
-import utility
+import util
 import TwoDice, Player, Board, Card, Bank
 
 class Game:
@@ -18,33 +18,26 @@ class Game:
         return self.players[0]
     
     #Return current player in game
-    def currentPlayer(self):
+    def getCurrentPlayer(self):
         return self.currentPlayer
-    
-    #Go to the next player in game, or set first player if new game
-    def goToNextPlayer(self, newGame = False): 
-        if ((newGame) or self.currentPlayer["Index"] == len(self.players)):
-            #Go to first player if new game or complete round 
-            self.currentPlayer = {"Player": firstPlayer(), "Index": 1}
 
-            #Generate more money in the bank 
-            self.bank.generateCash()
-        else: 
-            #If game in progress and no need to begin new round, set next player via indexing
-            newIndex = self.currentPlayer["Index"] + 1 
-            self.currentPlayer["Player"] = self.currentPlayer[newIndex-1]
-            self.currentPlayer["Index"] = newIndex
+    #Set the current player in round
+    def setCurrentPlayer(self, player):
+        self.currentPlayer = player
 
     #Add player to the game - if players are added post-roll, they are included at the end
     def addPlayer(self, id, name): 
-        if (len(self.player) < Player.PLAYER_MAXIMUM):
+        if (len(self.players) < Player.PLAYER_MAXIMUM):
             self.players.append(Player(id, name))
 
     #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
     #This would not affect the ordering of other players.
     def removePlayer(self, id): 
-        pass
-
+        for player in self.players: 
+            if (player.getuserID() == id):
+                self.players.remove(player)
+                break
+        
     #Determine the player as banker
     def setBanker(self, player):
         if (len(self.players) <= Player.PLAYER_BANKER_LIMIT):
@@ -70,10 +63,10 @@ class Game:
             playerListOrder.append({'userID': userID, 'order' : rollNumber})
 
         #Order the players by the set order
-        playerListOrder.sort(key=utility.rollOrder)
+        playerListOrder.sort(key=util.rollOrder)
 
         #Check if list order has ties based on the new order
-        playerListOrder = utility.checkTies(playerListOrder, self.dice)
+        playerListOrder = util.checkTies(playerListOrder, self.dice)
 
         #Order the main players list (self.players) based on player order 
         newPlayersList = [] #Temporary list
@@ -97,6 +90,26 @@ class Game:
     #Determine winner of the game   
     def determineWinner(self, timerExpired = false):
         pass
+
+    #Run the game 
+    def run(self): 
+        #Play game until a winner is found 
+        winner = False
+        if (not winner): 
+            self.round()
+
+            #If after the round, there is only one player left or game terminates, game ends
+            if (len(self.players) <= 1): 
+                winner = True
+            else: 
+                #Generate more money in the bank, and start another round
+                self.bank.generateCash() 
+    
+    #Go through all players in round
+    def round(self): 
+        for player in self.players: 
+            self.setCurrentPlayer(player)
+            self.turn(player)
 
     #Conduct the turn of a player
     def turn(self, player): 
@@ -124,17 +137,26 @@ class Game:
 
         #Get property card if player landed on property tile
         if boardTile == "Property":
-            pass
+            propertyName = Board.TILE_LIST[player.getPosition()]
+
+            user_properties = player.getProperties() 
+            
+            #Check if this property is already in user's possession 
+            if propertyName in 
+            
+            #Check if another player owns the property and pay any rent/mortgage.
+
+            #If no player owns the property, see if player will purchase or auction
 
         #Get utility card if player landed on utility tile
         if boardTile == "Utility":
-            pass
+            utilityName = Board.TILE_LIST[player.getPosition()]
 
         #Get transports card if player landed on transports tile
         if boardTile == "Transports":
-            pass
+            transportsName = Board.TILE_LIST[player.getPosition()]
 
-        #User pays the tax indicated on the board
+        #User pays the tax indicated on the board 
         if boardTile == "Tax":
             player.payTax(bank)
 
@@ -146,8 +168,11 @@ class Game:
         if boardTile == "Community Card":
             player.doCommunityCard(self.communityPile.pullCard(), bank)
 
+        #Log that the player has landed on a tile after all movements/actions are complete
+        self.board.hit(player.getPosition())
+
         #Go again if not on jail and has thrown double
-        if (not player.getInJail() and TwoDice.double):
+        if (not player.getInJailStatus() and dice.double):
             turn(player) 
         
 
