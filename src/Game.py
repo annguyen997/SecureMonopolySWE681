@@ -134,6 +134,10 @@ class Game:
         if boardTile == "Transports":
             pass
 
+        #User pays the tax indicated on the board
+        if boardTile == "Tax":
+            player.payTax(bank)
+
         #Get chance card if player landed on chance tile
         if boardTile == "Chance Card":
             player.doChanceCard(self.chancePile.pullCard(), bank)

@@ -1,4 +1,4 @@
-import Board
+import Board, Bank
 
 class Player():
 
@@ -11,7 +11,7 @@ class Player():
         self.id = id                            #Identification Number
         self.name = name                        #Name of player
         self.money = 0                          #Cash on hand - starts with 1500
-        self.position = 0                       #Start at "Go" tile
+        self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
         self.properties = []                    #Start with no properties
         self.jail_cards_Num = 0                 #Number of "Get Out of Jail Free" cards
         self.jail_cards = []                    #Jail cards in posession 
@@ -214,6 +214,22 @@ class Player():
         elif cardKind == "Escape Jail":
             pass
             #TODO: Get possession of the card for user to hold
+    
+    #User pays tax if lands on a tax tile
+    def payTax(self, bank): 
+        #Get position of player to get tax type, and create value to hold tax amount
+        position = self.getPosition()
+        taxCharged = 0 
+        
+        #Get the type of tax 
+        if (Board.TILES_LIST[position] == "Income Tax"):
+            taxCharged = Bank.INCOME_TAX
+        elif (Board.TILES_LIST[position] == "Luxury Tax"):
+            taxCharged = Bank.LUXURY_TAX
+
+        #Tax the player, and add the money to bank
+        self.changeMonetaryValue(taxCharged)
+        bank.add(abs(taxCharged))
 
     #Add a property/title deed to player's possession
     def addProperty(self, titleDeed): 

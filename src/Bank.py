@@ -4,6 +4,10 @@ class Bank:
     DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
     PASS_GO = 200
 
+    #Tax Amounts on Board
+    INCOME_TAX = -200
+    LUXURY_TAX = -100
+
     #TODO: May need to add logic regarding timing the auction 
     
     #Create a new bank
