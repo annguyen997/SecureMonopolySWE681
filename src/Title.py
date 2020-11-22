@@ -111,6 +111,12 @@ class Property:
 
     def __init__(self): 
         self.properties = PROPERTY_CARDS
+    
+    #Get the property card 
+    def getPropertyCard(self, name): 
+        for propertyCard in self.properties: 
+            if (propertyCard.getName() == name): 
+                return propertyCard
 
 class Utility: 
     UTILITY = ["Electric Company", "Water Works"]

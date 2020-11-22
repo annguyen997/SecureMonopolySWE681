@@ -138,15 +138,57 @@ class Game:
         #Get property card if player landed on property tile
         if boardTile == "Property":
             propertyName = Board.TILE_LIST[player.getPosition()]
-
-            user_properties = player.getProperties() 
             
-            #Check if this property is already in user's possession 
-            if propertyName in 
+            ownerName = None 
+            ownerExisting = False 
+            #Check the logic if players have the property
+            for player in self.players: 
+                user_properties = player.getProperties()
+                if (propertyName in user_properties): 
+                    ownerExisting = False 
+                    ownerName = player
+                    break 
             
-            #Check if another player owns the property and pay any rent/mortgage.
+            #Check if this property is already in a user's possession
+            if (ownerExisting):
+                if (ownerName.getuserID() == player.getuserID()):
+                    #If the current player owns this property
+                    pass
+                else: 
+                    #If another player owns the property
+                    #Pay rent or mortgage 
+                    pass
+            else: 
+                #No player current owns the property, see if player will purchase or auction
+                titleDeed = bank.getPropertyCard(propertyName)
 
-            #If no player owns the property, see if player will purchase or auction
+                #Get the printed value of the title deed 
+                printedValue = titleDeed.getPrintedValue() 
+
+                #Print stated value and color group 
+                print("Property Name: " + propertyName + "\n" + 
+                      "Printed Value: " + printedValue + "\n" + 
+                      "Color Group: " + titleDeed.getColorGroup + "\n\n") 
+                
+                value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
+                      "or do you wish to auction? \n" +
+                      "If you want to purchase, please type the word 'Purchase' with the printed price.\n" + 
+                      "If you wish to auction, please type 'Auction' and place the starting bidding price:")
+
+                #User types either "Purchase" or "Auction" 
+                """
+                ok = validateInputforTitle(value)
+                if (not ok): 
+                    revalidate input again 
+                """
+
+                if (value == "Purchase"): 
+                    player.addProperty(titleDeed)
+                    player.changeMonetaryValue(-printedValue)
+                elif (value == "Auction"): 
+                    pass
+                else: 
+                    print("Invald response was provided.") 
 
         #Get utility card if player landed on utility tile
         if boardTile == "Utility":

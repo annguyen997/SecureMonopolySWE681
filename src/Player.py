@@ -70,6 +70,16 @@ class Player():
     def getProperties(self): 
         return self.properties
     
+    #Add a property to the player's list of possessions
+    def addProperties(self, propertyCard): 
+        self.properties.append(propertyCard)
+
+    def getNumHomes(self): 
+        return self.num_homes
+
+    def getNumHotels(self): 
+        return self.num_hotels 
+
     #Get the status of player in jail
     def getInJailStatus(self):
         return self.inJail
@@ -89,7 +99,6 @@ class Player():
 
     #Move the player across the board when it is their turn 
     def move(self, moveNum, dice, bank):
-
         #Check if the user is in jail 
         #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
         if (self.jail_turns > 0):
@@ -206,12 +215,18 @@ class Player():
             bank.subtract(cardValue)
             self.changeMonetaryValue(cardValue)
         elif cardKind == "Debit": 
-            if (len(cardValue) > 1): 
-                pass
-                #debit from each home and hotel 
-            else: 
-                self.changeMonetaryValue(cardValue)
-                bank.add(cardValue) 
+            self.changeMonetaryValue(cardValue) 
+            bank.add(abs(cardValue))
+        elif cardKind == "Debit Complex": 
+            #debit from each home and hotel 
+            numHomePay = cardValue[0] * self.getNumHomes()
+            numHotelPay = cardValue[1] * self.getNumHotels() 
+            
+            #Debit the amount from player 
+            self.changeMonetaryValue(numHomePay + numHotelPay)
+
+            #Add the amount to the bank 
+            bank.add(abs(numHomePay + numHotelPay))
         elif cardKind == "Escape Jail":
             self.addEscapeJailCard(card)
     
@@ -238,13 +253,19 @@ class Player():
         elif cardKind == "Credit": 
             bank.subtract(cardValue)
             self.changeMonetaryValue(cardValue)
-        elif cardKind == "Debit":
-            if (len(cardValue) > 1): 
-                pass
-                #debit from each home and hotel 
-            else: 
-                self.changeMonetaryValue(cardValue)
-                bank.add(cardValue) 
+         elif cardKind == "Debit": 
+            self.changeMonetaryValue(cardValue) 
+            bank.add(abs(cardValue))
+        elif cardKind == "Debit Complex": 
+            #debit from each home and hotel 
+            numHomePay = cardValue[0] * self.getNumHomes()
+            numHotelPay = cardValue[1] * self.getNumHotels() 
+            
+            #Debit the amount from player 
+            self.changeMonetaryValue(numHomePay + numHotelPay)
+
+            #Add the amount to the bank 
+            bank.add(abs(numHomePay + numHotelPay)) 
         elif cardKind == "Escape Jail":
             self.addEscapeJailCard(card)
 

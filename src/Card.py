@@ -32,7 +32,7 @@ class ChanceCards:
 		Card("Chance", "Escape Jail", None),									#Keep card until needed or traded 
 		Card("Chance", "Advance", -3), 											#Go back 3 spaces
 		Card("Chance", "Advance", "Go to Jail"),  								#Go directly to jail; do not collect cash (200)
-		Card("Chance", "Debit", [-25, -100]), 									#Make repairs on all property, pay each: [house, hotel]
+		Card("Chance", "Debit Complex", [-25, -100]), 							#Make repairs on all property, pay each: [house, hotel]
 		Card("Chance", "Debit", -15),											#Pay tax to poor of 15
 		Card("Chance", "Advance", Board.TILES_LIST.index("Reading Railroad")),	#If pass Go, collect 200
 		Card("Chance", "Advance", Board.TILES_LIST.index("Boardwalk")), 		#Advance to Boardwalk, no collecting 200
@@ -109,7 +109,7 @@ class CommunityCards:
 		Card("Community", "Debit", -100),						#Pay hospital fees of 100
 		Card("Community", "Debit", -150),						#Pay school feeds of 150
 		Card("Community", "Credit", 25),						#Receive consultancy fee
-		Card("Community", "Debit", [-40, -115]), 				#Make street repairs on all property, pay each: [house, hotel]
+		Card("Community", "Debit Complex", [-40, -115]), 		#Make street repairs on all property, pay each: [house, hotel]
 		Card("Community", "Credit", 10),						#Won second prize in beauty contest - collect 10
 		Card("Community", "Credit", 100)						#Inherited 100
 	]
