@@ -1,4 +1,4 @@
-import random
+import random #- Add a seed to the the random; don't hard code seed - true randomness of the seed 
 import Board
 
 class Card(object): 

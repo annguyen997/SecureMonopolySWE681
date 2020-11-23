@@ -115,7 +115,8 @@ class Game:
     def turn(self, player): 
         #Check if player is in jail 
         if (player.getInJailStatus()):
-            pass 
+            player.escapeJailOptions()
+            return
 
         #Get the number of eyes on dice for movement
         moveNum = self.dice.rollDice()
@@ -133,75 +134,25 @@ class Game:
         #Check if player went to jail because of tile or rolling three doubles in a row
         if (player.getInJailStatus()):
             player.position = Board.TILES_JAIL[0]
+            player.setJailTurns(3)
             return #End the turn here
 
         #Get property card if player landed on property tile
         if boardTile == "Property":
-            propertyName = Board.TILE_LIST[player.getPosition()]
-            
-            ownerName = None 
-            ownerExisting = False 
-            #Check the logic if players have the property
-            for player in self.players: 
-                user_properties = player.getProperties()
-                if (propertyName in user_properties): 
-                    ownerExisting = False 
-                    ownerName = player
-                    break 
-            
-            #Check if this property is already in a user's possession
-            if (ownerExisting):
-                if (ownerName.getuserID() == player.getuserID()):
-                    #If the current player owns this property
-                    pass
-                else: 
-                    #If another player owns the property
-                    #Pay rent or mortgage 
-                    pass
-            else: 
-                #No player current owns the property, see if player will purchase or auction
-                titleDeed = bank.getPropertyCard(propertyName)
-
-                #Get the printed value of the title deed 
-                printedValue = titleDeed.getPrintedValue() 
-
-                #Print stated value and color group 
-                print("Property Name: " + propertyName + "\n" + 
-                      "Printed Value: " + printedValue + "\n" + 
-                      "Color Group: " + titleDeed.getColorGroup + "\n\n") 
-                
-                value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
-                      "or do you wish to auction? \n" +
-                      "If you want to purchase, please type the word 'Purchase' with the printed price.\n" + 
-                      "If you wish to auction, please type 'Auction' and place the starting bidding price:")
-
-                #User types either "Purchase" or "Auction" 
-                """
-                ok = validateInputforTitle(value)
-                if (not ok): 
-                    revalidate input again 
-                """
-
-                if (value == "Purchase"): 
-                    player.addProperty(titleDeed)
-                    player.changeMonetaryValue(-printedValue)
-                elif (value == "Auction"): 
-                    pass
-                else: 
-                    print("Invald response was provided.") 
-
+            self.checkProperty(player)
+        
         #Get utility card if player landed on utility tile
-        if boardTile == "Utility":
+        if boardTile =="Utility":
             utilityName = Board.TILE_LIST[player.getPosition()]
 
         #Get transports card if player landed on transports tile
         if boardTile == "Transports":
             transportsName = Board.TILE_LIST[player.getPosition()]
-
-        #User pays the tax indicated on the board 
+        
+        #User pays the tax indicated on the board
         if boardTile == "Tax":
             player.payTax(bank)
-
+            
         #Get chance card if player landed on chance tile
         if boardTile == "Chance Card":
             player.doChanceCard(self.chancePile.pullCard(), bank)
@@ -216,9 +167,53 @@ class Game:
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and dice.double):
             turn(player) 
-        
 
-
-    
+    #Get the property card and do the following actions based on the information provided.
+    def checkProperty(self, player): 
+        propertyName = Board.TILE_LIST[player.getPosition()]
         
-         
+        ownerName = None
+        ownerExisting = False
+        
+        for player in self.players: 
+            user_properties = player.getProperties()
+            if (propertyName in user_properties):
+                ownerExisting = False
+                ownerName = player
+        
+        #Check if this property is already in a user's possession
+        if (ownerExisting):
+            if (ownerName.getuserID() == player.getuserID()):
+                #If the current player owns this property
+                pass
+            else: #If another player owns the property; Pay rent or mortgage
+                pass
+        else: 
+            titleDeed = self.bank.getPropertyCard(propertyName)
+
+            printedValue = titleDeed.getPrintedValue()
+
+            #Print stated value and color group 
+            print("Property Name: " + propertyName + "\n" + 
+                    "Printed Value: " + printedValue + "\n" + 
+                    "Color Group: " + titleDeed.getColorGroup + "\n\n") 
+            
+            value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
+                    "or do you wish to auction? \n" +
+                    "If you want to purchase, please type the word 'Purchase' with the printed price.\n" + 
+                    "If you wish to auction, please type 'Auction' and place the starting bidding price:")
+
+            #User types either "Purchase" or "Auction" 
+            """
+            ok = validateInputforTitle(value)
+            if (not ok): 
+                revalidate input again 
+            """
+
+            if (value == "Purchase"): 
+                player.addProperty(titleDeed)
+                player.changeMonetaryValue(-printedValue)
+            elif (value == "Auction"): 
+                pass
+            else: 
+                print("Invald response was provided.")

@@ -14,6 +14,16 @@ class Title(object):
         #Set the owner of the title deed
         self.owner = None
 
+        def __str__(self): 
+            dataString = "Title Type: " + self.titleType 
+                   + "\nName: " + self.name
+                   + "\nPrinted Purchase Value: " + self.printed
+                   + "\nRent Amount: " + self.rent 
+                   + "\nMortgage Amount: " + self.mortgage
+            
+            if (self.rentCosts): 
+                dataString += "\n Rent Costs by Property: "
+
         def getTitleType(self):
             return self.titleType
         
@@ -117,14 +127,14 @@ class Property:
         for propertyCard in self.properties: 
             if (propertyCard.getName() == name): 
                 return propertyCard
-
+                
 class Utility: 
     UTILITY = ["Electric Company", "Water Works"]
 
     UTILITY_CARDS = [
         #Utilies do not have buildings and the associated rental costs and do not have a color group
         Title("Utility", "Electric Company", 150, [4, 10], 75),
-		Title("Property", "Water Works", 150, [4, 10], 75)
+		Title("Utility", "Water Works", 150, [4, 10], 75)
     ]
 
     def __init__(self): 

@@ -97,9 +97,14 @@ class Player():
         card = self.jail_cards.pop()
         return card
 
+    def getJailTurns(self): 
+        return self.jail_turns
+    
+    def setJailTurns(self, turns): 
+        self.jail_turns = turns
+
     #Move the player across the board when it is their turn 
     def move(self, moveNum, dice, bank):
-        #Check if the user is in jail 
         #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
         if (self.jail_turns > 0):
             return 0
@@ -253,7 +258,7 @@ class Player():
         elif cardKind == "Credit": 
             bank.subtract(cardValue)
             self.changeMonetaryValue(cardValue)
-         elif cardKind == "Debit": 
+        elif cardKind == "Debit": 
             self.changeMonetaryValue(cardValue) 
             bank.add(abs(cardValue))
         elif cardKind == "Debit Complex": 
@@ -285,11 +290,22 @@ class Player():
         self.changeMonetaryValue(taxCharged)
         bank.add(abs(taxCharged))
 
+    #Options to escape jail 
+    def escapeJailOptions(self): 
+        print("You are currently in jail, and you have " + self.getJailTurns() + " left in jail." + 
+              "\nYou do have three options if you wish to get out of jail early.")
+        
+        #Pay 50 fine
+        #Use get out of jail free card
+        #Roll a double 
+
     #Add a property/title deed to player's possession
     def addProperty(self, titleDeed): 
         self.properties.append(titleDeed)
     
     #Add money to auction - this requires inputting valid dollar amount
+
+
 
     
 
