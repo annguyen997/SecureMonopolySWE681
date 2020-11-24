@@ -164,6 +164,8 @@ class Game:
         #Log that the player has landed on a tile after all movements/actions are complete
         self.board.hit(player.getPosition())
 
+        #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
+
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and dice.double):
             turn(player) 
@@ -187,7 +189,7 @@ class Game:
                 #If the current player owns this property
                 pass
             else: #If another player owns the property; Pay rent or mortgage
-                pass
+                player.payRent(ownerName)
         else: 
             titleDeed = self.bank.getPropertyCard(propertyName)
 

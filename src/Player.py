@@ -293,7 +293,12 @@ class Player():
     #Options to escape jail 
     def escapeJailOptions(self): 
         print("You are currently in jail, and you have " + self.getJailTurns() + " left in jail." + 
-              "\nYou do have three options if you wish to get out of jail early.")
+              "\nYou do have three options if you wish to get out of jail early." + 
+              "\nPay 50 dollar fine - Type 'Pay 50' to use this option." +
+              "\nUse a get out of jail free card - Type 'Jail Free Card' to use this option." + 
+              "\nRoll a double - Type 'Roll Dice' to use this option.")
+
+        jailOption = input("Select an option based on the options listed.")
         
         #Pay 50 fine
         #Use get out of jail free card

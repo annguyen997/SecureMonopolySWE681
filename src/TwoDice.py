@@ -14,7 +14,7 @@ class TwoDice:
         #Reset the total to zero
         total = 0 
 
-        #Roll the two dice   - Add a seed to the the random 
+        #Roll the two dice   - Add a seed to the the random; don't hard code seed - true randomness of the seed  
         dice1 = randint(1,7)
         dice2 = randint(1,7)
         

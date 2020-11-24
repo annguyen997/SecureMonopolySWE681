@@ -1,5 +1,5 @@
 class Title(object):
-    def __init__(self, tileType, name, printed, rent, mortgage, rentCosts = [0], buildingCosts = [0], colorGroup = None):
+    def __init__(self, tileType, name, printed, rent, mortgage, rentCosts = [], buildingCosts = [], colorGroup = None):
         self.titleType = titleType              #The type of the title deed
         self.name = name                        #The name of the property or utility
         self.printed = printed                  #The printed value when player lands on title deed if no one has claimed
@@ -15,14 +15,31 @@ class Title(object):
         self.owner = None
 
         def __str__(self): 
-            dataString = "Title Type: " + self.titleType 
-                   + "\nName: " + self.name
-                   + "\nPrinted Purchase Value: " + self.printed
-                   + "\nRent Amount: " + self.rent 
-                   + "\nMortgage Amount: " + self.mortgage
+            dataString = "Title Type: " + self.titleType
+            + "\nName: " + self.name
+            + "\nPrinted Purchase Value: " + self.printed
+            + "\nRent Amount: " + self.rent
+            + "\nMortgage Amount: " + self.mortgage
             
+            #If there is a color group, display the group.
+            if (self.colorGroup != None): 
+                dataString += "\nColor Group of Property: " + self.colorGroup
+
+            #If there are rental property information with the title deed, display the information
             if (self.rentCosts): 
-                dataString += "\n Rent Costs by Property: "
+                dataString += "\n\nRental Costs of Property" 
+                + "\nWith One House: " + self.rentCosts[0]
+                + "\nWith Two Houses: " + self.rentCosts[1]
+                + "\nWith Threee Houses: " + self.rentCosts[2]
+                + "\nWith Four Houses: " + self.rentCosts[3]
+                + "\nWith Hotel (no homes): " + self.rentCosts[4]
+
+            #If there are building costs information with the title deed, display the information
+            if (self.buildingCosts): 
+                dataString += "\n\nBuilding Costs for Property" 
+                + "\nHouses Cost: " + self.buildingCosts[0] + " each house"
+                + "\nHotel Cost: " + self.buildingCosts[1] + " each plus 4 houses"
+                + "\nRemember: You can build houses only when you purchase all properties of a color group. "
 
         def getTitleType(self):
             return self.titleType
@@ -62,7 +79,7 @@ class Title(object):
         - For each property, up to 4 homes are permitted. To purchase a hotel, 4 homes must be returned to bank. 
         - For each property, up to 1 hotel is permitted with no homes. 
 
-        - A player can buy any house or hotel on their turn or between other players' turns.
+        - A player can buy any house or hotel on their turn (or between other players' turns - but this will not be enforced in this version.)
         - A player must buy all title deeds of a color group in order to purchase homes and hotels. Owning all sites of a color group is known as "owning a monopoly". 
         - Players' must build houses evenly (e.g. a player cannot build a second house on a title deed/site until every site of that color group has at least one house).
 
