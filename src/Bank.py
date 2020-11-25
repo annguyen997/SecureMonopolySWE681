@@ -32,7 +32,6 @@ class Bank:
         #Properties for auction
         self.auctionPrice = 0
 
-    
     #Generate additional cash after each round - this is unique for this particular game implementation
     def generateCash(self): 
         self.moneyReserves *= 1.5
@@ -53,14 +52,33 @@ class Bank:
     def transaction(self, amount, receiver): 
         pass
 
-    """ PROPERTIES """
-    def getPropertyCard(self, titleName): 
-        for propertyCard in self.propertyCards: 
-            if (propertyCard.getName() == titleName):
-                return propertyCard
+    def getTitleDeedCard(self, titleName, boardTileName):
+        if (boardTileName == "Property"):  
+            for propertyCard in self.propertyCards: 
+                if (propertyCard.getName() == titleName):
+                    return propertyCard
+            
+            #Used if no property of name was found
+            return None
+
+        elif (boardTileName == "Utility"):
+            for utilityCard in self.utilityCards: 
+                if (utilityCard.getName() == titleName):
+                    return utilityCard
+            
+            #Used if no utility of name was found
+            return None
+
+        elif (boardTileName == "Transports"):
+            for transportsCard in self.transportsCards: 
+                if (transportsCard.getName() == titleName):
+                    return transportsCard
+
+            #Used if no transports of name was found
+            return None
         
-        #Used if an invalid property was returned
-        return "Invalid Property"
+        #Invalid item is used
+        return None 
 
     def purchaseHome(self): 
         pass
@@ -74,12 +92,16 @@ class Bank:
     def sellHotel(self): 
         pass 
 
-    #Start the auction
+    """ AUCTION methods """
     def startAuction(self, startingPrice):
         self.auctionPrice = startingPrice
 
     def getAuctionPrice(self): 
         return self.auctionPrice
     
+    def setAuctionPrice(self, auctionPrice):
+        self.auctionPrice = auctionPrice
     
+    def resetAuctionPrice(self):
+        self.setAuctionPrice(0)
     

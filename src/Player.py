@@ -12,7 +12,7 @@ class Player():
         self.name = name                        #Name of player
         self.money = 0                          #Cash on hand - starts with 1500
         self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
-        self.properties = []                    #Start with no properties
+        self.titleDeeds = []                    #Start with no properties
         self.jail_cards = []                    #Jail cards in posession 
         self.jail_turns = 0                     #Number of remaining turns in jail
         self.bankrupt = False                   #Bankrupt status
@@ -57,12 +57,12 @@ class Player():
         self.order = order 
     
     #Get the list of properties of player
-    def getProperties(self): 
-        return self.properties
+    def getTitleDeeds(self): 
+        return self.titleDeeds
     
     #Add a property to the player's list of possessions
-    def addProperties(self, propertyCard): 
-        self.properties.append(propertyCard)
+    def addTitleDeeds(self, propertyCard): 
+        self.titleDeeds.append(propertyCard)
 
     def getNumHomes(self): 
         return self.num_homes
@@ -144,42 +144,66 @@ class Player():
 
         #Do actions based on chance card 
         if cardKind == "Advance": 
+            #Record user was on this space first
+            self.board.hit(position)
+
             #Read the values, and do the actions based on the vaue
             if cardValue == "Go": 
                 self.setPosition(Board.TILES_GO[0])
+
                 #Collect money
+                self.changeMonetaryValue(Board.PASS_GO)
+                bank.subtract(Board.PASS_GO)
 
             elif cardValue == "Utility":
                 #Keep track if nearest utility is found 
                 found = False 
+                newPositionUtility = None
 
                 #Go to the nearest utility
                 for posUtil in Board.TILES_UTILITY: 
                     if position < posUtil: 
-                        self.setPosition(posUtil)
+                        newPositionUtility = posUtil
                         found = True
                         break 
                 
                 #If not nearest utility found, go to first utility. 
                 #Note it may be possible that user does not collect cash if passing Go
                 if not found:
-                    self.setPosition(Board.TILES_UTILITY[0])
+                    newPositionUtility = Board.TILES_UTILITY[0]
+
+                #If player would cycle the board, re-calibrate the position number and collect 200 if necessary
+                if (newPositionUtility < position):
+                    #Collect more money by passing GO
+                    self.changeMonetaryValue(Bank.PASS_GO)
+                    bank.subtract(Bank.PASS_GO)
+
+                self.setPosition(newPositionUtility)
             
             elif cardValue == "Transports":
                 #Keep track if nearest transports is found 
                 found = False 
+                newPositionTransports = None
 
-                #Go to the nearest utility
-                for posUtil in Board.TILES_TRANSPORTS: 
-                    if position < posUtil: 
-                        self.setPosition(posUtil)
+                #Go to the nearest transport
+                for posTransports in Board.TILES_TRANSPORTS: 
+                    if position < posTransports: 
+                        newPositionTransports = posTransports
                         found = True
                         break 
                 
                 #If not nearest utility found, go to first transports. 
                 #Note it may be possible that user does not collect cash if passing Go
                 if not found:
-                    self.setPosition(Board.TILES_TRANSPORTS[0])
+                    newPositionTransports = Board.TILES_TRANSPORTS[0]
+                
+                #If player would cycle the board, re-calibrate the position number and collect 200 if necessary
+                if (newPositionTransports < position):
+                    #Collect more money by passing GO
+                    self.changeMonetaryValue(Bank.PASS_GO)
+                    bank.subtract(Bank.PASS_GO)
+
+                self.setPosition(newPositionTransports)
             
             elif cardValue <= 0: 
                 #If negative, this means player must go back
@@ -192,19 +216,14 @@ class Player():
                 self.setPosition(Board.TILES_JAIL[0])
             
             else: 
-                #Advance to the spot on the board; collect 200 if necessary
-                newPosition = cardValue + self.getPosition()
-
-                #If player cycles through the board, re-calibrate the position number
-                if (newPosition > len(Board.TILES_LIST)):
-                    newPosition -= len(Board.TILES_LIST)
-                
+                #If player would cycle the board, re-calibrate the position number and collect 200 if necessary
+                if (cardValue < position):
                     #Collect more money by passing GO
                     self.changeMonetaryValue(Bank.PASS_GO)
                     bank.subtract(Bank.PASS_GO)
                 
                 #Set new position
-                self.setPosition(newPosition)
+                self.setPosition(cardValue)
 
         elif cardKind == "Credit": 
             bank.subtract(cardValue)
@@ -234,13 +253,19 @@ class Player():
         cardKind = card.getKind()
         cardValue = card.getValue() 
 
-        #Do actions based on chance card 
+        #Do actions based on community card 
         if cardKind == "Advance": 
+            #Record user was on this space first
+            self.board.hit(position)
+
             #Read the values, and do the actions based on the vaue
             if cardValue == "Go": 
                 self.setPosition(Board.TILES_GO[0])
+                
                 #Collect money
-            
+                self.changeMonetaryValue(Board.PASS_GO)
+                bank.subtract(Board.PASS_GO)
+
             elif cardValue == "Go to Jail": 
                 self.setInJailStatus(True)
                 self.setPosition(Board.TILES_JAIL[0])
@@ -294,11 +319,17 @@ class Player():
         #Use get out of jail free card
         #Roll a double 
 
+    #User pays the rent to the other player
+    def payRent(self, owner, titleDeedName, boardTile): 
+        titleDeed = self.bank.getTitleDeedCard(titleDeedName, boardTile)
+
+
     #Add a property/title deed to player's possession
-    def addProperty(self, titleDeed): 
+    def addProperty(self, titleDeed, purchaseValue, bank): 
         self.properties.append(titleDeed)
+        self.changeMonetaryValue(-1 * purchaseValue)
+        bank.add(purchaseValue)
     
-    #Add money to auction - this requires inputting valid dollar amount
 
 
 

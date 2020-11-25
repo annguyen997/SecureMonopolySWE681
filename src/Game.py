@@ -41,16 +41,9 @@ class Game:
     #Determine the player who gets to go first in the game
     def determineFirstPlayer(self): 
         playerListOrder = [] #Temporary list to order players by highest roller
-        playerNotEligible = None
 
         #Set the order by rolling dice 
         for player in self.players: 
-
-            #If player is banker/auctioneer (non-dual role), player's order is not calculated. 
-            if (player.getTitle() == "Banker/Auctioneer"):
-                playerNotEligible = player
-                continue 
-
             userID = player.getuserID()
             rollNumber = self.dice.rollDice() 
             playerListOrder.append({'userID': userID, 'order' : rollNumber})
@@ -65,15 +58,11 @@ class Game:
         newPlayersList = [] #Temporary list
 
         for player in playerListOrder: #Insert players into temp list by order presented in sorted list
-            
             for playerObject in self.player:
                 if (playerObject.getuserID == player['userID']):
                     newPlayersList.append(playerObject)
                     break
-        
-        if(playerNotEligible): #If there was a banker, add the player back to list
-            newPlayersList.append(playerNotEligible)
-        
+                
         #Replace player list with temp list 
         self.playerList = newPlayersList
 
@@ -135,17 +124,9 @@ class Game:
             player.setJailTurns(3)
             return #End the turn here
 
-        #Get property card if player landed on property tile
-        if boardTile == "Property":
-            self.checkProperty(player)
-        
-        #Get utility card if player landed on utility tile
-        if boardTile =="Utility":
-            utilityName = Board.TILE_LIST[player.getPosition()]
-
-        #Get transports card if player landed on transports tile
-        if boardTile == "Transports":
-            transportsName = Board.TILE_LIST[player.getPosition()]
+        #Get property card if player landed on property, utility, or transports tile
+        if boardTile in ("Property", "Utility", "Transports"):
+            self.checkTitleDeed(player, boardTile)
         
         #User pays the tax indicated on the board
         if boardTile == "Tax":
@@ -155,41 +136,48 @@ class Game:
         if boardTile == "Chance Card":
             player.doChanceCard(self.chancePile.pullCard(), bank)
 
+            #May need to check the new position of the player for a property/utility/transport
+
         #Get community card if player landed on community chest tile
         if boardTile == "Community Card":
             player.doCommunityCard(self.communityPile.pullCard(), bank)
+
+            #May need to check the new position of the player for a including a property/utility/transport
 
         #Log that the player has landed on a tile after all movements/actions are complete
         self.board.hit(player.getPosition())
 
         #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
+        #User can also wish to sell properties 
+        #This statement also runs in player lands on Free Parking space 
 
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and dice.double):
             turn(player) 
 
-    #Get the property card and do the following actions based on the information provided.
-    def checkProperty(self, player): 
-        propertyName = Board.TILE_LIST[player.getPosition()]
+    #Get the title deed card and do the following actions based on the information provided.
+    def checkTitleDeed(self, player, boardTile = "None"): 
+        titleDeedName = Board.TILE_LIST[player.getPosition()]
         
-        ownerName = None
+        owner = None
         ownerExisting = False
         
+        #Check for owner information of a property
         for player in self.players: 
             user_properties = player.getProperties()
-            if (propertyName in user_properties):
-                ownerExisting = False
-                ownerName = player
+            if (titleDeedName in user_properties):
+                ownerExisting = True
+                owner = player
         
         #Check if this property is already in a user's possession
         if (ownerExisting):
-            if (ownerName.getuserID() == player.getuserID()):
+            if (owner.getuserID() == player.getuserID()):
                 #If the current player owns this property
                 pass
-            else: #If another player owns the property; Pay rent or mortgage
-                player.payRent(ownerName, propertyName)
+            else: #If another player owns the property; pay rent or mortgage
+                player.payRent(owner, titleDeedName, boardTile)
         else: 
-            titleDeed = self.bank.getPropertyCard(propertyName)
+            titleDeed = self.bank.getTitleDeedCard(titleDeedName, boardTile)
             printedValue = titleDeed.getPrintedValue()
 
             #Print card's information and request user input
@@ -209,47 +197,82 @@ class Game:
             """
 
             if (value == "Purchase"): 
-                player.addProperty(titleDeed)
-                player.changeMonetaryValue(-printedValue)
+                player.addProperty(titleDeed, printedValue, self.bank)
             elif (value == "Auction"):   #Get the starting value
                 #Validate the starting value - ensure value is not too high 
                 startingPrice = input("Please supply the starting price for auction: ")
                 self.auctionProperty(startingPrice, titleDeed, player.getName())
             else: 
-                print("Invald response was provided.")
+                print("Invalid response was provided.")
     
-    #If auctioning property, there will be two rounds to do auction from all players
-    #This is a modified change from the actual game for simplicity purposes
+    #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
     #A timer may be needed for each user to input a value; if runs out user does not play. - 1 minute max
     def auctionProperty(self, startingPrice, titleDeed, name):
-        bank.startAuction(startingPrice)
-
-        print("An auction has started for " + titleDeed.getName() + ", started by " + name + ".\n" + 
-            "The starting bid for this auction is: " + startingPrice)
+        auctionAmounts = [0] * len(self.players)
+        self.bank.startAuction(startingPrice)
 
         #First Round - Skipping the starting bid player
+        print("An auction has started for " + titleDeed.getName() + ", started by " + name + ".\n" + 
+            "The starting bid for this auction is: " + str(startingPrice))
+
+        numberAuctioned = 0
         for player in self.player: 
             if (name == player.getName()):
+                auctionAmounts[numberAuctioned] = startingPrice
+                numberAuctioned += 1
                 continue #Skip that player since they inputted starting bid.
 
             print("Please enter your bidding bid.")
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
+            #If user types in invalid value, re-enter. If time expires, player forfeits this round.
             biddingPrice = input("Enter bid here: ") 
+            self.auctionAmounts[numberAuctioned] = biddingPrice
+            numberAuctioned += 1
 
         #Process the amounts of first round - highest one is the new auction price
+        newBidAmount = max(auctionAmounts)
+        self.bank.setAuctionPrice(newBidAmount)
 
         #Second round
+        print("The second round of this auction has started for " + titleDeed.getName() + ".\n" + 
+            "The new starting bid for this round is: " + str(newBidAmount))
+            
+        numberAuctioned = 0
         for player in self.player: 
             print("Please enter your bidding bid.")
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
             biddingPrice = input("Enter bid here: ") 
+            auctionAmounts[numberAuctioned] = biddingPrice
+            numberAuctioned += 1
 
-        #Process the amounts of second round - highest one is the auction price
-        #Need the name of player to get the title deed. 
-        #If there is a tie, use tie breaker dice.
+        #Process the amounts of second round - highest one is the winner auction price
+        highestAmount = max(auctionAmounts)
+
+        #Check if highest amount occurs more than once (i.e. at least two players entered same value)
+        tieAmountExist = False
+        occurrences = auctionAmounts.count(highestAmount)
+        if (occurrences > 1): 
+            tieAmountExist = True 
+              
+        #Need the name of player to get the title deed. If there is a tie, one with higher order value wins. 
+        indexHighest = auctionAmounts.index(highestAmount)
+        playerAuctionWinner = self.player[indexHighest]
+
+        winnerAnnounce = ""
+        if (tieAmountExist): 
+            winnerAnnounce += "There is a tie in the highest amount bidder.\n"
         
-        #Determine the highest auction bidder to get the title deed. 
+        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + highestAmount + ". Congratulations!"
+        winnerAnnounce += "That player now owns this property, paying the specified amount."
+
+        print(winnerAnnounce)
+
+        #Conduct the purchase of property
+        playerAuctionWinner.addProperty(titleDeed, highestAmount, self.bank)
+
+        #Reset bank's auction amount
+        self.bank.resetAuctionPrice()
 
 
