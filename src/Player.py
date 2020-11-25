@@ -334,7 +334,7 @@ class Player():
             if (titleDeedName == titleDeed.getName()):
                 titleDeedCard = titleDeed
 
-        #Check if the property is in mortgage
+        #Check if the property is in mortgage, if so do not collect rent
 
         #Check if the owner owns a monopoly - that is owns all title deeds of that color group 
         #If so, check if that title deed is undeveloped
@@ -354,6 +354,8 @@ class Player():
             owner.changeMonetaryValue(rentAmount) 
 
         #If transports... 
+        if (boardTile == "Transports"):
+            pass
 
     #Add a title deed to player's possession
     def addTitleDeed(self, titleDeed, purchaseValue, bank): 
@@ -381,11 +383,31 @@ class Player():
     #def sellHotel() 
 
     def handleExistingTitleDeeds(self): 
-        pass 
+        #May need a while loop to loop through options continuously until user wishes to end the round
 
-    
+        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels 
 
+        #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
+        #That property also must not be mortgaged
+
+        #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
+        #That property also must not be mortgaged
+
+        #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
+
+        #If user wishes to sell a house, get property name
+        #If user wishes to sell a hotel, get property name
         
+        #If user wishes to sell a property
+
+        #If user wishes to sell a utility or transports
+        pass
+
+    #Check if user has run out of cash
+    def runOutOfCash(self): 
+        if (self.getMonetaryValue() <= 0): 
+            return True #User does not have cash 
+        return False 
 
             
 
