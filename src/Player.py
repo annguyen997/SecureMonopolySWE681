@@ -1,12 +1,11 @@
 import Board, Bank
 
 class Player():
+    #Dual means both Regular and Banker, used only if there are less than 5 players; Bank can be automated
+    #PLAYER_TITLES = ["Regular", "Banker/Auctioneer", "Dual"] 
 
-    #It is possible to remove the titles; the bank itself can act as a player in an automated environment 
-    PLAYER_TITLES = ["Regular", "Banker/Auctioneer", "Dual"]  #Dual means both Regular and Banker, used only if there are less than 5 players
     PLAYER_MINIMUM = 2
-    PLAYER_MAXIMUM = 8 
-    PLAYER_BANKER_LIMIT = 5 #If there are more than 5 players in game, one person must be Banker/Auctioneer only 
+    PLAYER_MAXIMUM = 8
     
     def __init__(self, id, name):
         self.id = id                            #Identification Number
@@ -14,11 +13,9 @@ class Player():
         self.money = 0                          #Cash on hand - starts with 1500
         self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
         self.properties = []                    #Start with no properties
-        self.jail_cards_Num = 0                 #Number of "Get Out of Jail Free" cards
         self.jail_cards = []                    #Jail cards in posession 
         self.jail_turns = 0                     #Number of remaining turns in jail
         self.bankrupt = False                   #Bankrupt status
-        self.title = PLAYER_TITLES["Regular"]   #Title of player - Default is Regular
         self.inJail = False                     #Check if user is in jail 
 
         self.consecutiveDoubles = 0             #Start with no doubles 
@@ -30,6 +27,10 @@ class Player():
     #Get the id of user
     def getuserID(self): 
         return self.id 
+    
+    #Get the name of user
+    def getName(self): 
+        return self.name 
 
     #Get the monetary value of the player
     def getMonetaryValue(self): 
@@ -55,17 +56,6 @@ class Player():
     def setOrder(self, order): 
         self.order = order 
     
-    #Get the title of the player
-    def getTitle(self):
-        return self.title
-    
-    #Set the title of the player
-    def setTitle(self, title):
-        self.title = PLAYER_TITLES[title] 
-
-        if (self.getTitle() == "Banker/Auctioneer"):
-            self.setOrder(0)
-
     #Get the list of properties of player
     def getProperties(self): 
         return self.properties

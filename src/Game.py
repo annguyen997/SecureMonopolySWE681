@@ -37,13 +37,6 @@ class Game:
             if (player.getuserID() == id):
                 self.players.remove(player)
                 break
-        
-    #Determine the player as banker
-    def setBanker(self, player):
-        if (len(self.players) <= Player.PLAYER_BANKER_LIMIT):
-            player.setTitle("Dual")
-        else: 
-            player.setTitle("Banker/Auctioneer")
 
     #Determine the player who gets to go first in the game
     def determineFirstPlayer(self): 
@@ -93,6 +86,9 @@ class Game:
 
     #Run the game 
     def run(self): 
+        #Determine who plays first 
+        self.determineFirstPlayer()
+
         #Play game until a winner is found 
         winner = False
         if (not winner): 
@@ -110,6 +106,8 @@ class Game:
         for player in self.players: 
             self.setCurrentPlayer(player)
             self.turn(player)
+    
+    #Implement timer 
 
     #Conduct the turn of a player
     def turn(self, player): 
@@ -189,33 +187,69 @@ class Game:
                 #If the current player owns this property
                 pass
             else: #If another player owns the property; Pay rent or mortgage
-                player.payRent(ownerName)
+                player.payRent(ownerName, propertyName)
         else: 
             titleDeed = self.bank.getPropertyCard(propertyName)
-
             printedValue = titleDeed.getPrintedValue()
 
-            #Print stated value and color group 
-            print("Property Name: " + propertyName + "\n" + 
-                    "Printed Value: " + printedValue + "\n" + 
-                    "Color Group: " + titleDeed.getColorGroup + "\n\n") 
+            #Print card's information and request user input
+            print(titleDeed) 
             
             value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
                     "or do you wish to auction? \n" +
-                    "If you want to purchase, please type the word 'Purchase' with the printed price.\n" + 
-                    "If you wish to auction, please type 'Auction' and place the starting bidding price:")
+                    "If you want to purchase, please type the word 'Purchase'. \n" + 
+                    "If you wish to auction, please type 'Auction'.")
 
             #User types either "Purchase" or "Auction" 
             """
             ok = validateInputforTitle(value)
             if (not ok): 
                 revalidate input again 
+                Use while loop here 
             """
 
             if (value == "Purchase"): 
                 player.addProperty(titleDeed)
                 player.changeMonetaryValue(-printedValue)
-            elif (value == "Auction"): 
-                pass
+            elif (value == "Auction"):   #Get the starting value
+                #Validate the starting value - ensure value is not too high 
+                startingPrice = input("Please supply the starting price for auction: ")
+                self.auctionProperty(startingPrice, titleDeed, player.getName())
             else: 
                 print("Invald response was provided.")
+    
+    #If auctioning property, there will be two rounds to do auction from all players
+    #This is a modified change from the actual game for simplicity purposes
+    #A timer may be needed for each user to input a value; if runs out user does not play. - 1 minute max
+    def auctionProperty(self, startingPrice, titleDeed, name):
+        bank.startAuction(startingPrice)
+
+        print("An auction has started for " + titleDeed.getName() + ", started by " + name + ".\n" + 
+            "The starting bid for this auction is: " + startingPrice)
+
+        #First Round - Skipping the starting bid player
+        for player in self.player: 
+            if (name == player.getName()):
+                continue #Skip that player since they inputted starting bid.
+
+            print("Please enter your bidding bid.")
+
+            #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
+            biddingPrice = input("Enter bid here: ") 
+
+        #Process the amounts of first round - highest one is the new auction price
+
+        #Second round
+        for player in self.player: 
+            print("Please enter your bidding bid.")
+
+            #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
+            biddingPrice = input("Enter bid here: ") 
+
+        #Process the amounts of second round - highest one is the auction price
+        #Need the name of player to get the title deed. 
+        #If there is a tie, use tie breaker dice.
+        
+        #Determine the highest auction bidder to get the title deed. 
+
+

@@ -1,4 +1,4 @@
-import random #- Add a seed to the the random; don't hard code seed - true randomness of the seed 
+import random, sys
 import Board
 
 class Card(object): 
@@ -115,6 +115,10 @@ class CommunityCards:
 	]
     
     def __init__(self): 
+		#Create a seed, and them seed the random number generator
+        seedValue = random.randrange(sys.maxsize)
+        random.seed(seedValue)
+
         #Generate the random order of the CHANCE cards
         self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
         self.jailFreeUsed = False 

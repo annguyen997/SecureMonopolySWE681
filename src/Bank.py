@@ -28,6 +28,10 @@ class Bank:
         #Create the property quantities 
         self.homesAvailable = HOMES_AVAILABLE
         self.hotelsAvailable = HOTELS_AVAILABLE
+
+        #Properties for auction
+        self.auctionPrice = 0
+
     
     #Generate additional cash after each round - this is unique for this particular game implementation
     def generateCash(self): 
@@ -69,6 +73,13 @@ class Bank:
     
     def sellHotel(self): 
         pass 
+
+    #Start the auction
+    def startAuction(self, startingPrice):
+        self.auctionPrice = startingPrice
+
+    def getAuctionPrice(self): 
+        return self.auctionPrice
     
     
     
