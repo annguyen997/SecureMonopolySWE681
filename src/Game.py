@@ -110,7 +110,7 @@ class Game:
 
         #Move the player to new position 
         player.move(moveNum, dice, bank)
-
+ 
         #Get the board tile based on player position 
         boardTile = self.board.getTileType(player.getPosition())
 
@@ -129,17 +129,17 @@ class Game:
             self.checkTitleDeed(player, boardTile)
         
         #User pays the tax indicated on the board
-        if boardTile == "Tax":
+        elif boardTile == "Tax":
             player.payTax(bank)
             
         #Get chance card if player landed on chance tile
-        if boardTile == "Chance Card":
+        elif boardTile == "Chance Card":
             player.doChanceCard(self.chancePile.pullCard(), bank)
 
             #May need to check the new position of the player for a property/utility/transport
 
         #Get community card if player landed on community chest tile
-        if boardTile == "Community Card":
+        elif boardTile == "Community Card":
             player.doCommunityCard(self.communityPile.pullCard(), bank)
 
             #May need to check the new position of the player for a including a property/utility/transport
@@ -150,6 +150,8 @@ class Game:
         #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
         #User can also wish to sell properties 
         #This statement also runs in player lands on Free Parking space 
+        
+        #player.handleExistingTitleDeeds() 
 
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and dice.getDoubleStatus()):
@@ -169,14 +171,16 @@ class Game:
                 ownerExisting = True
                 owner = player
         
-        #Check if this property is already in a user's possession
+        #Check if this property is already owned by some player
         if (ownerExisting):
             if (owner.getuserID() == player.getuserID()):
-                #If the current player owns this property
-                pass
+                #Player lands on their own property; can do any property handlings back in the caller turn() function 
+                return
             else: #If another player owns the property; pay rent or mortgage
                 player.payRent(owner, titleDeedName, boardTile, dice)
         else: 
+            #This is when this property is not yet owned by some player 
+
             titleDeed = self.bank.getTitleDeedCard(titleDeedName, boardTile)
             if (titleDeed == None): 
                 print("Invalid title deed requested or bank does not have this card.")

@@ -354,7 +354,7 @@ class Player():
             owner.changeMonetaryValue(rentAmount) 
 
         #If transports... 
-        
+
     #Add a title deed to player's possession
     def addTitleDeed(self, titleDeed, purchaseValue, bank): 
         #Add title deed to posession
@@ -370,8 +370,18 @@ class Player():
         self.changeMonetaryValue(-1 * purchaseValue)
         bank.add(purchaseValue)
     
+    #Remove a title deed from player's possession 
+    #For properties, this assumes the player does not have any buildings on that property
+    def removeTitleDeed(self, titleDeed, bank): 
+        pass 
 
+    #def purchaseHome()
+    #def purchaseHotel()
+    #def sellHome()
+    #def sellHotel() 
 
+    def handleExistingTitleDeeds(self): 
+        pass 
 
     
 
