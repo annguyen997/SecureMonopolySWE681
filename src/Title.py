@@ -68,8 +68,8 @@ class Title(object):
         def getOwner(self):
             return self.owner
         
-        def setOwner(self, player): 
-            self.owner = player 
+        def setOwner(self, playerName): 
+            self.owner = playerName
 
         """
         Notes: 
@@ -148,6 +148,9 @@ class Property:
 class Utility: 
     UTILITY = ["Electric Company", "Water Works"]
 
+    UTILITY_ONE = 1
+    UTILITY_BOTH = 2
+    
     UTILITY_CARDS = [
         #Utilies do not have buildings and the associated rental costs and do not have a color group
         Title("Utility", "Electric Company", 150, [4, 10], 75),
@@ -161,7 +164,7 @@ class Transports:
     TRANSPORTS = ["Reading Railroad", "Pennsylvania Railroad", "B. & O. Railroad", "Short Line"]
 
     TRANSPORTS_CARDS = [
-        #Transports do not have buildings and a color group, but do have tiered rental amounts
+        #Transports do not have buildings and a color group, but do have tiered rental amounts depending how much owner has transports
         Title("Transports", "Reading Railroad", 200, [25, 50, 100, 200], 100),
         Title("Transports", "Pennsylvania Railroad", 200, [25, 50, 100, 200], 100), 
         Title("Transports", "B. & O. Railroad", 200, [25, 50, 100, 200], 100), 

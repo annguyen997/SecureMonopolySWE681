@@ -10,6 +10,9 @@ class Bank:
     INCOME_TAX = -200
     LUXURY_TAX = -100
 
+    #Utility/Transport Multipler
+    RENT_MULTIPLER = 10
+
     #Numer of properties available
     HOMES_AVAILABLE = 4 * len(Property.PROPERTY_CARDS)
     HOTELS_AVAILABLE = 1 * len(Property.PROPERTY_CARDS)
@@ -48,10 +51,7 @@ class Bank:
     def subtract(self, amount):
         self.moneyReserves -= amount 
 
-    #Perform a transaction between two accounts
-    def transaction(self, amount, receiver): 
-        pass
-
+    #Retrieve the title deed. This assumes the bank has this card. 
     def getTitleDeedCard(self, titleName, boardTileName):
         if (boardTileName == "Property"):  
             for propertyCard in self.propertyCards: 
@@ -79,6 +79,40 @@ class Bank:
         
         #Invalid item is used
         return None 
+
+    #Remove a title deed from bank's possession 
+    def removeTitleDeed(self, titleDeed): 
+        titleType = titleDeed.getTitleType()
+        titleName = titleDeed.getName() 
+
+        if (titleType == "Property"):  
+            for propertyCard in self.propertyCards: 
+                if (propertyCard.getName() == titleName):
+                    self.propertyCards.remove(propertyCard) 
+                    return 
+        
+        elif (titleType == "Utility"):
+            for utilityCard in self.utilityCards: 
+                if (utilityCard.getName() == titleName):
+                    self.utilityCards.remove(utilityCard) 
+                    return 
+
+        elif (titleType == "Transports"):
+            for transportsCard in self.transportsCards: 
+                if (transportsCard.getName() == titleName):
+                    self.transportsCards.remove(transportsCard) 
+                    return 
+    
+    #Add a title deed to bank's possession (e.g. player sells the card)
+    def addTitleDeed(self, titleDeed): 
+        titleType = titleDeed.getTitleType()
+
+        if (titleType == "Property"):  
+            self.propertyCards.append(titleDeed)
+        elif (titleType == "Utility"):
+           self.utilityCards.append(titleDeed)
+        elif (titleType == "Transports"):
+            self.transportsCards.append(titleDeed)
 
     def purchaseHome(self): 
         pass

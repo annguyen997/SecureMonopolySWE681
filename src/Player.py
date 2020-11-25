@@ -1,4 +1,5 @@
 import Board, Bank
+from Title import Title, Property, Utility, Transports
 
 class Player():
     #Dual means both Regular and Banker, used only if there are less than 5 players; Bank can be automated
@@ -60,9 +61,9 @@ class Player():
     def getTitleDeeds(self): 
         return self.titleDeeds
     
-    #Add a property to the player's list of possessions
-    def addTitleDeeds(self, propertyCard): 
-        self.titleDeeds.append(propertyCard)
+    #Add a title deed to the player's list of possessions
+    def addTitleDeeds(self, titleDeed): 
+        self.titleDeeds.append(titleDeed)
 
     def getNumHomes(self): 
         return self.num_homes
@@ -100,7 +101,7 @@ class Player():
             return 0
 
         #Check if player rolled doubles 
-        if dice.double: 
+        if dice.getDoubleStatus(): 
             self.consecutiveDoubles += 1
 
             #Check if user goes to jail if 3 doubles in a row
@@ -108,6 +109,10 @@ class Player():
                 self.setInJailStatus(True)
                 self.setPosition(Board.TILES_JAIL[0])
                 self.consecutiveDoubles = 0 
+
+                #Rese the dice's double status
+                dice.resetDoubleStatus()
+
                 return #If going to jail, end the turn right here
 
         else: 
@@ -320,13 +325,48 @@ class Player():
         #Roll a double 
 
     #User pays the rent to the other player
-    def payRent(self, owner, titleDeedName, boardTile): 
-        titleDeed = self.bank.getTitleDeedCard(titleDeedName, boardTile)
+    def payRent(self, owner, titleDeedName, boardTile, dice):
+        titleDeedCard = None
 
+        #Get the title deed information 
+        titleDeedsList = owner.getTitleDeeds() 
+        for titleDeed in titleDeedsList: 
+            if (titleDeedName == titleDeed.getName()):
+                titleDeedCard = titleDeed
 
-    #Add a property/title deed to player's possession
-    def addProperty(self, titleDeed, purchaseValue, bank): 
-        self.properties.append(titleDeed)
+        #Check if the property is in mortgage
+
+        #Check if the owner owns a monopoly - that is owns all title deeds of that color group 
+        #If so, check if that title deed is undeveloped
+
+        #Check if that property contains homes or hotels
+
+        #If utility, roll dice, and the value is 4x roll multiply by 10
+        if (boardTile == "Utility"): 
+            diceRoll = dice.rollDice()
+            
+            #if owner has both utilities - use 10 
+            #Get the rent amount
+            rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_ONE] * Bank.RENT_MULTIPLER
+
+            #Make the rent payment
+            self.changeMonetaryValue(-1 * rentAmount)
+            owner.changeMonetaryValue(rentAmount) 
+
+        #If transports... 
+        
+    #Add a title deed to player's possession
+    def addTitleDeed(self, titleDeed, purchaseValue, bank): 
+        #Add title deed to posession
+        self.addTitleDeeds(titleDeed)
+
+        #Remove card from bank's possession
+        bank.removeTitleDeed(titleDeed)
+
+        #Set the owner to the title deed 
+        titleDeed.setOwner(self.getName())
+
+        #Make the purchase 
         self.changeMonetaryValue(-1 * purchaseValue)
         bank.add(purchaseValue)
     

@@ -67,7 +67,7 @@ class Game:
         self.playerList = newPlayersList
 
         #Reset double class variable should value have changed 
-        self.dice.double = False
+        self.dice.resetDoubleStatus()
 
     #Determine winner of the game   
     def determineWinner(self, timerExpired = false):
@@ -152,7 +152,7 @@ class Game:
         #This statement also runs in player lands on Free Parking space 
 
         #Go again if not on jail and has thrown double
-        if (not player.getInJailStatus() and dice.double):
+        if (not player.getInJailStatus() and dice.getDoubleStatus()):
             turn(player) 
 
     #Get the title deed card and do the following actions based on the information provided.
@@ -164,7 +164,7 @@ class Game:
         
         #Check for owner information of a property
         for player in self.players: 
-            user_properties = player.getProperties()
+            user_properties = player.getTitleDeeds()
             if (titleDeedName in user_properties):
                 ownerExisting = True
                 owner = player
@@ -175,14 +175,16 @@ class Game:
                 #If the current player owns this property
                 pass
             else: #If another player owns the property; pay rent or mortgage
-                player.payRent(owner, titleDeedName, boardTile)
+                player.payRent(owner, titleDeedName, boardTile, dice)
         else: 
             titleDeed = self.bank.getTitleDeedCard(titleDeedName, boardTile)
-            printedValue = titleDeed.getPrintedValue()
+            if (titleDeed == None): 
+                print("Invalid title deed requested or bank does not have this card.")
+                return #End immediately 
 
-            #Print card's information and request user input
+            #Get the printed value price, print card's information, and request user input
+            printedValue = titleDeed.getPrintedValue()
             print(titleDeed) 
-            
             value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
                     "or do you wish to auction? \n" +
                     "If you want to purchase, please type the word 'Purchase'. \n" + 
@@ -197,7 +199,7 @@ class Game:
             """
 
             if (value == "Purchase"): 
-                player.addProperty(titleDeed, printedValue, self.bank)
+                player.addTitleDeed(titleDeed, printedValue, self.bank)
             elif (value == "Auction"):   #Get the starting value
                 #Validate the starting value - ensure value is not too high 
                 startingPrice = input("Please supply the starting price for auction: ")
@@ -270,7 +272,7 @@ class Game:
         print(winnerAnnounce)
 
         #Conduct the purchase of property
-        playerAuctionWinner.addProperty(titleDeed, highestAmount, self.bank)
+        playerAuctionWinner.addTitleDeed(titleDeed, highestAmount, self.bank)
 
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()

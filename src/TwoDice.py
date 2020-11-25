@@ -58,5 +58,13 @@ class TwoDice:
     #Get the value of both dice 
     def getTotal(self):
         return total 
+
+    #Get the double status
+    def getDoubleStatus(self): 
+        return self.double
+
+    #Reset the double status
+    def resetDoubleStatus(self):
+        self.double = False
             
             
