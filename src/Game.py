@@ -122,7 +122,7 @@ class Game:
         if (player.getInJailStatus()):
             player.position = Board.TILES_JAIL[0]
             player.setJailTurns(3)
-            return #End the turn here
+            return #End the turn here - do not do any other action
 
         #Get property card if player landed on property, utility, or transports tile
         if boardTile in ("Property", "Utility", "Transports"):
@@ -150,8 +150,9 @@ class Game:
         #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
         #User can also wish to sell properties 
         #This statement also runs in player lands on Free Parking space 
-        
-        #player.handleExistingTitleDeeds() 
+        player.handleExistingTitleDeeds() 
+
+        #Check if user is bankrupt 
 
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and dice.getDoubleStatus()):

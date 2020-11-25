@@ -310,7 +310,7 @@ class Player():
         self.changeMonetaryValue(taxCharged)
         bank.add(abs(taxCharged))
 
-    #Options to escape jail 
+    #Options to escape jail - Note player can collect rent, but cannot do any changes on title deeds at this time. 
     def escapeJailOptions(self): 
         print("You are currently in jail, and you have " + self.getJailTurns() + " left in jail." + 
               "\nYou do have three options if you wish to get out of jail early." + 
@@ -385,22 +385,29 @@ class Player():
     def handleExistingTitleDeeds(self): 
         #May need a while loop to loop through options continuously until user wishes to end the round
 
-        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels 
+        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
+        #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that smae color group.
+
+        #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
 
         #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
-        #That property also must not be mortgaged
+        #The property also must not be mortgaged as well as others in color group
 
         #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
-        #That property also must not be mortgaged
+        #The property also must not be mortgaged as well as others in color group
 
         #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
 
-        #If user wishes to sell a house, get property name
-        #If user wishes to sell a hotel, get property name
+        #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
+        #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
         
-        #If user wishes to sell a property
+        #If user wishes to sell a property to another user - ensure there are no buildings
 
-        #If user wishes to sell a utility or transports
+        #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
+
+        #If user wishes to sell a utility or transports to another user
+
+
         pass
 
     #Check if user has run out of cash
@@ -408,6 +415,10 @@ class Player():
         if (self.getMonetaryValue() <= 0): 
             return True #User does not have cash 
         return False 
+    
+    #If bankrupt, start the destruction process
+    def declareBankruptcy(self): 
+        pass 
 
             
 
