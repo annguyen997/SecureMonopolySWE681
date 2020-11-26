@@ -172,8 +172,8 @@ class Game:
         
         #Check for owner information of a property
         for player in self.players: 
-            user_properties = player.getTitleDeeds()
-            if (titleDeedName in user_properties):
+            user_titleDeeds = player.getTitleDeeds()
+            if (titleDeedName == user_titleDeeds["Title Deed"].getName()):
                 ownerExisting = True
                 owner = player
         
@@ -219,17 +219,17 @@ class Game:
     
     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
     #A timer may be needed for each user to input a value; if runs out user does not play. - 1 minute max
-    def auctionProperty(self, startingPrice, titleDeed, name):
+    def auctionProperty(self, startingPrice, titleDeed, playerName):
         auctionAmounts = [0] * len(self.players)
         self.bank.startAuction(startingPrice)
 
         #First Round - Skipping the starting bid player
-        print("An auction has started for " + titleDeed.getName() + ", started by " + name + ".\n" + 
+        print("An auction has started for " + titleDeed.getName() + ", started by " + playerName + ".\n" + 
             "The starting bid for this auction is: " + str(startingPrice))
 
         numberAuctioned = 0
         for player in self.player: 
-            if (name == player.getName()):
+            if (playerName == player.getName()):
                 auctionAmounts[numberAuctioned] = startingPrice
                 numberAuctioned += 1
                 continue #Skip that player since they inputted starting bid.
@@ -292,8 +292,6 @@ class Game:
         titleDeedsOwned = player.getTitleDeeds()
         titleDeedsNames = [titleDeed.getName() for titleDeed in titleDeedsOwned]
 
-        #May need a while loop to loop through options continuously until user wishes to end the round
-        userHandling = True
         displayOptions = "Type in one of the following options exactly as shown: "
         + "\n 1. Mortgage a Property"  
         + "\n 2. Repay a Mortgaged Property" 
@@ -307,41 +305,45 @@ class Game:
         + "\n 10. Sell a Transport"
         + "\n 11. End Turn" 
 
-    while (userHandling): 
-        #Need to validate the input result
-        optionSelection = input(displayOptions + "\n\n Enter your choice: ")
+        #May need a while loop to loop through options continuously until user wishes to end the round
+        userHandling = True
+        while (userHandling): 
+            #Need to validate the input result
+            optionSelection = input(displayOptions + "\n\n Enter your choice: ")
 
-        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
-        #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that same color group.
-        if (optionSelection == "Mortgage a Property"):
-            self.getMortgage(player, titleDeedsOwned, titleDeedsNames)
+            #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
+            #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that same color group.
+            if (optionSelection == "Mortgage a Property"):
+                self.getMortgage(player, titleDeedsOwned, titleDeedsNames)
 
-        #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
+            #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
 
-        #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
-        #The property also must not be mortgaged as well as others in color group
+            #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
+            #The property also must not be mortgaged as well as others in color group
 
-        #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
-        #The property also must not be mortgaged as well as others in color group
+            #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
+            #The property also must not be mortgaged as well as others in color group
 
-        #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
+            #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
 
-        #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
-        #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
+            #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
+            #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
+            
+            #If user wishes to sell a property to another user - ensure there are no buildings
+
+            #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
+
+            #If user wishes to sell a utility or transports to another user
+
+            #If user wishes to exit
+            elif(optionSelection == "End Turn"): 
+                userHandling = False
+            
+            #If user entered invalid choice
+            else: 
+                print("\nYou have entered an invalid choice. Please try again.\n")
         
-        #If user wishes to sell a property to another user - ensure there are no buildings
-
-        #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
-
-        #If user wishes to sell a utility or transports to another user
-
-        #If user wishes to exit
-        elif(optionSelection == "End Turn"): 
-            userHandling = False
-        
-        #If user entered invalid choice
-        else: 
-            print("\nYou have entered an invalid choice. Please try again.\n")
+        print("End processing of making changes to user's title deeds.")
     
     #Helper function to process player's interest to get mortgage on a title deed. 
     def getMortgage(self, player, titleDeedsNames, titleDeedsOwned): 
@@ -356,16 +358,18 @@ class Game:
         #Search for the title deed, and get the card information
         titleDeedCard = None 
         for titleDeed in titleDeedsOwned: 
-            if (titleDeedToMortgage == titleDeed.getName()): 
+            if (titleDeedToMortgage == titleDeed["Title Deed"].getName()): 
                 titleDeedCard = titleDeed
             
         if (titleDeedCard == None): 
             print("There is no title deed card with that name. Returning to previous menu.")
             return #Go to the previous caller function 
         
-        #Check if there is any buildings on that title deed. 
-        if (titleDeedCard.getTileType() == "Property" and ):
-            
+        #Check if there is any buildings on that title deed and other title deeds of that color group. 
+        #If there are any buildings, player must sell all properties 
+        if (titleDeedCard.getTileType() == "Property" and (titleDeedCard["Houses"] or titleDeedCard["Hotels"])):
+            print("You cannot mortgage ")
+
         #Get the mortgage value 
                 
         

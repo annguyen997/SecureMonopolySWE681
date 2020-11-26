@@ -13,7 +13,6 @@ class Player():
         self.name = name                        #Name of player
         self.money = 0                          #Cash on hand - starts with 1500
         self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
-        self.titleDeeds = []                    #Start with no properties
         self.bankrupt = False                   #Bankrupt status
         
         self.inJail = False                     #Check if user is in jail 
@@ -23,6 +22,11 @@ class Player():
         self.consecutiveDoubles = 0             #Start with no doubles 
         self.order = None                       #Determine the order of play in game - default is None. 
 
+        self.titleDeeds = []                    #Start with no title deeds owned
+        self.propertyOwned = 0                  #Number of properties owned 
+        self.colorMonopolies = []               #List of color group monopolies owned 
+        self.utilityOwned = 0                   #Number of utilities owned
+        self.transportsOwned = 0                #Number of transports owned
         self.num_homes = 0                      #Number of homes in total 
         self.num_hotels = 0                     #Number of hotels in total 
 
@@ -64,8 +68,22 @@ class Player():
     
     #Add a title deed to the player's list of possessions
     def addTitleDeeds(self, titleDeed): 
-        self.titleDeeds.append(titleDeed)
+        titleType = titleDeed.getTitleType() 
+
+        if (titleType == "Property"): 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
+            self.propertyOwned += 1
+        elif (titleType == "Utility"):
+            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.utilityOwned += 1
+        elif(titleType == "Transports"): 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.transportsOwned += 1
     
+    #Remove a title deed from a player's list of possessions 
+    def removeTitleDeed(self, titleDeedName): 
+        pass
+
     #Get total number of homes owned
     def getNumHomes(self): 
         return self.num_homes
