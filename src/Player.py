@@ -14,10 +14,11 @@ class Player():
         self.money = 0                          #Cash on hand - starts with 1500
         self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
         self.titleDeeds = []                    #Start with no properties
+        self.bankrupt = False                   #Bankrupt status
+        
+        self.inJail = False                     #Check if user is in jail 
         self.jail_cards = []                    #Jail cards in posession 
         self.jail_turns = 0                     #Number of remaining turns in jail
-        self.bankrupt = False                   #Bankrupt status
-        self.inJail = False                     #Check if user is in jail 
 
         self.consecutiveDoubles = 0             #Start with no doubles 
         self.order = None                       #Determine the order of play in game - default is None. 
@@ -64,10 +65,12 @@ class Player():
     #Add a title deed to the player's list of possessions
     def addTitleDeeds(self, titleDeed): 
         self.titleDeeds.append(titleDeed)
-
+    
+    #Get total number of homes owned
     def getNumHomes(self): 
         return self.num_homes
-
+    
+    #Get total number of hotels owned 
     def getNumHotels(self): 
         return self.num_hotels 
 
@@ -382,33 +385,8 @@ class Player():
     #def sellHome()
     #def sellHotel() 
 
-    def handleExistingTitleDeeds(self): 
-        #May need a while loop to loop through options continuously until user wishes to end the round
-
-        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
-        #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that smae color group.
-
-        #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
-
-        #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
-        #The property also must not be mortgaged as well as others in color group
-
-        #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
-        #The property also must not be mortgaged as well as others in color group
-
-        #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
-
-        #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
-        #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
-        
-        #If user wishes to sell a property to another user - ensure there are no buildings
-
-        #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
-
-        #If user wishes to sell a utility or transports to another user
-
-
-        pass
+    def addMortgage(self): 
+        pass 
 
     #Check if user has run out of cash
     def runOutOfCash(self): 
@@ -420,6 +398,7 @@ class Player():
     def declareBankruptcy(self): 
         pass 
 
+    
             
 
             

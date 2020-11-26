@@ -77,6 +77,11 @@ class Game:
     def run(self): 
         #Determine who plays first 
         self.determineFirstPlayer()
+        
+        #Add money to each player before starting the first round
+        for player in self.players: 
+            player.changeMonetaryValue(Bank.STARTING_AMOUNT)
+            bank.subtract(Bank.STARTING_AMOUNT)
 
         #Play game until a winner is found 
         winner = False
@@ -150,7 +155,7 @@ class Game:
         #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
         #User can also wish to sell properties 
         #This statement also runs in player lands on Free Parking space 
-        player.handleExistingTitleDeeds() 
+        self.handleExistingTitleDeeds(player) 
 
         #Check if user is bankrupt 
 
@@ -282,4 +287,85 @@ class Game:
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
 
+    def handleExistingTitleDeeds(self, player): 
+        #Get player's title deeds
+        titleDeedsOwned = player.getTitleDeeds()
+        titleDeedsNames = [titleDeed.getName() for titleDeed in titleDeedsOwned]
 
+        #May need a while loop to loop through options continuously until user wishes to end the round
+        userHandling = True
+        displayOptions = "Type in one of the following options exactly as shown: "
+        + "\n 1. Mortgage a Property"  
+        + "\n 2. Repay a Mortgaged Property" 
+        + "\n 3. Purchase a House"
+        + "\n 4. Purchase a Hotel"
+        + "\n 5. Sell a House"
+        + "\n 6. Sell a Hotel" 
+        + "\n 7. Sell a Property to Another User"
+        + "\n 8. Sell a Mortgaged Property to Another User"
+        + "\n 9. Sell a Utility"
+        + "\n 10. Sell a Transport"
+        + "\n 11. End Turn" 
+
+    while (userHandling): 
+        #Need to validate the input result
+        optionSelection = input(displayOptions + "\n\n Enter your choice: ")
+
+        #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
+        #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that same color group.
+        if (optionSelection == "Mortgage a Property"):
+            self.getMortgage(player, titleDeedsOwned, titleDeedsNames)
+
+        #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
+
+        #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
+        #The property also must not be mortgaged as well as others in color group
+
+        #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
+        #The property also must not be mortgaged as well as others in color group
+
+        #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
+
+        #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
+        #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
+        
+        #If user wishes to sell a property to another user - ensure there are no buildings
+
+        #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
+
+        #If user wishes to sell a utility or transports to another user
+
+        #If user wishes to exit
+        elif(optionSelection == "End Turn"): 
+            userHandling = False
+        
+        #If user entered invalid choice
+        else: 
+            print("\nYou have entered an invalid choice. Please try again.\n")
+    
+    #Helper function to process player's interest to get mortgage on a title deed. 
+    def getMortgage(self, player, titleDeedsNames, titleDeedsOwned): 
+        #Print all title deeds owned
+        for titleDeed in titleDeedsNames: 
+            print(titleDeed) 
+        print("You may need to scroll if you own a large number of title deeds.")
+    
+        #User types in title deed to mortgage
+        titleDeedToMortgage = input("Enter name of title deed you wish to mortgage: ")  #This needs validation
+
+        #Search for the title deed, and get the card information
+        titleDeedCard = None 
+        for titleDeed in titleDeedsOwned: 
+            if (titleDeedToMortgage == titleDeed.getName()): 
+                titleDeedCard = titleDeed
+            
+        if (titleDeedCard == None): 
+            print("There is no title deed card with that name. Returning to previous menu.")
+            return #Go to the previous caller function 
+        
+        #Check if there is any buildings on that title deed. 
+        if (titleDeedCard.getTileType() == "Property" and ):
+            
+        #Get the mortgage value 
+                
+        
