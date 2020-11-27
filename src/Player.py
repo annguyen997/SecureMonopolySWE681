@@ -71,7 +71,7 @@ class Player():
         titleType = titleDeed.getTitleType() 
 
         if (titleType == "Property"): 
-            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
             self.propertyOwned += 1
             
             #Check if adding the property means the player has a monopoly
@@ -87,9 +87,9 @@ class Player():
                     #If given property item is not part of the owner's list of title deeds
                     createMonopoly = False 
                     break 
-            
+
             if (createMonopoly): 
-                self.colorMonopoly.append(colorGroupName)
+                self.colorMonopoly.append({"Color Group": colorGroupName, "Number Buildings Built": 0})
 
         elif (titleType == "Utility"):
             self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
@@ -101,6 +101,18 @@ class Player():
     #Remove a title deed from a player's list of possessions 
     def removeTitleDeed(self, titleDeedName): 
         pass
+    
+    def getPropertyOwned(self): 
+        return self.propertyOwned
+    
+    def getColorMonopoly(self):
+        return self.colorMonopoly
+    
+    def getUtilityOwned(self):
+        return self.utilityOwned
+    
+    def getTransportsOwned(self):
+        return self.transportsOwned
 
     #Get total number of homes owned
     def getNumHomes(self): 
@@ -398,7 +410,7 @@ class Player():
 
     #Add a title deed to player's possession
     def addTitleDeed(self, titleDeed, purchaseValue, bank): 
-        #Add title deed to posession
+        #Add title deed to possession
         self.addTitleDeeds(titleDeed)
 
         #Remove card from bank's possession
@@ -417,8 +429,15 @@ class Player():
         pass 
 
     #def purchaseHome()
+    #get color group 
+    #if colorGroup == colorName
+    #Increase number to 1 
+
     #def purchaseHotel()
+
     #def sellHome()
+    #Decrease number to 1
+
     #def sellHotel() 
 
     def addMortgage(self): 
