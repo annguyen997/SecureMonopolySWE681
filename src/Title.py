@@ -103,6 +103,27 @@ class Property:
     HOMES_RENT = [1, 2, 3, 4]
     HOTEL_RENT = [1]            #This would be the value '5' in the rent costs list 
 
+    @staticmethod
+    def getColorGroup(self, colorGroupName): 
+        if (colorGroupName == "BROWN"):
+            return Property.BROWN
+        elif (colorGroupName == "LIGHT_BLUE"):
+            return Property.LIGHT_BLUE
+        elif (colorGroupName == "PINK"):
+            return Property.PINK
+        elif (colorGroupName == "ORANGE"):
+            return Property.ORANGE
+        elif (colorGroupName == "RED"): 
+            return Property.RED
+        elif (colorGroupName == "YELLOW"):
+            return Property.YELLOW
+        elif (colorGroupName == "GREEN"):
+            return Property.GREEN
+        elif (colorGroupName == "DARK_BLUE"):
+            return Property.DARK_BLUE
+        else: 
+            return None 
+
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
     PROPERTY_CARDS = [
         Title("Property", "Mediterranean Avenue", 60, 2, 30, [10, 30, 90, 160, 250], [50, 50], 'BROWN'),
@@ -135,7 +156,7 @@ class Property:
         Title("Property", "Park Place", 350, 35, 175, [175, 500, 1100, 1300, 1500], [200, 200], 'DARK_BLUE'),
 		Title("Property", "Boardwalk", 400, 50, 200, [200, 600, 1400, 1700, 2000], [200, 200], 'DARK_BLUE')
 	]
-
+    
     def __init__(self): 
         self.properties = PROPERTY_CARDS
     

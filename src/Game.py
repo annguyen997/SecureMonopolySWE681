@@ -367,9 +367,11 @@ class Game:
         
         #Check if there is any buildings on that title deed and other title deeds of that color group. 
         #If there are any buildings, player must sell all properties 
-        if (titleDeedCard.getTileType() == "Property" and (titleDeedCard["Houses"] or titleDeedCard["Hotels"])):
-            print("You cannot mortgage ")
+        if (titleDeedCard.getTileType() == "Property" and
+        (titleDeedCard["Houses"] or titleDeedCard["Hotels"])):
+            print("You cannot mortgage this property because ")
 
         #Get the mortgage value 
+        mortgageValue = titleDeedCard.getMortgageValue()
                 
         

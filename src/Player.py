@@ -24,7 +24,7 @@ class Player():
 
         self.titleDeeds = []                    #Start with no title deeds owned
         self.propertyOwned = 0                  #Number of properties owned 
-        self.colorMonopolies = []               #List of color group monopolies owned 
+        self.colorMonopoly = []                 #List of color group monopolies owned 
         self.utilityOwned = 0                   #Number of utilities owned
         self.transportsOwned = 0                #Number of transports owned
         self.num_homes = 0                      #Number of homes in total 
@@ -73,6 +73,24 @@ class Player():
         if (titleType == "Property"): 
             self.titleDeeds.append({"Title Deed": titleDeed, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
             self.propertyOwned += 1
+            
+            #Check if adding the property means the player has a monopoly
+            colorGroupName = titleDeed.getColorGroup() 
+            colorGroupList = Property.getColorGroup(colorGroupName)
+
+            createMonopoly = True
+            for propertyItem in colorGroupList:
+                if (propertyItem == titleDeed.getName()): 
+                    #Property item refers to the title deed being added 
+                    continue
+                elif (not propertyItem in self.titleDeeds):
+                    #If given property item is not part of the owner's list of title deeds
+                    createMonopoly = False 
+                    break 
+            
+            if (createMonopoly): 
+                self.colorMonopoly.append(colorGroupName)
+
         elif (titleType == "Utility"):
             self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
             self.utilityOwned += 1
