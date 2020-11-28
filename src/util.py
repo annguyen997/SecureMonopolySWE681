@@ -202,9 +202,6 @@ def repayMortgage(self, player, titleDeedsOwned, bank):
         "Returning to the previous menu.")
 
 #Helper function to process player's interest to get a home
-
-#If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
-#The property also must not be mortgaged as well as others in color group
 def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned
     for titleDeed in titleDeedsNames: 
@@ -259,7 +256,33 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
             return #Go to the previous caller function
     
     #Check if other properties have the exactly same number as homes/hotels available for this property
-    pass
+    if (colorMonopoly):
+        #Get current number of buildings of title deed player wishes to purchase another building
+        getCurrentHouses = titleDeedRecord["Houses"]
+
+        #Check other properties of the color group
+        propertiesList = Title.getColorGroup(colorGroup)
+
+        notEvenHouses = False 
+        for propertyItem in propertiesList:
+            for titleDeed in titleDeedsOwned: 
+                if (titleDeed["Title Deed"].getName() == propertyItem):
+                    #Get current number of buildings of that title deed
+                    getCurrentHousesOther = titleDeed["Houses"]
+
+                    print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther)
+                    if (getCurrentHousesOther < getCurrentHouses):
+                        notEvenHouses = True
+
+        if (notEvenHouses): 
+            print("You cannot build another house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
+            return #Go to the previous caller function.
+    
+    #Check if all properties currently have four houses 
+    
+    #If other requirements are passed, purchase the house 
+    buildingCost = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST)
+    
 
 
 

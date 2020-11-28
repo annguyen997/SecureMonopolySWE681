@@ -103,6 +103,10 @@ class Property:
     HOMES_RENT = [0, 1, 2, 3]
     HOTEL_RENT = [4]            #This would be the fourth item in the rent costs list 
 
+    #Index to get the building cost
+    HOMES_COST = 0
+    HOTELS_COST = 1
+    
     @staticmethod
     def getColorGroup(self, colorGroupName): 
         if (colorGroupName == "BROWN"):

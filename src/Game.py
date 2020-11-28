@@ -300,8 +300,8 @@ class Game:
         + "\n 4. Purchase a Hotel"
         + "\n 5. Sell a House"
         + "\n 6. Sell a Hotel" 
-        + "\n 7. Sell a Property to Another User"
-        + "\n 8. Sell a Mortgaged Property to Another User"
+        + "\n 7. Sell a Property"
+        + "\n 8. Sell a Mortgaged Property"
         + "\n 9. Sell a Utility"
         + "\n 10. Sell a Transport"
         + "\n 11. End Turn" 
@@ -323,22 +323,38 @@ class Game:
 
             #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
             #The property also must not be mortgaged as well as others in color group
-            elif (optionSelection == "Purchase a Home"):
+            elif (optionSelection == "Purchase a House"):
                 util.purchaseHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
             #The property also must not be mortgaged as well as others in color group
-
+            elif (optionSelection == "Purchase a Hotel"): 
+                pass
             #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
 
             #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
+            elif (optionSelection == "Sell a House"): 
+                pass
+
             #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
-            
+            elif (optionSelection == "Sell a Hotel"): 
+                pass
+
             #If user wishes to sell a property to another user - ensure there are no buildings
+            elif (optionSelection == "Sell a Property"): 
+                pass
 
             #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
+            elif (optionSelection == "Sell a Mortgaged Property"): 
+                pass
 
             #If user wishes to sell a utility or transports to another user
+            elif (optionSelection == "Sell a Utility"): 
+                pass
+
+            #If user wishes to sell a transports to another user
+            elif (optionSelection == "Sell a Transport"): 
+                pass
 
             #If user wishes to exit
             elif(optionSelection == "End Turn"): 
