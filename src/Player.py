@@ -92,10 +92,10 @@ class Player():
                 self.colorMonopoly.append({"Color Group": colorGroupName, "Number Buildings Built": 0})
 
         elif (titleType == "Utility"):
-            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": None, "Hotels": None, "Color Group": None}) 
             self.utilityOwned += 1
         elif(titleType == "Transports"): 
-            self.titleDeeds.append({"Title Deed": titleDeed, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": None, "Hotels": None, "Color Group": None}) 
             self.transportsOwned += 1
     
     #Remove a title deed from a player's list of possessions 
@@ -361,7 +361,7 @@ class Player():
         self.changeMonetaryValue(taxCharged)
         bank.add(abs(taxCharged))
 
-    #Options to escape jail - Note player can collect rent, but cannot do any changes on title deeds at this time. 
+    #Options to escape jail - Note player can collect rent or make changes to the title deeds
     def escapeJailOptions(self): 
         print("You are currently in jail, and you have " + self.getJailTurns() + " left in jail." + 
               "\nYou do have three options if you wish to get out of jail early." + 
@@ -369,44 +369,85 @@ class Player():
               "\nUse a get out of jail free card - Type 'Jail Free Card' to use this option." + 
               "\nRoll a double - Type 'Roll Dice' to use this option.")
 
-        jailOption = input("Select an option based on the options listed.")
+        jailOption = input("Select an option based on the options listed.") #This needs to be validated
         
         #Pay 50 fine
+        if (jailOption == "Pay 50")
         #Use get out of jail free card
         #Roll a double 
 
     #User pays the rent to the other player
     def payRent(self, owner, titleDeedName, boardTile, dice):
         titleDeedCard = None
+        titleDeedRecord = None
+        rentAmount = 0
 
         #Get the title deed information 
         titleDeedsList = owner.getTitleDeeds() 
-        for titleDeed in titleDeedsList: 
-            if (titleDeedName == titleDeed.getName()):
-                titleDeedCard = titleDeed
+        for titleDeedItem in titleDeedsList: 
+            if (titleDeedName == titleDeedItem["Title Deed"].getName()):
+                titleDeedRecord = titleDeedItem
+                titleDeedCard = titleDeedItem["Title Deed"]
+        
+        #No payment can be made given no information is available 
+        if (titleDeedCard == None): 
+            print("There is no title deed card information available for " + titleDeedName)
+            return 
 
-        #Check if the property is in mortgage, if so do not collect rent
+        #Check if the title deed is in mortgages, if so do not collect rent
+        if (titleDeedRecord["Mortgaged"]):
+            print("This property " + titleDeedCard.getName() + " is currently mortgaged, and rent cannot be collected at this time.") 
+            return #Go back to the caller function; do not collect rent
 
-        #Check if the owner owns a monopoly - that is owns all title deeds of that color group 
-        #If so, check if that title deed is undeveloped
+        #If title deed is a property, additional checking is needed to determine the rent value.
+        if (boardTile == "Property"): 
+            #Check if the owner owns a monopoly - that is owns all title deeds of that color group 
+            colorGroup = titleDeedCard.getColorGroup() 
 
-        #Check if that property contains homes or hotels
+            #If the owner has a monopoly on that color group
+            if (colorGroup in owner.getColorMonopoly()): 
+                #Get the number of houses and hotels of that property
+                num_Houses = titleDeedRecord["Houses"]
+                num_Hotels = titleDeedRecord["Hotels"]
 
-        #If utility, roll dice, and the value is 4x roll multiply by 10
-        if (boardTile == "Utility"): 
+                if (num_Houses): 
+                    #There is at least one house on the property
+                    rentAmount = titleDeedCard.getRentCosts(Property.HOMES_RENT[num_Houses - 1])
+                elif (num_Hotels): 
+                    #There may be no homes on the property, but there is a hotel 
+                    rentAmount = titleDeedCard.getRentCosts(Property.HOTELS_RENT)
+                else: 
+                    #This is an undeveloped site 
+                    rentAmount = titleDeedCard.getRentValue() * Property.DOUBLE_RENT
+            else: 
+                #There is no monopoly on the color group associated for that property
+                rentAmount = titleDeedCard.getRentValue() 
+
+        #If utility, roll dice, and the rental amount based on number of utilities owned
+        elif (boardTile == "Utility"): 
+            #Roll the dice
             diceRoll = dice.rollDice()
             
-            #if owner has both utilities - use 10 
-            #Get the rent amount
-            rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_ONE] * Bank.RENT_MULTIPLER
+            #If owner has both utilities - use 10 
+            if (owner.getUtilityOwned() == Utility.UTILITY_BOTH):
+                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_BOTH - 1] * Bank.RENT_MULTIPLER
+            else: #If owner owns this utility only - use 4
+                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_ONE - 1] * Bank.RENT_MULTIPLER
 
-            #Make the rent payment
-            self.changeMonetaryValue(-1 * rentAmount)
-            owner.changeMonetaryValue(rentAmount) 
+        #If transports, calculate the rent amount based on number of transports title deeds owned by owner
+        elif (boardTile == "Transports"):
+            #Get the number of transports owned by the owner
+            transportsOwned = owner.getTransportsOwned() 
 
-        #If transports... 
-        if (boardTile == "Transports"):
-            pass
+            #Calculate the rental payment
+            rentAmount = titleDeedCard.getRentCosts[transportsOwned - 1] 
+
+        #Make the rental payment to owner        
+        self.changeMonetaryValue(-1 * rentAmount)
+        owner.changeMonetaryValue(rentAmount) 
+            
+        #Reset the dice's doubles
+        dice.resetDoubleStatus() 
 
     #Add a title deed to player's possession
     def addTitleDeed(self, titleDeed, purchaseValue, bank): 

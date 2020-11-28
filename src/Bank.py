@@ -6,10 +6,13 @@ class Bank:
     DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
     PASS_GO = 200
     STARTING_AMOUNT = 1500
-    
+
     #Tax Amounts on Board
     INCOME_TAX = -200
     LUXURY_TAX = -100
+
+    #Interests
+    MORTGAGE_INTEREST = 0.10
 
     #Utility/Transport Multipler
     RENT_MULTIPLER = 10

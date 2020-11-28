@@ -1,6 +1,7 @@
 import util
 import TwoDice, Player, Board, Card, Bank
 from Title import Title, Property, Utility, Transports
+
 class Game:
 
     #Instiates a new game
@@ -290,7 +291,7 @@ class Game:
     def handleExistingTitleDeeds(self, player): 
         #Get player's title deeds
         titleDeedsOwned = player.getTitleDeeds()
-        titleDeedsNames = [titleDeed.getName() for titleDeed in titleDeedsOwned]
+        titleDeedsNames = [titleDeed["Title Deed"].getName() for titleDeed in titleDeedsOwned]
 
         displayOptions = "Type in one of the following options exactly as shown: "
         + "\n 1. Mortgage a Property"  
@@ -314,12 +315,16 @@ class Game:
             #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
             #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that same color group.
             if (optionSelection == "Mortgage a Property"):
-                self.getMortgage(player, titleDeedsOwned, titleDeedsNames)
+                util.getMortgage(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
+            elif (optionSelection == "Repay a Mortgaged Property"):
+                util.repayMortgage(player, titleDeedsOwned, self.bank)
 
             #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
             #The property also must not be mortgaged as well as others in color group
+            elif (optionSelection == "Purchase a Home"):
+                util.purchaseHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
             #The property also must not be mortgaged as well as others in color group
@@ -344,50 +349,5 @@ class Game:
                 print("\nYou have entered an invalid choice. Please try again.\n")
         
         print("End processing of making changes to user's title deeds.")
-    
-    #Helper function to process player's interest to get mortgage on a title deed. 
-    def getMortgage(self, player, titleDeedsNames, titleDeedsOwned): 
-        #Print all title deeds owned
-        for titleDeed in titleDeedsNames: 
-            print(titleDeed) 
-        print("You may need to scroll if you own a large number of title deeds.")
-    
-        #User types in title deed to mortgage
-        titleDeedToMortgage = input("Enter name of title deed you wish to mortgage: ")  #This needs validation
-
-        #Search for the title deed, and get the card information
-        titleDeedCard = None 
-        for titleDeed in titleDeedsOwned: 
-            if (titleDeedToMortgage == titleDeed["Title Deed"].getName()): 
-                titleDeedCard = titleDeed
-        
-        #If there is no title deed of such name, stop processing. 
-        if (titleDeedCard == None): 
-            print("There is no title deed card with that name. Returning to previous menu.")
-            return #Go to the previous caller function 
-        
-        #Check if there is any buildings on that title deed and other title deeds of that color group. 
-        #If there are any buildings, player must sell all properties first. 
-        if (titleDeedCard.getTileType() == "Property"):
-
-            #Get the color group information from card and player 
-            colorGroup = titleDeedCard.getColorGroup()
-            playerColorMonopoly = player.getColorMonopoly()
-            colorGroupStats = None 
-
-            for colorMonopoly in playerColorMonopoly: 
-                if (colorMonopoly["Color Group"] == colorGroup):
-                    colorGroupStats = colorMonopoly
-            
-            #Check if there is any property, and if so inform player the property cannot be mortgaged 
-            if (colorGroupStats["Number Buildings Built"] > 0):
-                print("You cannot mortgage this property because there are buildings in at least one of properties in the color group " + colorGroup) 
-
-                #List the title deeds with properties 
-
-                return  #Go to the previous caller function 
-
-        #Get the mortgage value 
-        mortgageValue = titleDeedCard.getMortgageValue()
                 
         

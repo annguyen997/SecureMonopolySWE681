@@ -47,6 +47,9 @@ class TwoDice:
         #Return the sum of two dice rounds
         return round1 + round2
 
+        #Reset any double status if necessary
+        self.resetDoubleStatus()
+
     #Get the value of first die
     def getFirstDice(self): 
         return dice1

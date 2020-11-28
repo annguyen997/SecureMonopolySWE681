@@ -99,9 +99,9 @@ class Property:
     #The constant value for players to pay rent on undeveloped sites if an owner gets all title deeds of a color group
     DOUBLE_RENT = 2 
 
-    #Number of properties permitted
-    HOMES_RENT = [1, 2, 3, 4]
-    HOTEL_RENT = [1]            #This would be the value '5' in the rent costs list 
+    #Rental amount for number of buildings
+    HOMES_RENT = [0, 1, 2, 3]
+    HOTEL_RENT = [4]            #This would be the fourth item in the rent costs list 
 
     @staticmethod
     def getColorGroup(self, colorGroupName): 
@@ -180,6 +180,12 @@ class Utility:
 
     def __init__(self): 
         self.utilities = UTILITY_CARDS
+    
+    #Get the utility card 
+    def getUtilityCard(self, name): 
+        for utilityCard in self.utilities: 
+            if (utilityCard.getName() == name): 
+                return utilityCard
 
 class Transports:
     TRANSPORTS = ["Reading Railroad", "Pennsylvania Railroad", "B. & O. Railroad", "Short Line"]
@@ -194,3 +200,9 @@ class Transports:
 
     def __init__(self): 
         self.transports = TRANSPORTS_CARDS
+    
+    #Get the transports card 
+    def getTransportsCard(self, name): 
+        for transportsCard in self.transports: 
+            if (transportsCard.getName() == name): 
+                return transportsCard
