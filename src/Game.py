@@ -106,16 +106,16 @@ class Game:
 
     #Conduct the turn of a player
     def turn(self, player): 
-        #Check if player is in jail 
+        #Check if player is in jail, and if so process the options
         if (player.getInJailStatus()):
-            player.escapeJailOptions()
+            player.escapeJailOptions(bank, dice)
             return
+        else: 
+            #Get the number of eyes on dice for movement
+            moveNum = self.dice.rollDice()
 
-        #Get the number of eyes on dice for movement
-        moveNum = self.dice.rollDice()
-
-        #Move the player to new position 
-        player.move(moveNum, dice, bank)
+            #Move the player to new position 
+            player.move(moveNum, dice, bank)
  
         #Get the board tile based on player position 
         boardTile = self.board.getTileType(player.getPosition())

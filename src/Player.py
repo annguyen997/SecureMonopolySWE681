@@ -138,15 +138,27 @@ class Player():
     def removeEscapeJailCard(self):
         card = self.jail_cards.pop()
         return card
+    
+    #Check if there are jail cards available 
+    def jailCardsAvailable(self): 
+        if (len(self.jail_cards) > 0): 
+            return True
+        return False
 
+    #Get the current number of jail turns
     def getJailTurns(self): 
         return self.jail_turns
     
+    #Set the number of jail turns
     def setJailTurns(self, turns): 
         self.jail_turns = turns
+    
+    #Subtract the number of jail turns
+    def subtractJailTurns(self): 
+        self.jail_turns -= 1
 
     #Move the player across the board when it is their turn 
-    def move(self, moveNum, dice, bank):
+    def move(self, moveNum, dice, bank = None):
         #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
         if (self.jail_turns > 0):
             return 0
@@ -362,20 +374,51 @@ class Player():
         bank.add(abs(taxCharged))
 
     #Options to escape jail - Note player can collect rent or make changes to the title deeds
-    def escapeJailOptions(self): 
-        print("You are currently in jail, and you have " + self.getJailTurns() + " left in jail." + 
-              "\nYou do have three options if you wish to get out of jail early." + 
-              "\nPay 50 dollar fine - Type 'Pay 50' to use this option." +
-              "\nUse a get out of jail free card - Type 'Jail Free Card' to use this option." + 
-              "\nRoll a double - Type 'Roll Dice' to use this option.")
+    def escapeJailOptions(self, bank, dice): 
+        jailMessage = "You are currently in jail, and you have " + self.getJailTurns() + " left in jail."
+        + "\nYou do have the following options if you wish to get out of jail early." 
+        + "\nPay 50 dollar fine - Type 'Pay 50' to use this option." 
+        + "\nRoll a double - Type 'Roll Dice' to use this option."
+        
+        if (self.jailCardsAvailable()): 
+            jailMessage += "\nUse a get out of jail free card - Type 'Jail Free Card' to use this option."
 
+        print(jailMessage)
         jailOption = input("Select an option based on the options listed.") #This needs to be validated
         
-        #Pay 50 fine
-        if (jailOption == "Pay 50")
-        #Use get out of jail free card
-        #Roll a double 
+        #Pay 50 fine, user may not go forward until the next turn
+        if (jailOption == "Pay 50"): 
+            self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
+            bank.add(Bank.JAIL_PAYMENT)
 
+            #Reset the statuses 
+            self.setInJailStatus(False)
+            self.setJailTurns(0)
+
+            #Player goes to just visiting jail 
+            self.setPosition(Board.TILES_LIST["Just Visiting"])
+
+        #Use get out of jail free card
+        elif (jailOption == "Jail Free Card"): 
+            #Check if there is a jail free card available 
+            if (self.jailCardsAvailable()): 
+                pass
+            else: 
+                print("There are no jail free cards available in your possession. Please try another option.")
+
+        #Roll a double
+        elif (jailOption == "Roll Dice"):
+            total = dice.rollDice()
+
+            #If player rolls a double 
+            if (dice.getDoubleStatus()):
+                #Advance to the tile according to your roll
+                #Calculate new position of player
+                newPosition = self.getPosition() + total
+
+                #Apply new position 
+                self.setPosition(newPosition)
+                
     #User pays the rent to the other player
     def payRent(self, owner, titleDeedName, boardTile, dice):
         titleDeedCard = None

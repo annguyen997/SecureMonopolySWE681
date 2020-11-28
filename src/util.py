@@ -235,15 +235,32 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
     if (not colorMonopoly): 
         print("You cannot purchase a home at this time; you must own all properties of color group " + colorGroup + "first before you can purchase home.")
         return #Go to the previous caller function 
-        
-    #Check if the property is mortgaged 
+
+    #Check if the current property is mortgaged
     if (titleDeedRecord["Mortgaged"]): 
         print("This property is currently mortgaged. You cannot purchase any buildings.")
         return #Go to the previous caller function
+    
+    #Check if other properties of that color group are mortgaged
+    if (colorMonopoly):
+        propertiesList = Title.getColorGroup(colorGroup)
 
-    #Check if there is any buildings on that title deed and other title deeds of that color group. 
-    #If there are any buildings, player must sell all properties first. 
-    if (titleDeedCard.getTileType() == "Property"):
+        otherPropertiesMortgaged = False 
+
+        for propertyItem in propertiesList:
+            for titleDeed in titleDeedsOwned: 
+                if (titleDeed["Title Deed"].getName() == propertyItem):
+                    if (titleDeed["Mortgaged"]): 
+                        print("This property " + titleDeed["Title Deed"].getName() + " is mortgaged.")
+                        otherPropertiesMortgaged = True
+        
+        if (otherPropertiesMortgaged): 
+            print("Please repay the mortgages of the other properties first before purchasing buildings.")
+            return #Go to the previous caller function
+    
+    #Check if other properties have the exactly same number as homes/hotels available for this property
+    pass
+
 
 
 

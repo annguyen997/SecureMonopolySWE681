@@ -11,6 +11,9 @@ class Bank:
     INCOME_TAX = -200
     LUXURY_TAX = -100
 
+    #Jail Fine Payment 
+    JAIL_PAYMENT = 50
+
     #Interests
     MORTGAGE_INTEREST = 0.10
 
