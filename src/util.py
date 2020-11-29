@@ -275,13 +275,8 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
     #If other requirements are passed, purchase the house 
     buildingCost = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST)
 
-    #Make the payment
-    player.changeMonetaryValue(-1 * buildingCost) 
-    bank.add(buildingCost)
-
-    #Get the building 
-    bank.purchaseHome()
-    player.purchaseHouse(titleDeedToPurchaseHouse)
+    #Purchase the home by purchasing and then get the home
+    player.purchaseHouse(titleDeedToPurchaseHouse, bank)
     
 #Helper function to process player's interest to get a hotel 
 def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank): 
@@ -291,10 +286,80 @@ def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank):
     print("You may need to scroll if you own a large number of title deeds.")
 
     #User types in title deed to buy a hotel 
-    titleDeedToPurchaseHouse = input("Enter name of title deed you wish to buy a house: ")  #This needs validation
+    titleDeedToPurchaseHotel = input("Enter name of title deed you wish to buy a hotel: ")  #This needs validation
 
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToPurchaseHotel == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
+    
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Returning to previous menu.")
+        return #Go to the previous caller function 
 
+    #Check if the property's color group is a monopoly.
+    colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
+    monopolyList = player.getColorMonopoly()
+    colorMonopoly = False 
+    if (colorGroup in monopolyList):
+        colorMonopoly = True 
+    
+    if (not colorMonopoly): 
+        print("You cannot purchase a hotel at this time; you must own all properties of color group " + colorGroup + "first before you can purchase a hotel, which requires building four houses first.")
+        return #Go to the previous caller function 
 
+    #Check if the current property is mortgaged
+    if (titleDeedRecord["Mortgaged"]): 
+        print("This property is currently mortgaged. You cannot purchase any buildings.")
+        return #Go to the previous caller function
+    
+    #Check if other properties of that color group are mortgaged
+    if (colorMonopoly):
+        propertiesList = Title.getColorGroup(colorGroup)
+
+        otherPropertiesMortgaged = False 
+
+        for propertyItem in propertiesList:
+            for titleDeed in titleDeedsOwned: 
+                if (titleDeed["Title Deed"].getName() == propertyItem):
+                    if (titleDeed["Mortgaged"]): 
+                        print("This property " + titleDeed["Title Deed"].getName() + " is mortgaged.")
+                        otherPropertiesMortgaged = True
+        
+        if (otherPropertiesMortgaged): 
+            print("Please repay the mortgages of the other properties first before purchasing buildings.")
+            return #Go to the previous caller function
+    
+    #Check if this building has already reached the limit for hotels 
+    
+        
+    #Check if other properties have the exactly same number as homes as this property, in this case four
+    if (colorMonopoly):
+        #Get current number of buildings of title deed player wishes to purchase another building
+        getCurrentHouses = titleDeedRecord["Houses"]
+
+        """
+        #Check other properties of the color group
+        propertiesList = Title.getColorGroup(colorGroup)
+
+        notEvenHouses = False 
+        for propertyItem in propertiesList:
+            for titleDeed in titleDeedsOwned: 
+                if (titleDeed["Title Deed"].getName() == propertyItem):
+                    #Get current number of buildings of that title deed
+                    getCurrentHousesOther = titleDeed["Houses"]
+
+                    print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther)
+                    if (getCurrentHousesOther < getCurrentHouses):
+                        notEvenHouses = True
+
+        if (notEvenHouses): 
+            print("You cannot build another house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
+            return #Go to the previous caller function.
+        """
+    
 
 
 

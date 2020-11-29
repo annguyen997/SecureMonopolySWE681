@@ -572,18 +572,18 @@ class Player():
         pass 
 
     #Purchase a home for the property
-    def purchaseHome(self, propertyName):
+    def purchaseHome(self, propertyName, bank):
         propertyFound = False
         colorGroup = None
 
         #Search for the property 
-        for titleDeed in self.titleDees: 
+        for titleDeed in self.titleDeeds: 
             if (titleDeed["Title Deed"].getName() == propertyName):
                 propertyFound = True
                 colorGroup = titleDeed["Title Deed"].getColorGroup()
         
+        #Add the house to the property name if found
         if (propertyFound): 
-            #Add the home to the property
             titleDeed["Houses"] = titleDeed["Houses"] + 1
             self.num_homes += 1
         
@@ -591,13 +591,15 @@ class Player():
         for monopolyColor in self.colorMonopoly:
             if (colorGroup == monopolyColor["Color Group"]):
                 monopolyColor["Number of Houses Built"] = monopolyColor["Number of Houses Built"] + 1
-
-
-    #get color group 
-    #if colorGroup == colorName
-    #Increase number to 1 
-
-    #def purchaseHotel()
+        
+        #Make the purchase
+        self.changeMonetaryValue(-1 * buildingCost) 
+        bank.add(buildingCost)
+        bank.purchaseHome()
+    
+    #Purchase a hotel for the property
+    def purchaseHotel(self, propertyName, bank): 
+        pass
 
     #def sellHome()
     #Decrease number to 1
