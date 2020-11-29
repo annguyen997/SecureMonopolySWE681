@@ -122,16 +122,23 @@ class Bank:
             self.transportsCards.append(titleDeed)
 
     def purchaseHome(self): 
-        pass
+        self.homesAvailable -= 1
 
     def purchaseHotel(self):
-        pass
+        self.hotelsAvailable -= 1
 
     def sellHome(self):
-        pass
+        self.homesAvailable += 1
     
     def sellHotel(self): 
-        pass 
+        self.hotelsAvailable += 1 
+
+    """ MORTGAGE methods """
+    def giveMortgageLoan(self, mortgageValue):
+        self.subtract(mortgageValue)
+    
+    def creditMortgagePayment(self, repayAmount): 
+        self.add(repayAmount)
 
     """ AUCTION methods """
     def startAuction(self, startingPrice):

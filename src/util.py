@@ -86,7 +86,6 @@ def checkTies(playerListOrder, dice):
 
 
 """ Methods regarding user's processing of existing title deeds """ 
-
 #Helper function to process player's interest to get mortgage on a title deed. 
 def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned
@@ -98,13 +97,13 @@ def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank):
     titleDeedToMortgage = input("Enter name of title deed you wish to mortgage: ")  #This needs validation
 
     #Search for the title deed, and get the card information
-    titleDeedRecord  = None 
+    titleDeedRecord = None 
     for titleDeed in titleDeedsOwned: 
         if (titleDeedToMortgage == titleDeed["Title Deed"].getName()): 
             titleDeedRecord  = titleDeed
     
     #If there is no title deed of such name, stop processing. 
-    if (titleDeedRecord  == None): 
+    if (titleDeedRecord == None): 
         print("There is no title deed card with that name. Returning to previous menu.")
         return #Go to the previous caller function 
     
@@ -143,12 +142,7 @@ def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank):
     mortgageValue = titleDeedRecord["Title Deed"].getMortgageValue()
 
     #Make the mortgage
-    for titleDeed in titleDeedsOwned: 
-        if (titleDeed["Title Deed"].getName() == titleDeedRecord["Title Deed"].getName()): 
-            titleDeed["Mortgaged"] = True
-    
-    bank.subtract(mortgageValue)
-    player.changeMonetaryValue(mortgageValue)
+    player.addMortgage(titleDeedRecord["Title Deed"], mortgageValue, bank)
 
     print(player.getName() + ", your mortgage request for " + titleDeedRecord["Title Deed"].getName() + " was successful.\n" + 
         "Returning to the previous menu.")
@@ -191,12 +185,7 @@ def repayMortgage(self, player, titleDeedsOwned, bank):
         return #Stop processing, return to the caller function.
 
     #Make the repayment mortgage to the bank 
-    for titleDeed in titleDeedsOwned: 
-        if (titleDeed["Title Deed"].getName() == titleDeedStats["Title Deed"].getName()): 
-            titleDeed["Mortgaged"] = False
-    
-    player.changeMonetaryValue(-1 * repayAmount)
-    bank.add(repayAmount)
+    player.removeMortgage(titleDeedStats["Title Deed"].getName(), repayAmount, bank)
 
     print(player.getName() + ", your repayment for " + titleDeedStats["Title Deed"].getName() + " was successful.\n" + 
         "Returning to the previous menu.")
@@ -208,8 +197,8 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
         print(titleDeed) 
     print("You may need to scroll if you own a large number of title deeds.")
 
-    #User types in title deed to mortgage
-    titleDeedToPurchaseHouse = input("Enter name of title deed you wish to mortgage: ")  #This needs validation
+    #User types in title deed to buy a hotel
+    titleDeedToPurchaseHouse = input("Enter name of title deed you wish to buy a house: ")  #This needs validation
 
     #Search for the title deed, and get the card information
     titleDeedRecord = None 
@@ -278,12 +267,31 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
             print("You cannot build another house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
             return #Go to the previous caller function.
     
-    #Check if all properties currently have four houses 
-    
+    #Check if current property has four houses
+    if (titleDeedRecord["Houses"] == 4): 
+        print("You cannot purchase another house on this property. You may purchase a hotel instead.")
+        return #Go to the previous caller function. 
+
     #If other requirements are passed, purchase the house 
     buildingCost = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST)
-    
 
+    #Make the payment
+    player.changeMonetaryValue(-1 * buildingCost) 
+    bank.add(buildingCost)
+
+    #Get the building 
+    bank.purchaseHome()
+    player.purchaseHouse(titleDeedToPurchaseHouse)
+    
+#Helper function to process player's interest to get a hotel 
+def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned
+    for titleDeed in titleDeedsNames: 
+        print(titleDeed) 
+    print("You may need to scroll if you own a large number of title deeds.")
+
+    #User types in title deed to buy a hotel 
+    titleDeedToPurchaseHouse = input("Enter name of title deed you wish to buy a house: ")  #This needs validation
 
 
 

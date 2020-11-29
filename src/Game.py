@@ -108,8 +108,14 @@ class Game:
     def turn(self, player): 
         #Check if player is in jail, and if so process the options
         if (player.getInJailStatus()):
-            player.escapeJailOptions(bank, dice)
-            return
+            returnedCard = player.escapeJailOptions(bank, dice)
+
+            #If card is returned, do the following actions to return card to deck
+            if (returnedCard != None): 
+                if (returnedCard.getCardType() == "Chance"):
+                    self.chancePile.returnJailFreeCard(returnedCard)
+                elif (returnedCard.getCardType() == "Community"):
+                    self.communityPile.returnJailFreeCard(returnedCard) 
         else: 
             #Get the number of eyes on dice for movement
             moveNum = self.dice.rollDice()
@@ -125,8 +131,8 @@ class Game:
             player.setInJailStatus(True)
 
         #Check if player went to jail because of tile or rolling three doubles in a row
-        if (player.getInJailStatus()):
-            player.position = Board.TILES_JAIL[0]
+        if (player.getInJailStatus() and (player.getJailTurns() == 0)): 
+            player.setPosition(Board.TILES_JAIL[0])
             player.setJailTurns(3)
             return #End the turn here - do not do any other action
 
@@ -142,19 +148,30 @@ class Game:
         elif boardTile == "Chance Card":
             player.doChanceCard(self.chancePile.pullCard(), bank)
 
-            #May need to check the new position of the player for a property/utility/transport
+            #May need to check the new position of the player for a including a property/utility/transport
+            newBoardTile = self.board.getTileType(player.getPosition())
+            if newBoardTile in ("Property", "Utility", "Transports"):
+                self.checkTitleDeed(player, boardTile)
+            elif newBoardTile == "Go to Jail":
+                player.setJailTurns(3)
+                return #End turn right here
 
         #Get community card if player landed on community chest tile
         elif boardTile == "Community Card":
             player.doCommunityCard(self.communityPile.pullCard(), bank)
 
             #May need to check the new position of the player for a including a property/utility/transport
+            newBoardTile = self.board.getTileType(player.getPosition())
+            if newBoardTile in ("Property", "Utility", "Transports"):
+                self.checkTitleDeed(player, boardTile)
+            elif newBoardTile == "Go to Jail":
+                player.setJailTurns(3)
+                return #End turn right here
 
         #Log that the player has landed on a tile after all movements/actions are complete
         self.board.hit(player.getPosition())
 
-        #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn
-        #User can also wish to sell properties 
+        #If player has properties, check if the user would wish to purchase additional houses/hotels before ending turn as well as sell properties 
         #This statement also runs in player lands on Free Parking space 
         self.handleExistingTitleDeeds(player) 
 
@@ -329,7 +346,8 @@ class Game:
             #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
             #The property also must not be mortgaged as well as others in color group
             elif (optionSelection == "Purchase a Hotel"): 
-                pass
+                util.purchaseHotel(player, titleDeedsNames, titleDeedsOwned, self.bank) 
+                
             #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
 
             #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling

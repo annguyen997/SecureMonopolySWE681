@@ -27,6 +27,7 @@ class Player():
         self.colorMonopoly = []                 #List of color group monopolies owned 
         self.utilityOwned = 0                   #Number of utilities owned
         self.transportsOwned = 0                #Number of transports owned
+
         self.num_homes = 0                      #Number of homes in total 
         self.num_hotels = 0                     #Number of hotels in total 
 
@@ -89,7 +90,7 @@ class Player():
                     break 
 
             if (createMonopoly): 
-                self.colorMonopoly.append({"Color Group": colorGroupName, "Number Buildings Built": 0})
+                self.colorMonopoly.append({"Color Group": colorGroupName, "Number Houses Built": 0, "Number Hotels Built": 0})
 
         elif (titleType == "Utility"):
             self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": None, "Hotels": None, "Color Group": None}) 
@@ -101,6 +102,7 @@ class Player():
     #Remove a title deed from a player's list of possessions 
     def removeTitleDeed(self, titleDeedName): 
         pass
+        #Check if removing property would result in player to lose monopoly
     
     def getPropertyOwned(self): 
         return self.propertyOwned
@@ -157,6 +159,15 @@ class Player():
     def subtractJailTurns(self): 
         self.jail_turns -= 1
 
+    #Get the bankrupt status
+    def getBankruptStatus(self):
+        return self.bankrupt
+    
+    #Set the bankrupt status
+    def setBankruptStatus(self, status = False): 
+        self.bankrupt = status
+
+    """Methods associated with the player interacting in the game """
     #Move the player across the board when it is their turn 
     def move(self, moveNum, dice, bank = None):
         #TODO: Add logic regarding if user has jail-free cards or has money to self-bail 
@@ -335,6 +346,7 @@ class Player():
                 bank.subtract(Board.PASS_GO)
 
             elif cardValue == "Go to Jail": 
+                print("You have been sent to jail.")
                 self.setInJailStatus(True)
                 self.setPosition(Board.TILES_JAIL[0])
             
@@ -373,52 +385,99 @@ class Player():
         self.changeMonetaryValue(taxCharged)
         bank.add(abs(taxCharged))
 
-    #Options to escape jail - Note player can collect rent or make changes to the title deeds
+    #Options to escape jail - Note player can collect rent (provided not mortgaged) or make changes to the title deeds
     def escapeJailOptions(self, bank, dice): 
+        #Return the Get Out of Jail Free card to the deck in game if used 
+        card = None
+        validOptionSelected = False
+
         jailMessage = "You are currently in jail, and you have " + self.getJailTurns() + " left in jail."
         + "\nYou do have the following options if you wish to get out of jail early." 
-        + "\nPay 50 dollar fine - Type 'Pay 50' to use this option." 
-        + "\nRoll a double - Type 'Roll Dice' to use this option."
+        + "\n1. Pay 50 dollar fine - Type 'Pay 50' to use this option." 
+        + "\n2. Roll a double - Type 'Roll Dice' to use this option."
         
         if (self.jailCardsAvailable()): 
-            jailMessage += "\nUse a get out of jail free card - Type 'Jail Free Card' to use this option."
-
-        print(jailMessage)
-        jailOption = input("Select an option based on the options listed.") #This needs to be validated
+            jailMessage += "\n3. Use a get out of jail free card - Type 'Jail Free Card' to use this option."
         
-        #Pay 50 fine, user may not go forward until the next turn
-        if (jailOption == "Pay 50"): 
-            self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
-            bank.add(Bank.JAIL_PAYMENT)
+        while (not validOptionSelected): 
+            print(jailMessage)
+            jailOption = input("Select an option based on the options listed.") #This needs to be validated
+        
+            #Pay 50 fine, user may not go forward until the next turn
+            if (jailOption == "Pay 50"): 
+                self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
+                bank.add(Bank.JAIL_PAYMENT)
 
-            #Reset the statuses 
-            self.setInJailStatus(False)
-            self.setJailTurns(0)
+                #Reset the statuses 
+                self.setInJailStatus(False)
+                self.setJailTurns(0)
 
-            #Player goes to just visiting jail 
-            self.setPosition(Board.TILES_LIST["Just Visiting"])
+                #Player goes to just visiting jail 
+                self.setPosition(Board.TILES_LIST["Just Visiting"])
 
-        #Use get out of jail free card
-        elif (jailOption == "Jail Free Card"): 
-            #Check if there is a jail free card available 
-            if (self.jailCardsAvailable()): 
-                pass
-            else: 
-                print("There are no jail free cards available in your possession. Please try another option.")
+                validOptionSelected = True
 
-        #Roll a double
-        elif (jailOption == "Roll Dice"):
-            total = dice.rollDice()
+            #Use get out of jail free card
+            elif (jailOption == "Jail Free Card" and self.jailCardsAvailable()): 
+                card = self.removeEscapeJailCard() 
 
-            #If player rolls a double 
-            if (dice.getDoubleStatus()):
-                #Advance to the tile according to your roll
-                #Calculate new position of player
-                newPosition = self.getPosition() + total
+                #Reset the statuses 
+                self.setInJailStatus(False)
+                self.setJailTurns(0)
 
-                #Apply new position 
-                self.setPosition(newPosition)
+                #Player goes to just visiting jail 
+                self.setPosition(Board.TILES_LIST["Just Visiting"])
+
+                validOptionSelected = True
+            
+            #Roll a double
+            elif (jailOption == "Roll Dice"):
+                total = dice.rollDice()
+
+                #If player rolls a double 
+                if (dice.getDoubleStatus()):
+                    #Advance to the tile according to your roll
+                    #Calculate new position of player
+                    newPosition = self.getPosition() + total
+
+                    #Apply new position 
+                    self.setPosition(newPosition)
+
+                    #Reset the statuses 
+                    self.setInJailStatus(False)
+                    self.setJailTurns(0)
+
+                    #Reset the double status - user does not do another dice roll
+                    dice.resetDoubleStatus()
+
+                    validOptionSelected = True
+                else: 
+                    print("You did not roll a double, and thus you must remain in jail.") 
+
+                    #Reduce one jail turn 
+                    self.subtractJailTurns()
+
+                    #If this results in no more jail turns left, player must pay 50. If so reset statuses. 
+                    if (self.getJailStatus == 0): 
+                        print("You may now escape jail as a result, but you must pay 50 to the bank.")
+                        self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
+                        bank.add(Bank.JAIL_PAYMENT)
+                        #Reset the statuses 
+                        self.setInJailStatus(False)
+                        self.setJailTurns(0)
+                        self.setPosition(Board.TILES_LIST["Just Visiting"])
+                        
+                        #By virtue, valid option does not need to be selected
+                        validOptionSelected = True
+            else:
+                if (jailOption == "Jail Free Card"): 
+                    print("You do not have any jail free cards you can use at this time.")
                 
+                #Print message reporting user did not type in a valid response. 
+                print("You did not select a valid option to escape jail. Please try again.")
+        
+        return card 
+
     #User pays the rent to the other player
     def payRent(self, owner, titleDeedName, boardTile, dice):
         titleDeedCard = None
@@ -512,7 +571,28 @@ class Player():
     def removeTitleDeed(self, titleDeed, bank): 
         pass 
 
-    #def purchaseHome()
+    #Purchase a home for the property
+    def purchaseHome(self, propertyName):
+        propertyFound = False
+        colorGroup = None
+
+        #Search for the property 
+        for titleDeed in self.titleDees: 
+            if (titleDeed["Title Deed"].getName() == propertyName):
+                propertyFound = True
+                colorGroup = titleDeed["Title Deed"].getColorGroup()
+        
+        if (propertyFound): 
+            #Add the home to the property
+            titleDeed["Houses"] = titleDeed["Houses"] + 1
+            self.num_homes += 1
+        
+        #Add the number of houses built for that monopoly
+        for monopolyColor in self.colorMonopoly:
+            if (colorGroup == monopolyColor["Color Group"]):
+                monopolyColor["Number of Houses Built"] = monopolyColor["Number of Houses Built"] + 1
+
+
     #get color group 
     #if colorGroup == colorName
     #Increase number to 1 
@@ -524,8 +604,23 @@ class Player():
 
     #def sellHotel() 
 
-    def addMortgage(self): 
-        pass 
+    #Add a mortgage to a property
+    def addMortgage(self, propertyName, mortgageValue, bank): 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName): 
+                titleDeed["Mortgaged"] = True
+        
+        bank.giveMortgageLoan(mortgageValue)
+        self.changeMonetaryValue(mortgageValue)
+
+    #Remove and repay a mortgage from a property
+    def removeMortgage(self, propertyName, repayAmount, bank): 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName): 
+                titleDeed["Mortgaged"] = False
+    
+        self.changeMonetaryValue(-1 * repayAmount)
+        bank.creditMortgagePayment(repayAmount)
 
     #Check if user has run out of cash
     def runOutOfCash(self): 
