@@ -22,14 +22,14 @@ class Driver:
     def createNewGame(self): 
         return Game()
 
-    #Join existing game that needs players
+    #Join existing game that needs players      
     def joinExistingGame(self, game): 
         pass
 
     # get a random salt values so it doesnt have to be same salt all the times
     def generateSalt(self):
         self.salt = urandom(32)
-        pass
+        return 0
 
     # get the salt value, if none, generate
     def getSaltValue(self):
@@ -50,12 +50,21 @@ class Driver:
                         100000, # recommended 100,000 iter of sha256
                         dklen=128 # length of the hash
                             )
+    def calcHash(self, password, salt):
+        # does this vuln to timing attack?
+        return pbkdf2_hmac(
+                        'sha256',   # use sha256 for this bullshit
+                        password.encode('utf-8'),   # encode the password
+                        salt, # this will get the salt value.
+                        100000, # recommended 100,000 iter of sha256
+                        dklen=128 # length of the hash
+                            )
 
     def checkPasswordStrength(self, password):
         ## check password req
         # length
         if (len(password) < 8 or len(password) > 32):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet length req with length %i" 
+            print("[!] LOG: user %s with password - '%s' - doesn't meet password length req: actual - %i" 
                     % (str(user), str(password), str(len(password)  )))
             return False
         #complexity
@@ -92,23 +101,26 @@ class Driver:
         if not checkPasswordStrength(str(password)):
             print("[!] LOG: user %s with password - '%s' - password strength check (checkPasswordStrength): FAILED" 
                     % (str(user), str(password) ))
-            return -1
+            return False
 
         hash = getHash(str(password))
 
-        # store hash
-        storage = user + ':' + salt + hash 
-
         #store
         try:
+            with open('plEAzeDAddyNOO.txt', 'w') as file:
 
-
+                file.writelines(str(
+                        user + ':' 
+                        + self.getSaltValue() 
+                        + hash ))
+                # username:hash+password
+            # just casually save that shit to a file.
         except Exception as e:
             print("[!] LOG: failed to saved new user hash to file: user - '%s' - hash '%s' - create user FAILED"
                 % (str(user), str(hash) ))
-            return -1
+            return False
 
-        return
+        return True
 
     #Authenticate existing user 
     def authUser(self, user, password):
@@ -118,6 +130,35 @@ class Driver:
         salt_from_storage = storage[:32] # 32 is the length of the salt
         key_from_storage = storage[32:]
         '''
+        try:
+            with open('plEAzeDAddyNOO.txt', 'r') as file:
+                data = file.readlines()
+
+                for user_data in data:
+                    # find user in list
+                    if (str(user) == str(user_data.split(':')[0]))
+                        stored_hash = user_data.split(':')[-1]
+
+                        # calculate hash and compare
+                        # i need to convert to normal int from str, 
+                        salt_from_storage = stored_hash[:32] # 32 is the length of the salt
+
+                        # need to check compability
+                        if (calcHash(password, salt_from_storage) == key_from_storage = storage[32:-1])
+                            print("[!] LOG: User '%s' successful logged in"
+                                % (str(user)))
+                            return True
+                        else
+                            print("[!] LOG: User - '%s' authentication failed - user auth FAILED"
+                                % (str(user)))
+                            return False
+
+            # just casually save that shit to a file.
+        except Exception as e:
+            print("[!] LOG: failed to saved new user hash to file: user - '%s' - hash '%s' - create user FAILED"
+                % (str(user), str(hash) ))
+            return False
+
         return
 
     #Determine timer
