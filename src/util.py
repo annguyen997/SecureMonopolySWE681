@@ -489,7 +489,7 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
         "Returning to the previous menu.")
 
 #Helper function to process player's request to sell a non-mortgaged property to another player
-def sellHotel(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
+def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned by the owner 
     for titleDeed in titleDeedsNames: 
         print(titleDeed) 
