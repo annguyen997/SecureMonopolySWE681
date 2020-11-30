@@ -142,7 +142,7 @@ class Driver:
 
                 for user_data in data:
                     # find user in list
-                    if (str(user) == str(user_data.split(':')[0]))
+                    if (str(user) == str(user_data.split(':')[0])):
                         stored_hash = user_data.split(':')[-1]
 
                         # calculate hash and compare
@@ -150,11 +150,10 @@ class Driver:
                         salt_from_storage = stored_hash[:32] # 32 is the length of the salt
 
                         # need to check compability
-                        if (calcHash(password, salt_from_storage) == key_from_storage = storage[32:-1])
-                            print("[!] LOG: User '%s' successful logged in"
-                                % (str(user)))
+                        if (calcHash(password, salt_from_storage) == key_from_storage = storage[32:-1]):
+                            print("[!] LOG: User '%s' successful logged in" % (str(user))
                             return True
-                        else
+                        else:
                             print("[!] LOG: User - '%s' authentication failed - user auth FAILED"
                                 % (str(user)))
                             return False
