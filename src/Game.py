@@ -358,8 +358,28 @@ class Game:
 
             #If user wishes to sell a property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Property"): 
-                pass
+                #Get the name of the player
+                playerNames = []
+                for playerItem in self.players:
+                    #If current player, skip
+                    if (playerItem.getName() == player.getName()):
+                        continue
+                    print(playerItem.getName())
+                    playerNames.append(playerItem.getName())
 
+                #Request for player name, and validate the input.
+                validSender = False
+
+                while (not validSender): 
+                    playerRequest = input("Select a player which you wish to sell the property: ") 
+
+                    if (playerRequest in playerNames):
+                        validSender = True
+                    else: 
+                        print("Please enter a valid player name.")
+                
+                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
+                        
             #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Mortgaged Property"): 
                 pass

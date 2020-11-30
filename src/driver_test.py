@@ -182,7 +182,7 @@ def main():
 
 	a = Driver()
 	#a.createUser('test_user','sajAdnbash1jdas!')
-	a.authUser('test_user1','sajAdnbashajdas!')
+	#a.authUser('test_user1','sajAdnbashajdas!')
 
 
 	return

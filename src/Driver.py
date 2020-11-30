@@ -163,18 +163,27 @@ class Driver:
                 for user_data in data:
                     # find user in list
                     if (str(user) == str(user_data.split(':')[0])):
+<<<<<<< HEAD
                         stored_hash = base64.b64decode(user_data.split(':')[-1])
+=======
+                        stored_hash = user_data.split(':')[-1]
+>>>>>>> a0ab70da55769c9c318335cda4c64012bae9b446
 
                         # calculate hash and compare
                         # i need to convert to normal int from str, 
                         salt_from_storage = stored_hash[:32] # 32 is the length of the salt
 
                         # need to check compability
+<<<<<<< HEAD
                         if (self.__calcHash(password, salt_from_storage) == stored_hash[32:]):
                             print("[!] LOG: User '%s' successful logged in"
                                 % (str(user)))
 
                             # NEED SESSION ID
+=======
+                        if (calcHash(password, salt_from_storage) == key_from_storage = storage[32:-1]):
+                            print("[!] LOG: User '%s' successful logged in" % (str(user))
+>>>>>>> a0ab70da55769c9c318335cda4c64012bae9b446
                             return True
                         else:
                             print("[!] LOG: User - '%s' authentication failed - user auth FAILED"

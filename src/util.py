@@ -367,7 +367,7 @@ def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank):
     print(player.getName() + ", has purchase a hotel for " + titleDeedRecord["Title Deed"].getName() + 
         "Returning to the previous menu.")
     
-#Helper function to process player's interest to sell a house
+#Helper function to process player's interest to sell a house (assumes property not mortgaged)
 def sellHome(player, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned that have houses
     for titleDeedRecord in titleDeedsOwned: 
@@ -435,7 +435,7 @@ def sellHome(player, titleDeedsNames, titleDeedsOwned, bank):
     print(player.getName() + ", has sold a house for " + titleDeedRecord["Title Deed"].getName() + 
         "Returning to the previous menu.")
 
-#Helper function to process player's interest to sell a hotel 
+#Helper function to process player's interest to sell a hotel (assumes property not mortgaged)
 def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned that have hotel
     for titleDeedRecord in titleDeedsOwned: 
@@ -456,6 +456,18 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
     if (titleDeedRecord == None): 
         print("There is no title deed card with that name. Returning to previous menu.")
         return #Go to the previous caller function 
+    
+    #Check if that property is in the monopoly
+    colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
+    propertiesList = Title.getColorGroup(colorGroup)
+    
+    propertyInGroup = False
+    if (titleDeedRecord["Title Deed"].getName() in propertiesList): 
+        propertyInGroup = True
+    
+    if (not propertyInGroup): 
+        print("This property is not part of a monopoly. Returning to the previous menu.")
+        return #Go to the previous caller function 
 
     #Check if other properties have the exactly same number as homes/hotels available for this property before selling.
     getCurrentHotels = titleDeedRecord["Hotels"]
@@ -465,41 +477,39 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
         print("You do not have any hotels to sell.")
         return #Go to the previous caller function. 
 
-    #Check other properties of the color group
-    colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
-    propertiesList = Title.getColorGroup(colorGroup)
+    #Since a player would already have at most one hotel (and thus that property part of monopoly), and other functions have already handled the checking process of number of houses before selling (meaning any other properties must have at least four homes), checking the number of hotels is not necessary.
 
-    notEvenHouses = False 
-    for propertyItem in propertiesList:
-        for titleDeed in titleDeedsOwned: 
-            if (titleDeed["Title Deed"].getName() == propertyItem):
-                getCurrentBuildingsOther = 0 
-
-                #Get current number of buildings of that title deed
-                getCurrentHousesOther = titleDeed["Houses"]
-
-                #Get the number of hotels of that title deed
-                getCurrentHotelsOther = titleDeed["Hotel"]
-                if (getCurrentHotelsOther):
-                    getCurrentBuildingsOther = getCurrentHousesOther + getCurrentHotelsOther 
-                else: 
-                    getCurrentBuildingsOther = getCurrentHousesOther
-
-                print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther + "\tNumber of Hotels: " + getCurrentHotelsOther)
-
-                if (getCurrentBuildingsOther > getCurrentHouses):
-                    notEvenHouses = True
-
-    if (notEvenHouses): 
-        print("You cannot sell a house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
-        return #Go to the previous caller function.
-
-    #If other requirements are passed, sell the home  
-    sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50 
+    #If other requirements are passed, sell the hotel.  
+    sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOTELS_COST) * 0.50 
 
     #Purchase the home by purchasing from bank and then get the home
-    player.sellHouse(titleDeedToSellHouse, sellBuildingAmount, bank)
+    player.sellHouse(titleDeedToSellHotel, sellBuildingAmount, bank)
 
-    print(player.getName() + ", has sold a house for " + titleDeedRecord["Title Deed"].getName() + 
+    print(player.getName() + ", has sold a hotel for " + titleDeedRecord["Title Deed"].getName() + 
+        "Returning to the previous menu.")
+
+#Helper function to process player's request to sell a non-mortgaged property to another player
+def sellHotel(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned by the owner 
+    for titleDeed in titleDeedsNames: 
+        print(titleDeed) 
+    print("You may need to scroll if you own a large number of title deeds.")
+
+    #User types in title deed to sell
+    titleDeedToSellHotel = input("Enter name of title deed you wish to sell a hotel: ")  #This needs validation
+
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToSellHotel == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
+    
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function 
+
+
+    print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" +
         "Returning to the previous menu.")
     
