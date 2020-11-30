@@ -661,7 +661,8 @@ class Player():
         bank.sellHome(sellingAmount)
     
     #Sell a hotel from the property, and get four houses back from the bank
-    #def sellHotel() 
+    def sellHotel(self): 
+        pass
 
     #Add a mortgage to a property
     def addMortgage(self, propertyName, mortgageValue, bank): 
