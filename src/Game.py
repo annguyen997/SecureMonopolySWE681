@@ -347,16 +347,14 @@ class Game:
             #The property also must not be mortgaged as well as others in color group
             elif (optionSelection == "Purchase a Hotel"): 
                 util.purchaseHotel(player, titleDeedsNames, titleDeedsOwned, self.bank) 
-                
-            #Also add logic that a player cannot add any more houses or hotels once reach maximum limit
 
             #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
             elif (optionSelection == "Sell a House"): 
-                pass
+                util.sellHouse(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
             elif (optionSelection == "Sell a Hotel"): 
-                pass
+                util.sellHotel(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Property"): 

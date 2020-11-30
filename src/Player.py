@@ -479,6 +479,7 @@ class Player():
         return card 
 
     #User pays the rent to the other player
+    #Check if the current player has run out of money but still has property - i.e. owes debt
     def payRent(self, owner, titleDeedName, boardTile, dice):
         titleDeedCard = None
         titleDeedRecord = None
@@ -572,19 +573,21 @@ class Player():
         pass 
 
     #Purchase a home for the property
-    def purchaseHome(self, propertyName, bank):
+    def purchaseHome(self, propertyName, buildingCost, bank):
         propertyFound = False
         colorGroup = None
+        propertyRecord = None
 
         #Search for the property 
         for titleDeed in self.titleDeeds: 
             if (titleDeed["Title Deed"].getName() == propertyName):
                 propertyFound = True
                 colorGroup = titleDeed["Title Deed"].getColorGroup()
+                propertyRecord = titleDeed
         
         #Add the house to the property name if found
         if (propertyFound): 
-            titleDeed["Houses"] = titleDeed["Houses"] + 1
+            propertyRecord["Houses"] = propertyRecord["Houses"] + 1
             self.num_homes += 1
         
         #Add the number of houses built for that monopoly
@@ -594,16 +597,70 @@ class Player():
         
         #Make the purchase
         self.changeMonetaryValue(-1 * buildingCost) 
-        bank.add(buildingCost)
-        bank.purchaseHome()
+        bank.purchaseHome(buildingCost)
     
-    #Purchase a hotel for the property
-    def purchaseHotel(self, propertyName, bank): 
-        pass
+    #Purchase a hotel for the property, and return four houses to the bank
+    def purchaseHotel(self, propertyName, buildingCost, bank): 
+        propertyFound = False
+        colorGroup = None
+        propertyRecord = None
 
-    #def sellHome()
-    #Decrease number to 1
+        #Search for the property 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName):
+                propertyFound = True
+                colorGroup = titleDeed["Title Deed"].getColorGroup()
+                propertyRecord = titleDeed
+        
+        #Add the hotel to the property name if found, return four houses
+        if (propertyFound): 
+            propertyRecord["Hotels"] = propertyRecord["Hotels"] + 1
+            self.num_hotels += 1
 
+            propertyRecord["Houses"] = 0
+            self.num_homes -= Property.HOMES_MAX
+
+        #Add the number of hotels built for that monopoly, and reflect four houses returned
+        for monopolyColor in self.colorMonopoly:
+            if (colorGroup == monopolyColor["Color Group"]):
+                monopolyColor["Number of Hotels Built"] = monopolyColor["Number of Hotels Built"] + 1
+                monopolyColor["Number of Houses Built"] = monopolyColor["Number of Hotels Built"] - Property.HOMES_MAX
+        
+        #Make the purchase
+        self.changeMonetaryValue(-1 * buildingCost) 
+        bank.purchaseHotel(buildingCost)
+        
+        #Return four houses back to the bank
+        bank.returnHomesWithHotel()
+    
+    #Sell a home from the property
+    def sellHome(self, propertyName, sellingAmount, bank): 
+        propertyFound = False
+        colorGroup = None
+        propertyRecord = None
+
+        #Search for the property 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName):
+                propertyFound = True 
+                colorGroup = titleDeed["Title Deed"].getColorGroup()
+                propertyRecord = titleDeed
+        
+        #Remove the house to the property name if found
+        if (propertyFound): 
+            propertyRecord["Houses"] = propertyRecord["Houses"] - 1
+            self.num_homes -= 1
+        
+        #Add the number of houses built for that monopoly
+        for monopolyColor in self.colorMonopoly:
+            if (colorGroup == monopolyColor["Color Group"]):
+                monopolyColor["Number of Houses Built"] = monopolyColor["Number of Houses Built"] - 1
+        
+        #Make the purchase
+        self.changeMonetaryValue(sellingAmount) 
+        bank.sellHome(sellingAmount)
+    
+    #Sell a hotel from the property, and get four houses back from the bank
     #def sellHotel() 
 
     #Add a mortgage to a property
