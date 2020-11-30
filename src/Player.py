@@ -661,8 +661,38 @@ class Player():
         bank.sellHome(sellingAmount)
     
     #Sell a hotel from the property, and get four houses back from the bank
-    def sellHotel(self): 
-        pass
+    def sellHotel(self, propertyName, sellingAmount, bank): 
+        propertyFound = False
+        colorGroup = None
+        propertyRecord = None
+
+        #Search for the property 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName):
+                propertyFound = True
+                colorGroup = titleDeed["Title Deed"].getColorGroup()
+                propertyRecord = titleDeed
+        
+        #Add the hotel to the property name if found, return four houses
+        if (propertyFound): 
+            propertyRecord["Hotels"] = propertyRecord["Hotels"] - 1
+            self.num_hotels -= 1
+
+            propertyRecord["Houses"] = Property.HOMES_MAX
+            self.num_homes += Property.HOMES_MAX
+
+        #Add the number of hotels built for that monopoly, and reflect four houses returned
+        for monopolyColor in self.colorMonopoly:
+            if (colorGroup == monopolyColor["Color Group"]):
+                monopolyColor["Number of Hotels Built"] = monopolyColor["Number of Hotels Built"] - 1
+                monopolyColor["Number of Houses Built"] = monopolyColor["Number of Hotels Built"] + Property.HOMES_MAX
+        
+        #Make the purchase
+        self.changeMonetaryValue(sellingAmount) 
+        bank.sellHotel(sellingAmount)
+
+        #Return four houses back to the bank
+        bank.getHomesWithHotel()
 
     #Add a mortgage to a property
     def addMortgage(self, propertyName, mortgageValue, bank): 
