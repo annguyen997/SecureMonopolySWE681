@@ -121,17 +121,27 @@ class Bank:
         elif (titleType == "Transports"):
             self.transportsCards.append(titleDeed)
 
-    def purchaseHome(self): 
+    def purchaseHome(self, paymentAmount): 
         self.homesAvailable -= 1
+        self.add(paymentAmount)
 
-    def purchaseHotel(self):
+    def purchaseHotel(self, paymentAmount):
         self.hotelsAvailable -= 1
+        self.add(paymentAmount)
 
-    def sellHome(self):
+    def sellHome(self, refundAmount):
         self.homesAvailable += 1
+        self.subtract(refundAmount)
     
-    def sellHotel(self): 
+    def sellHotel(self, refundAmount): 
         self.hotelsAvailable += 1 
+        self.subtract(refundAmount)
+
+    def returnHomesWithHotel(self): 
+        self.homesAvailable += Property.HOMES_MAX
+    
+    def getHomesWithHotel(self): 
+        self.homesAvailable -= Property.HOMES_MAX
 
     """ MORTGAGE methods """
     def giveMortgageLoan(self, mortgageValue):

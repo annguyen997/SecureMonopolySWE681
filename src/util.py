@@ -84,7 +84,6 @@ def checkTies(playerListOrder, dice):
     return playerListOrder
 
 
-
 """ Methods regarding user's processing of existing title deeds """ 
 #Helper function to process player's interest to get mortgage on a title deed. 
 def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank): 
@@ -190,7 +189,7 @@ def repayMortgage(self, player, titleDeedsOwned, bank):
     print(player.getName() + ", your repayment for " + titleDeedStats["Title Deed"].getName() + " was successful.\n" + 
         "Returning to the previous menu.")
 
-#Helper function to process player's interest to get a home
+#Helper function to process player's interest to get a house
 def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned
     for titleDeed in titleDeedsNames: 
@@ -275,8 +274,11 @@ def purchaseHome(player, titleDeedsNames, titleDeedsOwned, bank):
     #If other requirements are passed, purchase the house 
     buildingCost = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST)
 
-    #Purchase the home by purchasing and then get the home
-    player.purchaseHouse(titleDeedToPurchaseHouse, bank)
+    #Purchase the home by purchasing from bank and then get the home
+    player.purchaseHouse(titleDeedToPurchaseHouse, buildingCost, bank)
+
+    print(player.getName() + ", has purchased a house for " + titleDeedRecord["Title Deed"].getName() + 
+        "Returning to the previous menu.")
     
 #Helper function to process player's interest to get a hotel 
 def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank): 
@@ -333,14 +335,11 @@ def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank):
             return #Go to the previous caller function
     
     #Check if this building has already reached the limit for hotels 
-    
+    if (titleDeedRecord["Hotels"] == 1): 
+        print("You cannot purchase any more hotels on this property. You have reached the limit.")
         
     #Check if other properties have the exactly same number as homes as this property, in this case four
     if (colorMonopoly):
-        #Get current number of buildings of title deed player wishes to purchase another building
-        getCurrentHouses = titleDeedRecord["Houses"]
-
-        """
         #Check other properties of the color group
         propertiesList = Title.getColorGroup(colorGroup)
 
@@ -352,14 +351,155 @@ def purchaseHotel(player, titleDeedsNames, titleDeedsOwned, bank):
                     getCurrentHousesOther = titleDeed["Houses"]
 
                     print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther)
-                    if (getCurrentHousesOther < getCurrentHouses):
+                    if (getCurrentHousesOther != 4):
                         notEvenHouses = True
 
         if (notEvenHouses): 
-            print("You cannot build another house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
+            print("You cannot build a hotel on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " each have exactly 4 houses before proceeding.")
             return #Go to the previous caller function.
-        """
     
+    #If other requirements are passed, purchase the hotel
+    buildingCost = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOTELS_COST)
 
+    #Purchase the hotel by purchasing from bank and then get the home
+    player.purchaseHotel(titleDeedToPurchaseHotel, buildingCost, bank)
 
+    print(player.getName() + ", has purchase a hotel for " + titleDeedRecord["Title Deed"].getName() + 
+        "Returning to the previous menu.")
+    
+#Helper function to process player's interest to sell a house
+def sellHome(player, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned that have houses
+    for titleDeedRecord in titleDeedsOwned: 
+        if (titleDeedRecord["Houses"] != None and titleDeedRecord["Houses"] >= 1): 
+            print(titleDeedRecord["Title Deed"].getName())
+    print("You may need to scroll if you have many title deeds with houses.")
 
+    #User types in title deed to sell the home
+    titleDeedToSellHouse = input("Enter name of title deed you wish to sell a home: ")  #This needs validation
+
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToSellHouse == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
+    
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Returning to previous menu.")
+        return #Go to the previous caller function 
+
+    #Check if other properties have the exactly same number as homes/hotels available for this property before selling. First current number of buildings of title deed player wishes to sell another building
+    getCurrentHouses = titleDeedRecord["Houses"]
+
+    #Check if current property has no homes to sell
+    if (getCurrentHouses == 0): 
+        print("You do not have any houses to sell.")
+        return #Go to the previous caller function. 
+
+    #Check other properties of the color group
+    colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
+    propertiesList = Title.getColorGroup(colorGroup)
+
+    notEvenHouses = False 
+    for propertyItem in propertiesList:
+        for titleDeed in titleDeedsOwned: 
+            if (titleDeed["Title Deed"].getName() == propertyItem):
+                getCurrentBuildingsOther = 0 
+
+                #Get current number of buildings of that title deed
+                getCurrentHousesOther = titleDeed["Houses"]
+
+                #Get the number of hotels of that title deed
+                getCurrentHotelsOther = titleDeed["Hotel"]
+                if (getCurrentHotelsOther):
+                    getCurrentBuildingsOther = getCurrentHousesOther + getCurrentHotelsOther 
+                else: 
+                    getCurrentBuildingsOther = getCurrentHousesOther
+
+                print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther + "\tNumber of Hotels: " + getCurrentHotelsOther)
+
+                if (getCurrentBuildingsOther > getCurrentHouses):
+                    notEvenHouses = True
+
+    if (notEvenHouses): 
+        print("You cannot sell a house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
+        return #Go to the previous caller function.
+
+    #If other requirements are passed, sell the home  
+    sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50 
+
+    #Purchase the home by purchasing from bank and then get the home
+    player.sellHouse(titleDeedToSellHouse, sellBuildingAmount, bank)
+
+    print(player.getName() + ", has sold a house for " + titleDeedRecord["Title Deed"].getName() + 
+        "Returning to the previous menu.")
+
+#Helper function to process player's interest to sell a hotel 
+def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned that have hotel
+    for titleDeedRecord in titleDeedsOwned: 
+        if (titleDeedRecord["Hotels"] != None and titleDeedRecord["Hotels"] == 1): 
+            print(titleDeedRecord["Title Deed"].getName())
+    print("You may need to scroll if you have many title deeds with hotels.")
+
+    #User types in title deed to buy a hotel 
+    titleDeedToSellHotel = input("Enter name of title deed you wish to sell a hotel: ")  #This needs validation
+
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToSellHotel == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
+    
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Returning to previous menu.")
+        return #Go to the previous caller function 
+
+    #Check if other properties have the exactly same number as homes/hotels available for this property before selling.
+    getCurrentHotels = titleDeedRecord["Hotels"]
+
+    #Check if current property has no homes to sell
+    if (getCurrentHotels == 0): 
+        print("You do not have any hotels to sell.")
+        return #Go to the previous caller function. 
+
+    #Check other properties of the color group
+    colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
+    propertiesList = Title.getColorGroup(colorGroup)
+
+    notEvenHouses = False 
+    for propertyItem in propertiesList:
+        for titleDeed in titleDeedsOwned: 
+            if (titleDeed["Title Deed"].getName() == propertyItem):
+                getCurrentBuildingsOther = 0 
+
+                #Get current number of buildings of that title deed
+                getCurrentHousesOther = titleDeed["Houses"]
+
+                #Get the number of hotels of that title deed
+                getCurrentHotelsOther = titleDeed["Hotel"]
+                if (getCurrentHotelsOther):
+                    getCurrentBuildingsOther = getCurrentHousesOther + getCurrentHotelsOther 
+                else: 
+                    getCurrentBuildingsOther = getCurrentHousesOther
+
+                print("Property Name: " + titleDeed["Title Deed"].getName() + "\tNumber of Houses: " + getCurrentHousesOther + "\tNumber of Hotels: " + getCurrentHotelsOther)
+
+                if (getCurrentBuildingsOther > getCurrentHouses):
+                    notEvenHouses = True
+
+    if (notEvenHouses): 
+        print("You cannot sell a house on this property " + titleDeedRecord["Title Deed"].getName() + " right now.\nPlease ensure all other properties of the color group " + colorGroup + " have exactly " + getCurrentHouses + " each before proceeding.")
+        return #Go to the previous caller function.
+
+    #If other requirements are passed, sell the home  
+    sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50 
+
+    #Purchase the home by purchasing from bank and then get the home
+    player.sellHouse(titleDeedToSellHouse, sellBuildingAmount, bank)
+
+    print(player.getName() + ", has sold a house for " + titleDeedRecord["Title Deed"].getName() + 
+        "Returning to the previous menu.")
+    

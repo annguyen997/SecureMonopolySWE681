@@ -106,6 +106,10 @@ class Property:
     #Index to get the building cost
     HOMES_COST = 0
     HOTELS_COST = 1
+
+    #Number of buildings maximum
+    HOMES_MAX = 4
+    HOTELS_MAX = 1
     
     @staticmethod
     def getColorGroup(self, colorGroupName): 
