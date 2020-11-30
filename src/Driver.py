@@ -27,12 +27,12 @@ class Driver:
         pass
 
     # get a random salt values so it doesnt have to be same salt all the times
-    def generateSalt(self):
+    def __generateSalt(self):
         self.salt = urandom(32)
         return 0
 
     # get the salt value, if none, generate
-    def getSaltValue(self):
+    def __getSaltValue(self):
         if self.salt is None:
             self.generateSalt()
             return self.salt
@@ -41,7 +41,7 @@ class Driver:
 
 
     # https://nitratine.net/blog/post/how-to-hash-passwords-in-python/
-    def getHash(self, password):
+    def __getHash(self, password):
         # does this vuln to timing attack?
         return pbkdf2_hmac(
                         'sha256',   # use sha256 for this bullshit
@@ -50,7 +50,7 @@ class Driver:
                         100000, # recommended 100,000 iter of sha256
                         dklen=128 # length of the hash
                             )
-    def calcHash(self, password, salt):
+    def __calcHash(self, password, salt):
         # does this vuln to timing attack?
         return pbkdf2_hmac(
                         'sha256',   # use sha256 for this bullshit
@@ -60,7 +60,7 @@ class Driver:
                         dklen=128 # length of the hash
                             )
 
-    def checkPasswordStrength(self, password):
+    def checkPasswordStrength(self, user, password):
         ## check password req
         # length
         if (len(password) < 8 or len(password) > 32):
@@ -75,35 +75,41 @@ class Driver:
         lowercase = compile(r'[a-z]')
         uppercase = compile(r'[A-Z]')
         number = compile(r'[0-9]')
-        special = compile(r'[@#!~;:<>,.-_$%|^&+={}\[\]\']')
+        special = compile(r'[^A-Za-z0-9]')
 
-        if (lowercase.search(password.encode(utf-8) is None)):
+        if (lowercase.search(str(password)) is None):
             print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: LOWERCASE" 
                     % (str(user), str(password) ))
             return False
-        if (uppercase.search(password.encode(utf-8) is None)):
+        if (uppercase.search(str(password)) is None):
             print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: UPPERCASE" 
                     % (str(user), str(password) ))
             return False
-        if (number.search(password.encode(utf-8) is None)):
+        if (number.search(str(password)) is None):
             print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: NUMBER" 
                     % (str(user), str(password) ))
             return False
-        if (special.search(password.encode(utf-8) is None)):
+        if (special.search(str(password)) is None):
             print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: SPECIAL" 
                     % (str(user), str(password) ))
             return False
+
+        print("[!] LOG: user %s with password - '%s' - passed password strength check" 
+                    % (str(user), str(password) )) 
         return True
 
     #Create new user
     def createUser(self, user, password):
         #store user and hash to a file 
-        if not checkPasswordStrength(str(password)):
+        if not self.checkPasswordStrength(str(user), str(password)):
             print("[!] LOG: user %s with password - '%s' - password strength check (checkPasswordStrength): FAILED" 
                     % (str(user), str(password) ))
             return False
 
-        hash = getHash(str(password))
+        hash = self.__getHash(str(password))
+
+        print(self.__getSaltValue())
+        print(hash)
 
         #store
         try:
@@ -160,5 +166,3 @@ class Driver:
             return False
 
         return
-
-    #Determine timer
