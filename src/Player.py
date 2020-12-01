@@ -1,5 +1,6 @@
 import Board, Bank
 from Title import Title, Property, Utility, Transports
+import math 
 
 class Player():
     #Dual means both Regular and Banker, used only if there are less than 5 players; Bank can be automated
@@ -68,11 +69,11 @@ class Player():
         return self.titleDeeds
     
     #Add a title deed to the player's list of possessions
-    def addTitleDeeds(self, titleDeed): 
+    def addTitleDeed(self, titleDeed, mortgaged = False): 
         titleType = titleDeed.getTitleType() 
 
         if (titleType == "Property"): 
-            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": mortgaged, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
             self.propertyOwned += 1
             
             #Check if adding the property means the player has a monopoly
@@ -81,22 +82,28 @@ class Player():
 
             createMonopoly = True
             for propertyItem in colorGroupList:
-                if (propertyItem == titleDeed.getName()): 
+                if (propertyItem == titleDeed.getName()):
                     #Property item refers to the title deed being added 
                     continue
-                elif (not propertyItem in self.titleDeeds):
-                    #If given property item is not part of the owner's list of title deeds
-                    createMonopoly = False 
-                    break 
+                for titleDeed in self.titleDeeds:
+                    titleDeedInList = False 
+
+                    if (propertyItem == titleDeed["Title Deed"].getName()): 
+                        titleDeedInList = True 
+                    
+                    if (not titleDeedInList): 
+                        #If given property item is not part of the owner's list of title deeds, the new item would not result in a monopoly
+                        createMonopoly = False
+                        break
 
             if (createMonopoly): 
                 self.colorMonopoly.append({"Color Group": colorGroupName, "Number Houses Built": 0, "Number Hotels Built": 0})
 
         elif (titleType == "Utility"):
-            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": mortgaged, "Houses": None, "Hotels": None, "Color Group": None}) 
             self.utilityOwned += 1
         elif(titleType == "Transports"): 
-            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": False, "Houses": None, "Hotels": None, "Color Group": None}) 
+            self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": mortgaged, "Houses": None, "Hotels": None, "Color Group": None}) 
             self.transportsOwned += 1
     
     #Remove a title deed from a player's list of possessions 
@@ -110,9 +117,28 @@ class Player():
                 record = self.titleDeeds.remove(titleDeed) 
                 titleDeedCard = record["Title Deed"]
             
-        #Check if removing property would result in player to lose monopoly
-        
-    
+        #Reduce the number of properties owned by this player
+        if (titleDeedCard.getTitleType() == "Property"): 
+            colorGroup = record["Color Group"]
+
+            #Check if removing property would result in player to lose monopoly
+            #This already assumes the color group has no property already
+            monopolyList = self.getColorMonopoly() 
+
+            #If color group is in the monopoly list, the property being removed results in monopoly loss
+            if (colorGroup in monopolyList): 
+                for monopolyItem in monopolyList:
+                    if (monopolyItem["Color Group"] == colorGroup): 
+                        monopolyList.remove(monopolyItem)
+
+            self.propertyOwned -= 1 
+        elif (titleDeedCard.getTitleType() == "Utility"):
+            self.utilityOwned -= 1
+        elif (titleDeedCard.getTitleType() == "Transports"): 
+            self.transportsOwned -= 1
+
+        return titleDeedCard
+
     def getPropertyOwned(self): 
         return self.propertyOwned
     
@@ -461,14 +487,14 @@ class Player():
 
                     validOptionSelected = True
                 else: 
-                    print("You did not roll a double, and thus you must remain in jail.") 
+                    print("You did not roll a double.") 
 
                     #Reduce one jail turn 
                     self.subtractJailTurns()
 
                     #If this results in no more jail turns left, player must pay 50. If so reset statuses. 
                     if (self.getJailStatus == 0): 
-                        print("You may now escape jail as a result, but you must pay 50 to the bank.")
+                        print("\nYou may now escape jail as a result, but you must pay 50 to the bank.")
                         self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
                         bank.add(Bank.JAIL_PAYMENT)
                         #Reset the statuses 
@@ -478,6 +504,8 @@ class Player():
                         
                         #By virtue, valid option does not need to be selected
                         validOptionSelected = True
+                    else: 
+                        print("Currently, you must remain in jail.")
             else:
                 if (jailOption == "Jail Free Card"): 
                     print("You do not have any jail free cards you can use at this time.")
@@ -554,9 +582,23 @@ class Player():
             #Calculate the rental payment
             rentAmount = titleDeedCard.getRentCosts[transportsOwned - 1] 
 
-        #Make the rental payment to owner        
-        self.changeMonetaryValue(-1 * rentAmount)
-        owner.changeMonetaryValue(rentAmount) 
+        #Check current amounts and title deeds owned by player before making rental payment 
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - rentAmount
+        titleDeeds = len(self.getTitleDeeds())
+
+        #Check if the player already has no money currently (on the condition has title deeds)
+        if (monetaryAmount < 0): 
+            #Record the amount of money owned to that player
+            pass 
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt (on the condition has title deeds)
+        elif (newPossibleMonetaryAmount < 0): 
+            #Record the remaining amount
+            pass
+        #If player has sufficient funds
+        else: 
+            self.changeMonetaryValue(-1 * rentAmount)
+            owner.changeMonetaryValue(rentAmount) 
             
         #Reset the dice's doubles
         dice.resetDoubleStatus() 
@@ -565,7 +607,7 @@ class Player():
     #Add a title deed to player's possession (as a result of the bank)
     def acquireTitleDeed(self, titleDeed, purchaseValue, bank): 
         #Add title deed to possession
-        self.addTitleDeeds(titleDeed)
+        self.addTitleDeed(titleDeed)
 
         #Remove card from bank's possession
         bank.removeTitleDeed(titleDeed)
@@ -577,21 +619,20 @@ class Player():
         self.changeMonetaryValue(-1 * purchaseValue)
         bank.add(purchaseValue)
     
-
     """Methods associated with existing properties or making changes including selling and mortgaging""" 
     #Add a mortgage to a property
-    def addMortgage(self, propertyName, mortgageValue, bank): 
+    def addMortgage(self, titleDeedName, mortgageValue, bank): 
         for titleDeed in self.titleDeeds: 
-            if (titleDeed["Title Deed"].getName() == propertyName): 
+            if (titleDeed["Title Deed"].getName() == titleDeedName): 
                 titleDeed["Mortgaged"] = True
         
         bank.giveMortgageLoan(mortgageValue)
         self.changeMonetaryValue(mortgageValue)
 
     #Remove and repay a mortgage from a property
-    def removeMortgage(self, propertyName, repayAmount, bank): 
+    def removeMortgage(self, titleDeedName, repayAmount, bank): 
         for titleDeed in self.titleDeeds: 
-            if (titleDeed["Title Deed"].getName() == propertyName): 
+            if (titleDeed["Title Deed"].getName() == titleDeedName): 
                 titleDeed["Mortgaged"] = False
     
         self.changeMonetaryValue(-1 * repayAmount)
@@ -719,15 +760,47 @@ class Player():
         #Return four houses back to the bank
         bank.getHomesWithHotel()
 
-    #Sell the property title deed to another player
-    def sellPropertyTitle(self, propertyName, sellingAmount):
-        self.removeTitleDeed(propertyName)
+    #Sell the title deed to another player
+    def sellTitle(self, titleDeedName, sellingAmount = 0):
+        titleDeed = self.removeTitleDeed(titleDeedName)
         self.changeMonetaryValue(sellingAmount)
+        
+        #Return the card to allow receiver to gain possession
+        return titleDeed
 
-    #Inherit a property title from a sell by another player (i.e. original owner)
-    def inheritPropertyTitle(self, titleDeedPropertyCard, purchaseAmount): 
-         self.changeMonetaryValue(-1 * purchaseAmount)
+    #Inherit a title deed from a sell by another player (i.e. original owner)
+    def inheritTitle(self, titleDeedCard, purchaseAmount, mortgaged = False, bank = None): 
+        self.addTitleDeed(titleDeedCard, mortgaged)
+        self.changeMonetaryValue(-1 * purchaseAmount)
 
+        if (mortgaged): 
+            #Get the mortgage value
+            mortgageValue = titleDeedCard.getMortgageValue()
+
+            print("This title deed " + titleDeedCard.getName() + " is mortgaged. You have two options.\n" + 
+            "1. Repay the Mortgage Now\n" + 
+            "2. Pay 10\% Interest Now\n" + 
+            "Please type either 'Repay Mortgage' or 'Pay Interest Only'")
+
+            option = input("Type in your option: ")  #This requires validation 
+
+            if (option == "Repay Mortgage"): 
+                #Calculate repayment amount with interest
+                repayAmount = int(math.ceil((mortgageValue + (mortgageValue * Bank.MORTGAGE_INTEREST))/100.0) * 100)
+
+                #Make the repayment mortgage to the bank 
+                self.removeMortgage(titleDeedCard.getName(), repayAmount, bank)
+
+                print(self.getName() + ", your repayment for " + titleDeedCard.getName() + " was successful.\n")
+
+            elif (option == "Pay Interest Only"): 
+                #Calculate interest amount
+                interestAmount = int(math.ceil(mortgageValue * Bank.MORTGAGE_INTEREST)/100.0) * 100
+
+                #Pay the interest only, user retains mortgage 
+                self.changeMonetaryValue(-1 * interestAmount)
+                bank.add(interestAmount)
+    
     #Check if user has run out of cash
     def runOutOfCash(self): 
         if (self.getMonetaryValue() <= 0): 
@@ -735,8 +808,16 @@ class Player():
         return False 
     
     #If bankrupt, start the destruction process
-    def declareBankruptcy(self): 
+    def declareBankruptcy(self):  
+        #If you owe debt to another player (i.e. rent), sell all buildings and title deeds and any jail free cards
+        #Any cash generated by selling the buildings is credited to the new owner 
+
+        #Otherwise
+        #Each of the title deeds must be auctioned by the bank
+
+        #Return any jail free cards to the bottom of the pile 
         pass 
+
 
     #Provide amount for auctioning or selling (if receiver)
     def provideAmount(self, currentPlayStatus, titleDeedName, bidAmount = 0):

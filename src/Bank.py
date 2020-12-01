@@ -20,8 +20,8 @@ class Bank:
     #Utility/Transport Multipler
     RENT_MULTIPLER = 10
 
-    #Numer of properties available
-    HOMES_AVAILABLE = 4 * len(Property.PROPERTY_CARDS)
+    #Numer of properties available - For this game bank has enough buildings for all properties 
+    HOMES_AVAILABLE = 4 * len(Property.PROPERTY_CARDS) 
     HOTELS_AVAILABLE = 1 * len(Property.PROPERTY_CARDS)
 
     #TODO: May need to add logic regarding timing the auction 

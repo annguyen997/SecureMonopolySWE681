@@ -1,5 +1,6 @@
 import TwoDice, Bank
 from Title import Title, Property, Utility, Transports
+import math 
 
 """Utility methods regarding the order of the player list"""
 #Determine the method of ordering of players in list
@@ -175,7 +176,7 @@ def repayMortgage(self, player, titleDeedsOwned, bank):
             mortgageValue = titleDeedStats["Title Deed"].getMortgageValue()
 
             #Calculate repayment amount with interest
-            repayAmount = mortgageValue + (mortgageValue * Bank.MORTGAGE_INTEREST)
+            repayAmount = int(math.ceil((mortgageValue + (mortgageValue * Bank.MORTGAGE_INTEREST))/100.0) * 100)
         else: 
             print("This property is not mortgaged. Please enter a property that is mortgaged.")
             return #Stop processing, return to the caller function. 
@@ -488,8 +489,8 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
     print(player.getName() + ", has sold a hotel for " + titleDeedRecord["Title Deed"].getName() + 
         "Returning to the previous menu.")
 
-#Helper function to process player's request to sell a non-mortgaged property to another player
-def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned): 
+#Helper function to process player's request to sell a property to another player
+def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
     #Print all title deeds owned by the owner 
     for titleDeed in titleDeedsNames: 
         print(titleDeed) 
@@ -516,7 +517,7 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned):
 
     #Check if there is any buildings on that title deed and other title deeds of that color group. 
     #If there are any buildings, player must sell all properties first. 
-    if (titleDeedRecord["Title Deed"].getTitleType() == "Property"):
+    if (titleDeedRecord["Title Deed"].getTitleType() == "Property" and titleDeedRecord["Mortgaged"] == False):
 
         #Get the color group information from card and player's current monopolies
         colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
@@ -545,21 +546,149 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned):
 
             return  #Go to the previous caller function 
     
+    #Check if the property is mortgaged
+    mortgaged = titleDeedRecord["Mortgaged"]
+
     #Make the selling price 
     agreementReached = False
     amountWishToSell = 0 
 
     while (not agreementReached): 
-        amountWishToSell = playerReceiver.provideAmount("Selling", titleDeedRecord["Title Deed"].getName())
-        ownerResponse = playerOwner.decideAmount(playerReceiver.getName(), titleDeedRecord["Title Deed"].getName(), amountWishToSell)
-
-        if (ownerResponse): 
+        amountWishToSell = makeSellTitleDeedDeal(playerOwner, playerReceiver, titleDeedRecord["Title Deed"].getName())
+        if (amountWishToSell > 0): 
             agreementReached = True
-        else: 
-            print("The owner did not accept the amount offered.")
-    
+
     #If agreement reached, make the sell - owner begins the selling
-    titleDeedInTransit = playerOwner.sellPropertyTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+    titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+    playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
     print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
+
+#Helper function to process player's request to sell a utility to another player
+def sellUtility(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned by the owner 
+    for titleDeed in titleDeedsNames: 
+        print(titleDeed) 
+    print("You may need to scroll if you own a large number of title deeds.")
+
+    #User types in title deed to sell
+    titleDeedToSellUtility = input("Enter name of utility title deed you wish to sell: ")  #This needs validation
+
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToSellUtility == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
     
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function 
+
+    #Check if this title deed is a utility
+    if (titleDeedRecord["Title Deed"].getTitleType() != "Utility"): 
+        print("This title deed is not a utility. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function  
+    
+    #Check if the property is mortgaged
+    mortgaged = titleDeedRecord["Mortgaged"]
+
+    #Make the selling price 
+    agreementReached = False
+    amountWishToSell = 0 
+
+    while (not agreementReached): 
+        amountWishToSell = makeSellTitleDeedDeal(playerOwner, playerReceiver, titleDeedRecord["Title Deed"].getName())
+        if (amountWishToSell > 0): 
+            agreementReached = True
+        
+    #If agreement reached, make the sell - owner begins the selling
+    titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+    playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
+
+    print(playerOwner.getName() + ", has sold the utility " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
+
+#Helper function to process player's request to sell a utility to another player
+def sellTransport(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
+    #Print all title deeds owned by the owner 
+    for titleDeed in titleDeedsNames: 
+        print(titleDeed) 
+    print("You may need to scroll if you own a large number of title deeds.")
+
+    #User types in title deed to sell
+    titleDeedToSellTransport = input("Enter name of transport title deed you wish to sell: ")  #This needs validation
+
+    #Search for the title deed, and get the card information
+    titleDeedRecord = None 
+    for titleDeed in titleDeedsOwned: 
+        if (titleDeedToSellTransport == titleDeed["Title Deed"].getName()): 
+            titleDeedRecord = titleDeed
+    
+    #If there is no title deed of such name, stop processing. 
+    if (titleDeedRecord == None): 
+        print("There is no title deed card with that name. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function 
+
+    #Check if this title deed is a utility
+    if (titleDeedRecord["Title Deed"].getTitleType() != "Transports"): 
+        print("This title deed is not a transports. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function  
+    
+    #Check if the property is mortgaged
+    mortgaged = titleDeedRecord["Mortgaged"]
+
+    #Make the selling price 
+    agreementReached = False
+    amountWishToSell = 0 
+
+    while (not agreementReached): 
+        amountWishToSell = makeSellTitleDeedDeal(playerOwner, playerReceiver, titleDeedRecord["Title Deed"].getName())
+        if (amountWishToSell > 0): 
+            agreementReached = True
+        
+    #If agreement reached, make the sell - owner begins the selling
+    titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+    playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
+
+    print(playerOwner.getName() + ", has sold the transport " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
+
+
+""" Helper functions to assist in selling title deeds """ 
+#Helper function to select player to receive a title deed from a possible sale
+def selectPlayerToSell(self, player, titleDeedType):
+    playerReceiver = None 
+
+    #Get the names of the players
+    playerNames = []
+    for playerItem in self.players:
+        #If current player, skip
+        if (playerItem.getName() == player.getName()):
+            continue
+        print(playerItem.getName())
+        playerNames.append(playerItem.getName())
+
+    #Request for player name, and validate the input.
+    validSender = False
+
+    while (not validSender): 
+        playerRequest = input("Select a player which you wish to sell a " + titleDeedType + " title deed: ") 
+
+        if (playerRequest in playerNames):
+            validSender = True
+        else: 
+            print("Please enter a valid player name.")
+    
+    #Get the player name from the request variable (used as a safety mechanism) and return the name
+    playerReceiver = playerRequest
+    return playerReceiver
+
+#Helper function to make the selling arrangement between two players 
+def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName):
+    amountWishToSell = playerReceiver.provideAmount("Selling", titleDeedName)
+    ownerResponse = playerOwner.decideAmount(playerReceiver.getName(), titleDeedName, amountWishToSell)
+
+    if (ownerResponse): 
+        return amountWishToSell
+    else: 
+        print("The owner did not accept the amount offered.")
+        return 0

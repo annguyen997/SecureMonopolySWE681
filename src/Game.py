@@ -302,6 +302,7 @@ class Game:
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
 
+    #Handle all existing deeds of a player
     def handleExistingTitleDeeds(self, player): 
         #Get player's title deeds
         titleDeedsOwned = player.getTitleDeeds()
@@ -315,10 +316,10 @@ class Game:
         + "\n 5. Sell a House"
         + "\n 6. Sell a Hotel" 
         + "\n 7. Sell a Property"
-        + "\n 8. Sell a Mortgaged Property"
-        + "\n 9. Sell a Utility"
-        + "\n 10. Sell a Transport"
-        + "\n 11. End Turn" 
+        + "\n 8. Sell a Utility"
+        + "\n 9. Sell a Transport"
+        + "\n 11. End Turn \n\n" 
+        + "Note for options 7, 8, and 9 - you can also sell mortgaged title deeds." 
 
         #May need a while loop to loop through options continuously until user wishes to end the round
         userHandling = True
@@ -355,39 +356,18 @@ class Game:
 
             #If user wishes to sell a property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Property"): 
-                #Get the name of the player
-                playerNames = []
-                for playerItem in self.players:
-                    #If current player, skip
-                    if (playerItem.getName() == player.getName()):
-                        continue
-                    print(playerItem.getName())
-                    playerNames.append(playerItem.getName())
-
-                #Request for player name, and validate the input.
-                validSender = False
-
-                while (not validSender): 
-                    playerRequest = input("Select a player which you wish to sell the property: ") 
-
-                    if (playerRequest in playerNames):
-                        validSender = True
-                    else: 
-                        print("Please enter a valid player name.")
-                
-                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned)
+                playerRequest = util.selectPlayerToSell(player, "property")
+                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
                         
-            #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
-            elif (optionSelection == "Sell a Mortgaged Property"): 
-                pass
-
-            #If user wishes to sell a utility or transports to another user
-            elif (optionSelection == "Sell a Utility"): 
-                pass
+            #If user wishes to sell a utility to another user
+            elif (optionSelection == "Sell a Utility"):
+               playerRequest = util.selectPlayerToSell(player, "utility")
+               util.sellUtility(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
 
             #If user wishes to sell a transports to another user
             elif (optionSelection == "Sell a Transport"): 
-                pass
+                playerRequest = util.selectPlayerToSell(player, "transport")
+                util.sellTransport(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
 
             #If user wishes to exit
             elif(optionSelection == "End Turn"): 
