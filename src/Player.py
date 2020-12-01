@@ -101,8 +101,17 @@ class Player():
     
     #Remove a title deed from a player's list of possessions 
     def removeTitleDeed(self, titleDeedName): 
-        pass
+        titleDeedCard = None 
+        record = None 
+
+        #Remove the title deed from the list
+        for titleDeed in self.titleDeeds: 
+            if titleDeed["Title Deed"].getName() == titleDeedName: 
+                record = self.titleDeeds.remove(titleDeed) 
+                titleDeedCard = record["Title Deed"]
+            
         #Check if removing property would result in player to lose monopoly
+        
     
     def getPropertyOwned(self): 
         return self.propertyOwned
@@ -552,8 +561,9 @@ class Player():
         #Reset the dice's doubles
         dice.resetDoubleStatus() 
 
-    #Add a title deed to player's possession
-    def addTitleDeed(self, titleDeed, purchaseValue, bank): 
+    """Methods associated with adding by purchasing or auctioning from the bank (or by bankruptcy of another player) """
+    #Add a title deed to player's possession (as a result of the bank)
+    def acquireTitleDeed(self, titleDeed, purchaseValue, bank): 
         #Add title deed to possession
         self.addTitleDeeds(titleDeed)
 
@@ -567,10 +577,25 @@ class Player():
         self.changeMonetaryValue(-1 * purchaseValue)
         bank.add(purchaseValue)
     
-    #Remove a title deed from player's possession 
-    #For properties, this assumes the player does not have any buildings on that property
-    def removeTitleDeed(self, titleDeed, bank): 
-        pass 
+
+    """Methods associated with existing properties or making changes including selling and mortgaging""" 
+    #Add a mortgage to a property
+    def addMortgage(self, propertyName, mortgageValue, bank): 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName): 
+                titleDeed["Mortgaged"] = True
+        
+        bank.giveMortgageLoan(mortgageValue)
+        self.changeMonetaryValue(mortgageValue)
+
+    #Remove and repay a mortgage from a property
+    def removeMortgage(self, propertyName, repayAmount, bank): 
+        for titleDeed in self.titleDeeds: 
+            if (titleDeed["Title Deed"].getName() == propertyName): 
+                titleDeed["Mortgaged"] = False
+    
+        self.changeMonetaryValue(-1 * repayAmount)
+        bank.creditMortgagePayment(repayAmount)
 
     #Purchase a home for the property
     def purchaseHome(self, propertyName, buildingCost, bank):
@@ -694,23 +719,14 @@ class Player():
         #Return four houses back to the bank
         bank.getHomesWithHotel()
 
-    #Add a mortgage to a property
-    def addMortgage(self, propertyName, mortgageValue, bank): 
-        for titleDeed in self.titleDeeds: 
-            if (titleDeed["Title Deed"].getName() == propertyName): 
-                titleDeed["Mortgaged"] = True
-        
-        bank.giveMortgageLoan(mortgageValue)
-        self.changeMonetaryValue(mortgageValue)
+    #Sell the property title deed to another player
+    def sellPropertyTitle(self, propertyName, sellingAmount):
+        self.removeTitleDeed(propertyName)
+        self.changeMonetaryValue(sellingAmount)
 
-    #Remove and repay a mortgage from a property
-    def removeMortgage(self, propertyName, repayAmount, bank): 
-        for titleDeed in self.titleDeeds: 
-            if (titleDeed["Title Deed"].getName() == propertyName): 
-                titleDeed["Mortgaged"] = False
-    
-        self.changeMonetaryValue(-1 * repayAmount)
-        bank.creditMortgagePayment(repayAmount)
+    #Inherit a property title from a sell by another player (i.e. original owner)
+    def inheritPropertyTitle(self, titleDeedPropertyCard, purchaseAmount): 
+         self.changeMonetaryValue(-1 * purchaseAmount)
 
     #Check if user has run out of cash
     def runOutOfCash(self): 
@@ -722,6 +738,48 @@ class Player():
     def declareBankruptcy(self): 
         pass 
 
+    #Provide amount for auctioning or selling (if receiver)
+    def provideAmount(self, currentPlayStatus, titleDeedName, bidAmount = 0):
+        amount = 0 
+        inputValid = False
+
+        while (not inputValid): 
+            if (currentPlayStatus == "Auction"): 
+                print("Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'.") 
+
+                #Validate the input 
+                amount = input("\nEnter bid here: ") 
+            
+            elif (currentPlayStatus == "Selling"):
+                print("Please enter the amount you wish to purchase for " + titleDeedName + ".")
+
+                #Validate the input 
+                amount = input("\nEnter bid here: ") 
+            
+            if (amount < 0 or amount == None): 
+                print("This is not an acceptable value. Please try again.")
+            elif (currentPlayStatus == "Auction" and amount < bidAmount):
+                print("You must enter a bid amount higher than or equal to the starting amount. Please enter a higher value.")
+            elif (currentPlayStatus == "Selling" and amount <= 0):
+                print("You must enter a non-zero positive value for selling. Please enter a higher value.")
+            else: 
+                inputValid = True
+
+        return amount
+        
+    #Accept or reject an amount for selling a title deed
+    def decideAmount(self, receiverName, titleDeedName, sellingOfferAmount): 
+        print("Player " + receiverName + " can purchase your property for " + str(sellingOfferAmount) + 
+        ". Do you wish to sell " + titleDeedName + " at this amount?")
+
+        #Validate the input
+        response = input("Enter either 'Accept' or 'Decline': ")
+
+        if (response == "Accept"):
+            return True
+        
+        #Default amount if not accepted or some other response
+        return False
     
             
 

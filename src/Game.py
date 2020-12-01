@@ -227,7 +227,7 @@ class Game:
             """
 
             if (value == "Purchase"): 
-                player.addTitleDeed(titleDeed, printedValue, self.bank)
+                player.acquireTitleDeed(titleDeed, printedValue, self.bank)
             elif (value == "Auction"):   #Get the starting value
                 #Validate the starting value - ensure value is not too high 
                 startingPrice = input("Please supply the starting price for auction: ")
@@ -252,11 +252,9 @@ class Game:
                 numberAuctioned += 1
                 continue #Skip that player since they inputted starting bid.
 
-            print("Please enter your bidding bid.")
-
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
             #If user types in invalid value, re-enter. If time expires, player forfeits this round.
-            biddingPrice = input("Enter bid here: ") 
+            biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
             self.auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
 
@@ -269,11 +267,10 @@ class Game:
             "The new starting bid for this round is: " + str(newBidAmount))
             
         numberAuctioned = 0
-        for player in self.player: 
-            print("Please enter your bidding bid.")
+        for player in self.player:
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
-            biddingPrice = input("Enter bid here: ") 
+            biddingPrice = player.provideAmount("Auction", titleDeed.getName(), newBidAmount)
             auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
 
@@ -300,7 +297,7 @@ class Game:
         print(winnerAnnounce)
 
         #Conduct the purchase of property
-        playerAuctionWinner.addTitleDeed(titleDeed, highestAmount, self.bank)
+        playerAuctionWinner.acquireTitleDeed(titleDeed, highestAmount, self.bank)
 
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
@@ -378,7 +375,7 @@ class Game:
                     else: 
                         print("Please enter a valid player name.")
                 
-                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
+                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned)
                         
             #If user wishes to sell a mortgaged property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Mortgaged Property"): 

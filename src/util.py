@@ -108,7 +108,7 @@ def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank):
     
     #Check if there is any buildings on that title deed and other title deeds of that color group. 
     #If there are any buildings, player must sell all properties first. 
-    if (titleDeedRecord["Title Deed"].getTileType() == "Property"):
+    if (titleDeedRecord["Title Deed"].getTitleType() == "Property"):
 
         #Get the color group information from card and player's current monopolies
         colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
@@ -489,19 +489,19 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
         "Returning to the previous menu.")
 
 #Helper function to process player's request to sell a non-mortgaged property to another player
-def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, bank): 
+def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned): 
     #Print all title deeds owned by the owner 
     for titleDeed in titleDeedsNames: 
         print(titleDeed) 
     print("You may need to scroll if you own a large number of title deeds.")
 
     #User types in title deed to sell
-    titleDeedToSellHotel = input("Enter name of title deed you wish to sell a hotel: ")  #This needs validation
+    titleDeedToSellProperty = input("Enter name of property title deed you wish to sell: ")  #This needs validation
 
     #Search for the title deed, and get the card information
     titleDeedRecord = None 
     for titleDeed in titleDeedsOwned: 
-        if (titleDeedToSellHotel == titleDeed["Title Deed"].getName()): 
+        if (titleDeedToSellProperty == titleDeed["Title Deed"].getName()): 
             titleDeedRecord = titleDeed
     
     #If there is no title deed of such name, stop processing. 
@@ -509,7 +509,57 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, 
         print("There is no title deed card with that name. Aborting sell. Returning to previous menu.")
         return #Go to the previous caller function 
 
+    #Check if this title deed is a property
+    if (titleDeedRecord["Title Deed"].getTitleType() != "Property"): 
+        print("This title deed is not a property. Aborting sell. Returning to previous menu.")
+        return #Go to the previous caller function  
 
-    print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" +
-        "Returning to the previous menu.")
+    #Check if there is any buildings on that title deed and other title deeds of that color group. 
+    #If there are any buildings, player must sell all properties first. 
+    if (titleDeedRecord["Title Deed"].getTitleType() == "Property"):
+
+        #Get the color group information from card and player's current monopolies
+        colorGroup = titleDeedRecord["Title Deed"].getColorGroup()
+        playerColorMonopoly = playerOwner.getColorMonopoly()
+        colorGroupStats = None 
+
+        #Get the stats information on that monopoly
+        for colorMonopoly in playerColorMonopoly: 
+            if (colorMonopoly["Color Group"] == colorGroup):
+                colorGroupStats = colorMonopoly
+        
+        #Check if there is any buildings, and if so inform player the property cannot be sold until all buildings ar esold
+        if (colorGroupStats["Number Buildings Built"] > 0):
+            print("You cannot sell this property because there are buildings in at least one of properties in the color group " + colorGroup) 
+
+            #List the title deeds in the color group with buildings
+            propertiesList = Title.getColorGroup(colorGroup)
+            for propertyItem in propertiesList:
+                for titleDeed in titleDeedsOwned: 
+                    if (titleDeed["Title Deed"].getName() == propertyItem): 
+                        print("Property Name: " + propertyItem + 
+                        "\nNumber of Houses: " + titleDeed["Houses"] + 
+                        "\nNumber of Hotels: " + titleDeed["Hotels"] + "\n")
+            
+            print("If you wish to sell this property, " + titleDeedRecord["Title Deed"].getName() + "please sell all buildings in this color group first.")
+
+            return  #Go to the previous caller function 
+    
+    #Make the selling price 
+    agreementReached = False
+    amountWishToSell = 0 
+
+    while (not agreementReached): 
+        amountWishToSell = playerReceiver.provideAmount("Selling", titleDeedRecord["Title Deed"].getName())
+        ownerResponse = playerOwner.decideAmount(playerReceiver.getName(), titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+
+        if (ownerResponse): 
+            agreementReached = True
+        else: 
+            print("The owner did not accept the amount offered.")
+    
+    #If agreement reached, make the sell - owner begins the selling
+    titleDeedInTransit = playerOwner.sellPropertyTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+
+    print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
     
