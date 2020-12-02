@@ -21,6 +21,7 @@ class Bank:
     RENT_MULTIPLER = 10
 
     #Numer of properties available - For this game bank has enough buildings for all properties 
+    #As a result, the bank would not need to auction buildings if there are running out
     HOMES_AVAILABLE = 4 * len(Property.PROPERTY_CARDS) 
     HOTELS_AVAILABLE = 1 * len(Property.PROPERTY_CARDS)
 

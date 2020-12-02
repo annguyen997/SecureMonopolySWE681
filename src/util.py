@@ -431,7 +431,7 @@ def sellHome(player, titleDeedsNames, titleDeedsOwned, bank):
     sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50 
 
     #Purchase the home by purchasing from bank and then get the home
-    player.sellHouse(titleDeedToSellHouse, sellBuildingAmount, bank)
+    player.sellHome(titleDeedToSellHouse, sellBuildingAmount, bank)
 
     print(player.getName() + ", has sold a house for " + titleDeedRecord["Title Deed"].getName() + 
         "Returning to the previous menu.")
@@ -479,12 +479,11 @@ def sellHotel(player, titleDeedsNames, titleDeedsOwned, bank):
         return #Go to the previous caller function. 
 
     #Since a player would already have at most one hotel (and thus that property part of monopoly), and other functions have already handled the checking process of number of houses before selling (meaning any other properties must have at least four homes), checking the number of hotels is not necessary.
-
     #If other requirements are passed, sell the hotel.  
     sellBuildingAmount = titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOTELS_COST) * 0.50 
 
     #Purchase the home by purchasing from bank and then get the home
-    player.sellHouse(titleDeedToSellHotel, sellBuildingAmount, bank)
+    player.sellHotel(titleDeedToSellHotel, sellBuildingAmount, bank)
 
     print(player.getName() + ", has sold a hotel for " + titleDeedRecord["Title Deed"].getName() + 
         "Returning to the previous menu.")

@@ -175,10 +175,29 @@ class Game:
         #This statement also runs in player lands on Free Parking space 
         self.handleExistingTitleDeeds(player) 
 
-        #Check if user is bankrupt 
+        #Check if player has no cash left after this round
+        noCashStatus = player.runOutOfCash() 
+        if (noCashStatus): 
+            #Check if user has title deeds (having mortgages or buildings means title deeds) 
+            titleDeedsNum = player.getTitleDeeds()
+            
+            #If user has no deeds, user has no income sources and thus must declare bankruptcy 
+            if (titleDeedsNum == 0):
+                player.setBankruptStatus(True) 
+            elif (titleDeedsNum > 0): 
+                #User needs to check if the buildings would offset any debts
+                #Or have properties which can be mortgaged - if so consider that amount in possible total asset values 
+                #Asset Value - Buildings on Title Deeds + Current Mortgages + Potential Mortgages + (Rent does not count as that is not guaranteed)
 
+                #If your debt totals to more than all properties are mortgaged and buildings owned, you are declared bankrupt
+                pass 
+        
+        #Check if the player is bankrupt
+        if (player.getBankruptStatus()):
+            player.declareBankruptcy() 
+            
         #Go again if not on jail and has thrown double
-        if (not player.getInJailStatus() and dice.getDoubleStatus()):
+        if (not player.getInJailStatus() and (dice.getDoubleStatus())):
             turn(player) 
 
     #Get the title deed card and do the following actions based on the information provided.
