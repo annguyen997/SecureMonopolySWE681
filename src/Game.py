@@ -191,10 +191,12 @@ class Game:
 
                 #If your debt totals to more than all properties are mortgaged and buildings owned, you are declared bankrupt
                 pass 
+
         
         #Check if the player is bankrupt
         if (player.getBankruptStatus()):
-            player.declareBankruptcy() 
+            player.declareBankruptcy()
+            return #Player has left the game, stop turn here 
             
         #Go again if not on jail and has thrown double
         if (not player.getInJailStatus() and (dice.getDoubleStatus())):
