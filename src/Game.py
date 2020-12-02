@@ -302,7 +302,7 @@ class Game:
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
 
-    #Handle all existing deeds of a player
+    #Handle all existing deeds of a player 
     def handleExistingTitleDeeds(self, player): 
         #Get player's title deeds
         titleDeedsOwned = player.getTitleDeeds()
