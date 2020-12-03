@@ -1,5 +1,5 @@
 class Title(object):
-    def __init__(self, tileType, name, printed, rent, mortgage, rentCosts = [], buildingCosts = [], colorGroup = None):
+    def __init__(self, titleType, name, printed, rent, mortgage, rentCosts = [], buildingCosts = [], colorGroup = None):
         self.titleType = titleType              #The type of the title deed
         self.name = name                        #The name of the property or utility
         self.printed = printed                  #The printed value when player lands on title deed if no one has claimed
