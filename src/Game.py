@@ -182,7 +182,7 @@ class Game:
             
         #Check if the player is bankrupt (due to no cash and/or insufficient asset amounts)
         if (player.getBankruptStatus()):
-            player.declareBankruptcy()
+            player.declareBankruptcy(bank)
             return #Player has left the game, stop turn here 
             
         #Go again if not on jail and has thrown double
