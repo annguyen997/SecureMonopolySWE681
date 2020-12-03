@@ -561,6 +561,9 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, 
     titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
+    #Clear any debt to the receiver
+    self.reduceDebtAfterSell(playerOwner, playerReceiver)
+
     print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
 #Helper function to process player's request to sell a utility to another player
@@ -605,6 +608,9 @@ def sellUtility(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, b
     titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
+    #Clear any debt to the receiver
+    self.reduceDebtAfterSell(playerOwner, playerReceiver)
+    
     print(playerOwner.getName() + ", has sold the utility " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
 #Helper function to process player's request to sell a utility to another player
@@ -649,8 +655,31 @@ def sellTransport(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned,
     titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
+    #Clear any debt to the receiver
+    self.reduceDebtAfterSell(playerOwner, playerReceiver)
+    
     print(playerOwner.getName() + ", has sold the transport " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
+#Helper function to determine if player owns any debt to another player after sell transaction 
+def reduceDebtAfterSell(playerOwner, playerReceiver): 
+    #Check if there is any existing debt to the bank, and if so reduce debt. 
+    debtOwned = playerOwner.getDebtRecord() 
+
+    for record in debtOwned: 
+        if (record["Player"] == playerReceiver): 
+            amountOwned = record["Debt Owned"]
+            currentMonetaryAmount = playerOwner.getMonetaryValue()
+
+            #To reduce debt, the sell must result in positive monetary cash amount
+            if (currentMonetaryAmount > 0):
+                if (currentMonetaryAmount >= amountOwned): 
+                    #Player has enough cash to clear the debt, and has at least some money
+                    playerOwner.changeMonetaryValue(-1 * amountOwned) 
+                    playerOwner.reduceDebt(playerReceiver, amountOwned) 
+                else: 
+                    #Player does not have enough cash to clear debt fully 
+                    playerOwner.changeMonetaryValue(-1 * amountOwned) 
+                    playerOwner.reduceDebt(playerReceiver, amountOwned - currentMonetaryAmount)
 
 """ Helper functions to assist in selling title deeds """ 
 #Helper function to select player to receive a title deed from a possible sale

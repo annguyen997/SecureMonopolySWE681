@@ -276,7 +276,8 @@ class Player():
                 
             #Collect more money by passing GO
             self.changeMonetaryValue(Bank.PASS_GO)
-            bank.subtract(Bank.PASS_GO)
+            if (bank != None): 
+                bank.subtract(Bank.PASS_GO)
         
         #Apply new position 
         self.setPosition(newPosition)
@@ -450,9 +451,30 @@ class Player():
         elif (Board.TILES_LIST[position] == "Luxury Tax"):
             taxCharged = Bank.LUXURY_TAX
 
-        #Tax the player, and add the money to bank
-        self.changeMonetaryValue(taxCharged)
-        bank.add(abs(taxCharged))
+        #Check current amounts of player before paying tax
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - abs(taxCharged)
+ 
+        #Check if the player already has no money currently
+        if (monetaryAmount <= 0): 
+            #Record the amount of money owned to the bank
+            self.addDebtRecord("Bank", abs(taxCharged))
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt
+        elif (newPossibleMonetaryAmount < 0): 
+            #Make payment that can be paid now 
+            payableNow = newPossibleMonetaryAmount + abs(taxCharged)
+            self.changeMonetaryValue(-1 * payableNow)
+            bank.add(abs(payableNow))
+
+            #Add the amount to debt record
+            amountDebt = newPossibleMonetaryAmount
+            self.addDebtRecord("Bank", amountDebt)
+        else: 
+            #If sufficient amount, pay the tax to the bank
+            #Tax the player, and add the money to bank
+            self.changeMonetaryValue(taxCharged)
+            bank.add(abs(taxCharged))
 
     #Options to escape jail - Note player can collect rent (provided not mortgaged) or make changes to the title deeds
     def escapeJailOptions(self, bank, dice): 
@@ -474,17 +496,21 @@ class Player():
         
             #Pay 50 fine, user may not go forward until the next turn
             if (jailOption == "Pay 50"): 
-                self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
-                bank.add(Bank.JAIL_PAYMENT)
+                #User must have sufficient funds to pay the bank 
+                if (self.getMonetaryValue > 0): 
+                    self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
+                    bank.add(Bank.JAIL_PAYMENT)
 
-                #Reset the statuses 
-                self.setInJailStatus(False)
-                self.setJailTurns(0)
+                    #Reset the statuses 
+                    self.setInJailStatus(False)
+                    self.setJailTurns(0)
 
-                #Player goes to just visiting jail 
-                self.setPosition(Board.TILES_LIST["Just Visiting"])
+                    #Player goes to just visiting jail 
+                    self.setPosition(Board.TILES_LIST["Just Visiting"])
 
-                validOptionSelected = True
+                    validOptionSelected = 
+                else: 
+                    print("You do not have sufficient funds to get out of jail.")
 
             #Use get out of jail free card
             elif (jailOption == "Jail Free Card" and self.jailCardsAvailable()): 
@@ -616,34 +642,27 @@ class Player():
             #Calculate the rental payment
             rentAmount = titleDeedCard.getRentCosts[transportsOwned - 1] 
 
-        #Check current amounts and title deeds owned by player before making rental payment 
+        #Check current amounts of player before making rental payment 
         monetaryAmount = self.getMonetaryValue() 
         newPossibleMonetaryAmount = monetaryAmount - rentAmount
  
-        #Check if the player already has no money currently (on the condition has title deeds)
+        #Check if the player already has no money currently
         if (monetaryAmount <= 0): 
-            #Record the amount of money owned to that player, assuming player has title deeds
-            if (len(self.getTitleDeeds() > 0)):
-                self.addDebtRecord(owner.getName(), rentAmount)
-            else: 
-                "Declare bankruptcy" 
-                pass 
+            #Record the amount of money owned to that player
+            self.addDebtRecord(owner.getName(), rentAmount)
 
-        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt (on the condition has title deeds)
+            #Since there is no tangible object of monetary value being exchanged, there is no additional debt accumulated. 
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt
         elif (newPossibleMonetaryAmount < 0): 
             #Make payment that can be paid now 
             payableNow = newPossibleMonetaryAmount + rentAmount
             self.changeMonetaryValue(-1 * payableNow)
             owner.changeMonetaryValue(payableNow) 
 
-            #Add the amount to debt record, assuming player has title deeds
+            #Add the amount to debt record
             amountDebt = newPossibleMonetaryAmount
-    
-            if (len(self.getTitleDeeds() > 0)): 
-                self.addDebtRecord(owner.getName(), amountDebt)
-            else: 
-                "Declare bankruptcy"
-                pass 
+            self.addDebtRecord(owner.getName(), amountDebt)
         
         #If player has sufficient funds
         else: 
@@ -662,19 +681,54 @@ class Player():
 
     """Methods associated with adding by purchasing or auctioning from the bank (or by bankruptcy of another player) """
     #Add a title deed to player's possession (as a result of the bank)
-    def acquireTitleDeed(self, titleDeed, purchaseValue, bank): 
+    def acquireTitleDeed(self, titleDeed, purchaseValue, bank = None): 
         #Add title deed to possession
         self.addTitleDeed(titleDeed)
 
         #Remove card from bank's possession
-        bank.removeTitleDeed(titleDeed)
+        if (bank != None): 
+            bank.removeTitleDeed(titleDeed)
 
         #Set the owner to the title deed 
         titleDeed.setOwner(self.getName())
+        
+        #Check current amounts of player before repaying mortgage
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - purchaseValue
+ 
+        #Check if the player already has no money currently
+        if (monetaryAmount <= 0): 
+            #Record the amount of money owned to the bank
+            self.addDebtRecord("Bank", purchaseValue)
 
-        #Make the purchase 
-        self.changeMonetaryValue(-1 * purchaseValue)
-        bank.add(purchaseValue)
+            self.changeMonetaryValue(-1 * purchaseValue)
+            if (bank != None): 
+                bank.add(purchaseValue)
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt (on the condition has title deeds)
+        elif (newPossibleMonetaryAmount < 0): 
+            #Make payment that can be paid now 
+            payableNow = newPossibleMonetaryAmount + purchaseValue
+            self.changeMonetaryValue(-1 * payableNow)
+            if (bank != None): 
+                bank.changeMonetaryValue(payableNow) 
+
+            #Add the amount to debt record
+            amountDebt = newPossibleMonetaryAmount
+            self.addDebtRecord("Bank", amountDebt)
+        else: 
+            #If there are sufficient funds to pay mortgage w/ interest in full 
+            #Make the purchase
+            self.changeMonetaryValue(-1 * purchaseValue)
+            if (bank != None): 
+                bank.add(purchaseValue)
+
+            #Check if there is any existing debt to the bank, and if so reduce debt. 
+            debtOwned = self.getDebtRecord() 
+
+            for record in debtOwned: 
+                if (record["Player"] == "Bank"): 
+                    self.reduceDebt("Bank", purchaseValue)
     
     """Methods associated with existing properties or making changes including selling and mortgaging""" 
     #Add a mortgage to a property
@@ -691,9 +745,30 @@ class Player():
         for titleDeed in self.titleDeeds: 
             if (titleDeed["Title Deed"].getName() == titleDeedName): 
                 titleDeed["Mortgaged"] = False
-    
-        self.changeMonetaryValue(-1 * repayAmount)
-        bank.creditMortgagePayment(repayAmount)
+        
+        #Check current amounts of player before repaying mortgage
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - repayAmount
+ 
+        #Check if the player already has no money currently 
+        if (monetaryAmount <= 0): 
+            #Record the amount of money owned to the bank
+            self.addDebtRecord("Bank", repayAmount)
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt
+        elif (newPossibleMonetaryAmount < 0): 
+            #Make payment that can be paid now 
+            payableNow = newPossibleMonetaryAmount + repayAmount
+            self.changeMonetaryValue(-1 * payableNow)
+            bank.changeMonetaryValue(payableNow) 
+
+            #Add the amount to debt record
+            amountDebt = newPossibleMonetaryAmount
+            self.addDebtRecord("Bank", amountDebt)
+        else: 
+            #If there are sufficient funds to pay mortgage w/ interest in full 
+            self.changeMonetaryValue(-1 * repayAmount)
+            bank.creditMortgagePayment(repayAmount)
 
     #Purchase a home for the property
     def purchaseHome(self, propertyName, buildingCost, bank):
@@ -717,10 +792,42 @@ class Player():
         for monopolyColor in self.colorMonopoly:
             if (colorGroup == monopolyColor["Color Group"]):
                 monopolyColor["Number of Houses Built"] = monopolyColor["Number of Houses Built"] + 1
-        
-        #Make the purchase
-        self.changeMonetaryValue(-1 * buildingCost) 
-        bank.purchaseHome(buildingCost)
+
+        #Check current amounts of player before repaying mortgage
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - buildingCost
+ 
+        #Check if the player already has no money currently
+        if (monetaryAmount <= 0): 
+            #Record the amount of money owned to the bank
+            self.addDebtRecord("Bank", buildingCost)
+
+            #Make the purchase
+            self.changeMonetaryValue(-1 * buildingCost) 
+            bank.purchaseHome(buildingCost)
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt
+        elif (newPossibleMonetaryAmount < 0): 
+            #Make payment that can be paid now 
+            payableNow = newPossibleMonetaryAmount + buildingCost
+            self.changeMonetaryValue(-1 * payableNow)
+            bank.purchaseHome(payableNow) 
+
+            #Add the amount to debt record
+            amountDebt = newPossibleMonetaryAmount
+            self.addDebtRecord("Bank", amountDebt)
+        else: 
+            #If there are sufficient funds to pay mortgage w/ interest in full 
+            #Make the purchase
+            self.changeMonetaryValue(-1 * buildingCost) 
+            bank.purchaseHome(buildingCost)
+
+            #Check if there is any existing debt to the bank, and if so reduce debt. 
+            debtOwned = self.getDebtRecord() 
+
+            for record in debtOwned: 
+                if (record["Bank"] == "Bank"): 
+                    self.reduceDebt("Bank", buildingCost)
     
     #Purchase a hotel for the property, and return four houses to the bank
     def purchaseHotel(self, propertyName, buildingCost, bank): 
@@ -749,9 +856,40 @@ class Player():
                 monopolyColor["Number of Hotels Built"] = monopolyColor["Number of Hotels Built"] + 1
                 monopolyColor["Number of Houses Built"] = monopolyColor["Number of Hotels Built"] - Property.HOMES_MAX
         
-        #Make the purchase
-        self.changeMonetaryValue(-1 * buildingCost) 
-        bank.purchaseHotel(buildingCost)
+        #Check current amounts of player before repaying mortgage
+        monetaryAmount = self.getMonetaryValue() 
+        newPossibleMonetaryAmount = monetaryAmount - buildingCost
+ 
+        #Check if the player already has no money currently (on the condition has title deeds)
+        if (monetaryAmount <= 0): 
+            #Record the amount of money owned to that player, assuming player has title deeds
+            self.addDebtRecord("Bank", buildingCost)
+
+            self.changeMonetaryValue(-1 * buildingCost) 
+            bank.purchaseHotel(buildingCost)
+
+        #Check if the new monetary value causes player to go below zero. If so, the remaining amount must be recorded as debt (on the condition has title deeds)
+        elif (newPossibleMonetaryAmount < 0): 
+            #Make payment that can be paid now 
+            payableNow = newPossibleMonetaryAmount + buildingCost
+            self.changeMonetaryValue(-1 * payableNow)
+            bank.purchaseHotel(payableNow)
+
+            #Add the amount to debt record
+            amountDebt = newPossibleMonetaryAmount
+            self.addDebtRecord("Bank", amountDebt)
+        else: 
+            #If there are sufficient funds to pay mortgage w/ interest in full 
+            #Make the purchase
+            self.changeMonetaryValue(-1 * buildingCost) 
+            bank.purchaseHotel(buildingCost)
+
+            #Check if there is any existing debt to the bank, and if so reduce debt. 
+            debtOwned = self.getDebtRecord() 
+
+            for record in debtOwned: 
+                if (record["Player"] == "Bank"): 
+                    self.reduceDebt("Bank", buildingCost)
         
         #Return four houses back to the bank
         bank.returnHomesWithHotel()
@@ -779,9 +917,28 @@ class Player():
             if (colorGroup == monopolyColor["Color Group"]):
                 monopolyColor["Number of Houses Built"] = monopolyColor["Number of Houses Built"] - 1
         
-        #Make the purchase
+        #Make the sell
         self.changeMonetaryValue(sellingAmount) 
         bank.sellHome(sellingAmount)
+
+        #Check if there is any existing debt to the bank, and if so reduce debt. 
+        debtOwned = self.getDebtRecord() 
+
+        for record in debtOwned: 
+            if (record["Player"] == "Bank"): 
+                amountOwned = record["Debt Owned"]
+                currentMonetaryAmount = self.getMonetaryValue()
+
+                #To reduce debt, the sell must result in positive monetary cash amount
+                if (currentMonetaryAmount > 0):
+                    if (currentMonetaryAmount >= amountOwned): 
+                        #Player has enough cash to clear the debt, and has at least some money
+                        self.changeMonetaryValue(-1 * amountOwned) 
+                        self.reduceDebt("Bank", amountOwned) 
+                    else: 
+                        #Player does not have enough cash to clear debt fully 
+                        self.changeMonetaryValue(-1 * amountOwned) 
+                        self.reduceDebt("Bank", amountOwned - currentMonetaryAmount)
     
     #Sell a hotel from the property, and get four houses back from the bank
     def sellHotel(self, propertyName, sellingAmount, bank): 
@@ -816,6 +973,25 @@ class Player():
 
         #Return four houses back to the bank
         bank.getHomesWithHotel()
+
+        #Check if there is any existing debt to the bank, and if so reduce debt. 
+        debtOwned = self.getDebtRecord() 
+
+        for record in debtOwned: 
+            if (record["Player"] == "Bank"): 
+                amountOwned = record["Debt Owned"]
+                currentMonetaryAmount = self.getMonetaryValue()
+
+                #To reduce debt, the sell must result in positive monetary cash amount
+                if (currentMonetaryAmount > 0):
+                    if (currentMonetaryAmount >= amountOwned): 
+                        #Player has enough cash to clear the debt, and has at least some money
+                        self.changeMonetaryValue(-1 * amountOwned) 
+                        self.reduceDebt("Bank", amountOwned) 
+                    else: 
+                        #Player does not have enough cash to clear debt fully 
+                        self.changeMonetaryValue(-1 * amountOwned) 
+                        self.reduceDebt("Bank", amountOwned - currentMonetaryAmount)
 
     #Sell the title deed to another player
     def sellTitle(self, titleDeedName, sellingAmount = 0):
@@ -856,7 +1032,8 @@ class Player():
 
                 #Pay the interest only, user retains mortgage 
                 self.changeMonetaryValue(-1 * interestAmount)
-                bank.add(interestAmount)
+                if (bank != None): 
+                    bank.add(interestAmount)
     
     #Check if user has run out of cash
     def runOutOfCash(self): 
@@ -869,7 +1046,13 @@ class Player():
         #Get the list of debts
         debtItems = self.getDebtRecord() 
 
-        #If you owe debt to another player (i.e. rent), sell all buildings and title deeds and any jail free cards
+        #Sell all buildings first to the bank
+        monetaryBuildingValue = 0 
+
+        #pay all remaining debts to players - least amount of debt first
+
+        #If you owe debt to another player (i.e. rent), sell all buildings and give the title deeds and any jail free cards to the player owned the most
+        
         #Any cash generated by selling the buildings is credited to the new owner
         #This option is used even if the bankrupt player owns money to the bank (e.g. repaying a mortgage payment)
 

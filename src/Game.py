@@ -175,25 +175,12 @@ class Game:
         #This statement also runs in player lands on Free Parking space 
         self.handleExistingTitleDeeds(player) 
 
-        #Check if player has no cash left after this round
+        #Check if player has no cash left after this round, and if so if has assets
         noCashStatus = player.runOutOfCash() 
         if (noCashStatus): 
-            #Check if user has title deeds (having mortgages or buildings means title deeds) 
-            titleDeedsNum = player.getTitleDeeds()
+            self.checkForAssets(player) 
             
-            #If user has no deeds, user has no income sources and thus must declare bankruptcy 
-            if (titleDeedsNum == 0):
-                player.setBankruptStatus(True) 
-            elif (titleDeedsNum > 0): 
-                #User needs to check if the buildings would offset any debts
-                #Or have properties which can be mortgaged - if so consider that amount in possible total asset values 
-                #Asset Value - Buildings on Title Deeds + Current Mortgages + Potential Mortgages + (Rent does not count as that is not guaranteed)
-
-                #If your debt totals to more than all properties are mortgaged and buildings owned, you are declared bankrupt
-                pass 
-
-        
-        #Check if the player is bankrupt
+        #Check if the player is bankrupt (due to no cash and/or insufficient asset amounts)
         if (player.getBankruptStatus()):
             player.declareBankruptcy()
             return #Player has left the game, stop turn here 
@@ -256,6 +243,59 @@ class Game:
             else: 
                 print("Invalid response was provided.")
     
+    #Check if player has assets if run out of cash. If no sufficient assets, declare bankruptcy 
+    def checkForAssets(self, player):
+        #Check if user has title deeds (having mortgages or buildings means title deeds) 
+        titleDeedsNum = player.getTitleDeeds()
+        
+        #If user has no title deeds, user has no income sources and thus must declare bankruptcy 
+        if (titleDeedsNum <= 0):
+            player.setBankruptStatus(True) 
+        else: 
+            #Note that having title deeds by themselves have no inherit value 
+            #Possible rent is not considered when calculating assets as those are not realized and not guaranteed
+
+            #Get the title deed and debt records of player
+            titleDeedRecords = player.getTitleDeeds() 
+            debtRecords = player.getDebtRecord()
+
+            #Set the variables to calculate the assets and possible mortgaged values
+            buildingAssetsValue = 0 
+            potentialMortgagedValue = 0 
+
+            #Calculate the value of the buildings owned and possible mortgages 
+            for titleDeedRecord in titleDeedRecords: 
+                #If the title deed contains buildings, get the building values (at selling price)
+                if (titleDeedRecord["Houses"] or titleDeedRecord["Hotels"]):
+                    housesValue = titleDeedRecord["Houses"] * (titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50)
+                    hotelsValue = titleDeedRecord["Hotels"] * (titleDeedRecord["Title Deed"].getBuildingCosts(Property.HOTELS_COST) * 0.50)
+                    
+                    buildingAssetsValue = buildingAssetsValue + housesValue + hotelsValue
+                
+                #If title deed has no properties but can be mortgaged, get the possible mortgage amount
+                #Skip if mortgages are already set
+                if (titleDeedRecord["Mortgaged"] == False):
+                    potentialMortgagedValue += titleDeedRecord["Title Deed"].getMortgageValue() 
+            
+            #Get the total amount of debts from each player (or bank)
+            debtAmount = 0 
+            for debtRecord in debtRecords: 
+                debtAmount += debtRecord["Debt Owned"]
+            
+            #Determine if player is bankrupt
+            if ((debtAmount > buildingAssetsValue) and (debtAmount > potentialMortgagedValue)): 
+                #If debt amount is higher than building and potential mortgages separately
+                #Check if debt is higher than building and mortgages combined 
+                if (debtAmount > buildingAssetsValue + potentialMortgagedValue): 
+                    #If debt amount is higher than assets and potential mortgages combined, set bankruptcy 
+                    player.setBankruptStatus(True) 
+                else: 
+                    #This means the debt amount is lower than the assets and potential mortgages combined
+                    player.setBankruptStatus(False) 
+            else: 
+                #Debt amount is lower than assets, or the possible mortgages, or both 
+                player.setBankruptStatus(False)
+
     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
     #A timer may be needed for each user to input a value; if runs out user does not play. - 1 minute max
     def auctionProperty(self, startingPrice, titleDeed, playerName):
