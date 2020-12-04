@@ -158,7 +158,7 @@ class Game:
 
         #Get community card if player landed on community chest tile
         elif boardTile == "Community Card":
-            player.doCommunityCard(self.communityPile.pullCard(), bank)
+            player.doCommunityCard(self.communityPile.pullCard(), self.bank)
 
             #May need to check the new position of the player for a including a property/utility/transport
             newBoardTile = self.board.getTileType(player.getPosition())
@@ -182,7 +182,7 @@ class Game:
             
         #Check if the player is bankrupt (due to no cash and/or insufficient asset amounts)
         if (player.getBankruptStatus()):
-            player.declareBankruptcy(self.players, bank)
+            player.declareBankruptcy(player, self.players, bank)
             return #Player has left the game, stop turn here 
             
         #Go again if not on jail and has thrown double
@@ -363,6 +363,74 @@ class Game:
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
 
+    
+     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
+    
+    #Auction the title deed as a result of a bankruptcy of owner
+    def bankruptAuction(self, titleDeed, mortgaged, bankruptedPlayer):
+        auctionAmounts = [0] * (len(self.players) - 1)
+        self.bank.startAuction(0)
+
+        #First Round - Skipping the starting bid player
+        print("An auction has started for " + titleDeed.getName() + ".\n")
+
+        numberAuctioned = 0
+        for player in self.player: 
+            if (bankruptedPlayer == player.getName()):
+                continue #Skip that player since bankrupted
+
+            #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
+            #If user types in invalid value, re-enter. If time expires, player forfeits this round.
+            biddingPrice = player.provideAmount("Auction", titleDeed.getName(), 0)
+            self.auctionAmounts[numberAuctioned] = biddingPrice
+            numberAuctioned += 1
+
+        #Process the amounts of first round - highest one is the new auction price
+        newBidAmount = max(auctionAmounts)
+        self.bank.setAuctionPrice(newBidAmount)
+
+        #Second round
+        print("The second round of this auction has started for " + titleDeed.getName() + ".\n" + 
+            "The new starting bid for this round is: " + str(newBidAmount))
+            
+        numberAuctioned = 0
+        for player in self.player:
+            if (bankruptedPlayer == player.getName()):
+                continue #Skip that player since bankrupted
+
+            #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
+            biddingPrice = player.provideAmount("Auction", titleDeed.getName(), newBidAmount)
+            auctionAmounts[numberAuctioned] = biddingPrice
+            numberAuctioned += 1
+
+        #Process the amounts of second round - highest one is the winner auction price
+        highestAmount = max(auctionAmounts)
+
+        #Check if highest amount occurs more than once (i.e. at least two players entered same value)
+        tieAmountExist = False
+        occurrences = auctionAmounts.count(highestAmount)
+        if (occurrences > 1): 
+            tieAmountExist = True 
+              
+        #Need the name of player to get the title deed. If there is a tie, one with higher order value wins. 
+        indexHighest = auctionAmounts.index(highestAmount)
+        playerAuctionWinner = self.player[indexHighest]
+
+        winnerAnnounce = ""
+        if (tieAmountExist): 
+            winnerAnnounce += "There is a tie in the highest amount bidder.\n"
+        
+        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + highestAmount + ". Congratulations!"
+        winnerAnnounce += "That player now owns this property, paying the auction amount."
+
+        print(winnerAnnounce)
+
+        #Conduct the purchase of property via inheritance
+        playerAuctionWinner.inheritTitle(titleDeed, highestAmount, mortgaged, self.bank)
+
+        #Reset bank's auction amount
+        self.bank.resetAuctionPrice()
+
     #Handle all existing deeds of a player 
     def handleExistingTitleDeeds(self, player): 
         #Get player's title deeds
@@ -440,4 +508,143 @@ class Game:
         
         print("End processing of making changes to user's title deeds.")
                 
+    #Do bankruptcy process if bankrupt
+    def declareBankruptcy(self, player, playersList, bank): 
+        #Get the list of debts and title deeds
+        debtItems = player.getDebtRecord()
+        titleDeedRecords = player.getTitleDeeds() 
+
+        #Sell all buildings first to the bank, then add amount to the current monetary value of player
+        monetaryBuildingValue = 0 
+        for titleDeed in titleDeedRecords: 
+            #If the title deed is a property, sell any buildings
+            if (titleDeed["Title Deed"].getTitleType() == "Property"): 
+                propertyName = titleDeed["Title Deed"].getName()
+
+                #If there is a hotel, sell hotel first
+                if (titleDeed["Hotels"] > 0):
+                    sellHotelAmount = titleDeed["Title Deed"].getBuildingCosts(Property.HOTELS_COST) * 0.50 
+                    player.sellHotel(propertyName, sellHotelAmount, bank)
+                    monetaryBuildingValue += sellHotelAmount
+
+                #Then sell each house of that property
+                if (titleDeed["Houses"] > 0):
+                    #Get the number of houses of that property; needs constant value
+                    numberHouses = titleDeed["Houses"]
+
+                    #For each house, make the sell back to bank
+                    for i in range(numberHouses):
+                        sellHouseAmount = titleDeed["Title Deed"].getBuildingCosts(Property.HOMES_COST) * 0.50 
+                        player.sellHome(propertyName, sellHouseAmount, bank)
+                        monetaryBuildingValue += sellHouseAmount
         
+        player.changeMonetaryValue(monetaryBuildingValue)
+        
+        #Pay all remaining debts to players - least amount of debt first
+        debtAmounts = []
+        for debtItem in debtItems: 
+            #If player owes debt to bank, skip that for as bank is least priority 
+            if (debtItem["Player"] == "Bank"): 
+                continue
+            debtAmounts.append(debtItem["Debt Owned"])
+        debtAmounts.sort(reverse=True)
+
+        #Pay debts until player has insufficient funds 
+        for debtAmount in debtAmounts: 
+            repayPlayerName = None
+
+            #If player has enough funds to clear debt, clear the debt
+            possibleNewAmount = player.getMonetaryValue() - debtAmount
+
+            if (possibleNewAmount > 0): 
+                #Find player of that debt amount
+                for debtItem in debtItems: 
+                    if (debtItem["Debt Owned"] == debtAmount):
+                        repayPlayerName = debtItem["Player"]
+                        break
+            
+                #Search for that player in player list (of the game), and pay the debts
+                for indebitedPlayer in playersList: 
+                    if (indebitedPlayer.getName() == repayPlayerName): 
+                        self.changeMonetaryValue(-1 * debtAmount)
+                        indebitedPlayer.changeMonetaryValue(debtAmount)
+                        self.reduceDebt(repayPlayerName, debtAmount)
+            else: 
+                break #End the for loop to pay the debts
+          
+        #If you owe debt to another player (most debt first), sell the title deeds and any jail free cards to that player
+        #Any other players which bankrupted player had payables dues must accept losses
+        #Any cash generated by selling the buildings is credited to the new owner
+        #This option is used even if the bankrupt player owns money to the bank (e.g. repaying a mortgage payment)
+        debtAmounts.sort()
+        maxDebtAmount = max(debtAmounts) 
+        secondDebtAmount = debtAmounts[1]
+
+        maxPlayer = None
+        secondHighestPlayer = None
+
+        #Find players of highest and second highest debt amounts
+        for debtItem in debtItems: 
+            if (debtItem["Debt Owned"] == maxDebtAmount):
+                maxPlayer = debtItem["Player"]
+            elif (debtItem["Debt Owned"] == secondDebtAmount):
+                secondHighestPlayer = debtItem["Player"]
+
+        #If highest debt amount is another player, or the highest is bank but there are more than two debt items
+        if (maxPlayer != "Bank" or (maxPlayer == "Bank" and (len(debtAmounts) > 1))): 
+            playerToSellAllItems = None
+            if (maxPlayer == "Bank"):
+                playerToSellAllItems = secondHighestPlayer
+            else: 
+                playerToSellAllItems = maxPlayer 
+
+            #Find the player in the list of the game
+            newOwner = None
+            for playerReceiver in playersList: 
+                if (playerReceiver.getName() == playerToSellAllItems): 
+                    newOwner = playerReceiver
+                
+            #Sell all deeds to the player
+            for titleDeedRecord in titleDeedRecords: 
+                deedMortgaged = titleDeedRecord["Mortgaged"]
+                titleDeedInTransit = player.sellTitle(titleDeedRecord["Title Deed"].getName(), 0)
+                newOwner.inheritTitle(titleDeedInTransit, 0, deedMortgaged, bank)
+
+            #Give away any jail cards
+            while (player.jailCardsAvailable()): 
+                jailCard = player.removeEscapeJailCard() 
+                newOwner.addEscapeJailCard(jailCard)
+            
+            #Give any cash (from selling properties) remaining to that player, assuming it is greater than zero 
+            if (player.getMonetaryValue() > 0): 
+                cashAmount = player.getMonetaryValue() 
+                player.changeMonetaryValue(-1 * cashAmount) 
+                newOwner.changeMonetaryValue(cashAmount) 
+
+        #If there is just the bank, bank must auction the properties and receive any cash     
+        else: 
+            #Auction all deeds to other players via bank
+            for titleDeedRecord in titleDeedRecords: 
+                titleDeedCard = player.sellTitle(titleDeedRecord["Title Deed"].getName(), 0)
+                deedMortgaged = titleDeedRecord["Mortgaged"]
+                self.bankruptAuction(titleDeedCard, deedMortgaged, bankruptedPlayer)
+
+            #Give away any jail cards back to the game piles
+            while (player.jailCardsAvailable()): 
+                jailCard = player.removeEscapeJailCard() 
+
+                #Return card to deck based on the card Type
+                if (jailCard.getCardType() == "Chance"):
+                    self.chancePile.returnJailFreeCard(returnedCard)
+                elif (jailCard.getCardType() == "Community"):
+                    self.communityPile.returnJailFreeCard(returnedCard) 
+            
+            #Give any cash (from selling properties) remaining to the bank, assuming it is greater than zero 
+            if (player.getMonetaryValue() > 0): 
+                cashAmount = player.getMonetaryValue() 
+                player.changeMonetaryValue(-1 * cashAmount) 
+                bank.changeMonetaryValue(cashAmount) 
+    
+        #Remove player from the game
+        playerID = player.getuserID()
+        self.removePlayer(playerID)
