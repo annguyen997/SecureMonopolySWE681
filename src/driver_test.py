@@ -1,23 +1,25 @@
-#! /usr/bin/python3
-from Driver import createUser, authUser
+#! /usr/bin/python	
+from Driver import *
 
-from time import time
-
+import afl
+import sys
 
 '''
 	fuzzing stuff
 '''
 
-#def randomshit():
-
-#	for x in range(0,32):
 def main():
 
+	afl.init()
+
 	a = Driver()
-	a.createUser('test_user','sajAdnbash1jdas!')
-	a.authUser('test_user','sajAdnbash1jdas!')
 
+	try:
+		a.createUser('test_user',sys.stdin.read())
+		a.authUser('test_user','sajAdnbash1jdas!')
 
+	except Exception as e:
+		print("[!!!] FUZZING: EXCEPTION CAUGHT: %s" % (str()))
 	return
 
 if __name__ == '__main__':

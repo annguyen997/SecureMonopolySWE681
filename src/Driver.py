@@ -5,7 +5,6 @@ import io
 from hashlib import pbkdf2_hmac
 from os import urandom
 from re import compile, search
-from io import open, readlines, writelines
 
 class Driver: 
     salt = None
