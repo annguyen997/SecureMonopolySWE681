@@ -1,5 +1,5 @@
 import random, sys
-import Board
+from Board import *	
 
 class Card(object): 
 	def __init__(self, cardType, kind, value):
