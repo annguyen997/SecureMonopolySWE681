@@ -22,7 +22,7 @@ class Card(object):
 #Chance Cards
 class ChanceCards: 
     #Listing of all CHANCE cards in Monopoly. There are 16 chance cards. 
-    CHANCE_CARDS = [
+	CHANCE_CARDS = [
 		Card("Chance", "Advance", "Go"),  										#Advance to Go, collect 200
 		Card("Chance", "Advance", Board.TILES_LIST.index("Illinois Avenue")),   #If pass Go, collect 200
 		Card("Chance", "Advance", Board.TILES_LIST.index("St. Charles Place")),	#If pass Go, collect 200
@@ -41,10 +41,10 @@ class ChanceCards:
 		Card("Chance", "Credit", 100)											#Crossword win 
 	]
 
-    def __init__(self): 
+	def __init__(self): 
         #Generate the random order of the CHANCE cards
-        self.pile = random.sample(range(0, len(self.CHANCE_CARDS)), len(self.CHANCE_CARDS))
-        self.jailFreeUsed = False 
+		self.pile = random.sample(range(0, len(self.CHANCE_CARDS)), len(self.CHANCE_CARDS))
+		self.jailFreeUsed = False 
 	
 	def __str__(self):
 		# Start with calling that is a pile of cards
@@ -94,8 +94,8 @@ class ChanceCards:
 #Community Cards 
 class CommunityCards:
     #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
-    COMMUNITY_CARDS = [
-        Card("Community", "Advance", "Go"),  					#Advance to Go, collect 200
+	COMMUNITY_CARDS = [
+		Card("Community", "Advance", "Go"),  					#Advance to Go, collect 200
 		Card("Community", "Credit", 200),						#Bank error - collect 200
 		Card("Community", "Debit", -50),						#Doctor's fee 
 		Card("Community", "Credit", 50),						#Capital gain from stock
@@ -114,14 +114,14 @@ class CommunityCards:
 		Card("Community", "Credit", 100)						#Inherited 100
 	]
     
-    def __init__(self): 
+	def __init__(self): 
 		#Create a seed, and them seed the random number generator
-        seedValue = random.randrange(sys.maxsize)
-        random.seed(seedValue)
+		seedValue = random.randrange(sys.maxsize)
+		random.seed(seedValue)
 
-        #Generate the random order of the CHANCE cards
-        self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
-        self.jailFreeUsed = False 
+		#Generate the random order of the CHANCE cards
+		self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
+		self.jailFreeUsed = False 
 	
 	def __str__(self):
 		# Start with calling that is a pile of cards
