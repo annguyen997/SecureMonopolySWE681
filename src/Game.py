@@ -63,8 +63,8 @@ class Game:
         newPlayersList = [] #Temporary list
 
         for player in playerListOrder: #Insert players into temp list by order presented in sorted list
-            for playerObject in player:
-                if (playerObject.getuserID == player['userID']):
+            for playerObject in self.players:
+                if (playerObject.getuserID() == player.get('userID')):
                     newPlayersList.append(playerObject)
                     break
                 
@@ -205,9 +205,10 @@ class Game:
         #Check for owner information of a property
         for player in self.players: 
             user_titleDeeds = player.getTitleDeeds()
-            if (titleDeedName == user_titleDeeds["Title Deed"].getName()):
-                ownerExisting = True
-                owner = player
+            for titleDeed in user_titleDeeds:
+                if (titleDeedName == titleDeed["Title Deed"].getName()):
+                    ownerExisting = True
+                    owner = player
         
         #Check if this property is already owned by some player
         if (ownerExisting):
@@ -227,8 +228,8 @@ class Game:
             #Get the printed value price, print card's information, and request user input
             printedValue = titleDeed.getPrintedValue()
             print(titleDeed) 
-            value = input("Do you wish to purchase to this property at the printed value of " + printedValue + 
-                    "or do you wish to auction? \n" +
+            value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
+                    " or do you wish to auction? \n" +
                     "If you want to purchase, please type the word 'Purchase'. \n" + 
                     "If you wish to auction, please type 'Auction'.")
 
@@ -443,7 +444,7 @@ class Game:
         titleDeedsOwned = player.getTitleDeeds()
         titleDeedsNames = [titleDeed["Title Deed"].getName() for titleDeed in titleDeedsOwned]
 
-        displayOptions = "Type in one of the following options exactly as shown: " + "\n 1. Mortgage a Property" + "\n 2. Repay a Mortgaged Property" + "\n 3. Purchase a House" + "\n 4. Purchase a Hotel" + "\n 5. Sell a House" + "\n 6. Sell a Hotel" + "\n 7. Sell a Property" + "\n 8. Sell a Utility" + "\n 9. Sell a Transport" + "\n 11. End Turn \n\n" + "Note for options 7, 8, and 9 - you can also sell mortgaged title deeds."
+        displayOptions = "Type in one of the following options exactly as shown: " + "\n 1. Mortgage a Property" + "\n 2. Repay a Mortgaged Property" + "\n 3. Purchase a House" + "\n 4. Purchase a Hotel" + "\n 5. Sell a House" + "\n 6. Sell a Hotel" + "\n 7. Sell a Property" + "\n 8. Sell a Utility" + "\n 9. Sell a Transport" + "\n 10. End Turn \n\n" + "Note for options 7, 8, and 9 - you can also sell mortgaged title deeds."
 
         #May need a while loop to loop through options continuously until user wishes to end the round
         userHandling = True

@@ -70,10 +70,16 @@ class ChanceCards:
 		#Get the card that is currently at top of pile
 		card = self.pile[0]
 
+		newPile = None
+		if (card.getKind() == "Escape Jail"):
+			newPile = [] * (len(self.pile) - 1)
+		else:
+			newPile = [] * len(self.pile)
+
 		#Create a new pile for the cards
-		newPile = [] * len(self.pile)
-		for i in range(0, len(self.pile) - 1):
-			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+		for i in range(1, len(self.pile)):
+			print(self.pile[i])
+			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 			
 		if (card.getKind() != "Escape Jail"):
 			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
@@ -90,9 +96,9 @@ class ChanceCards:
 			return None
 		
 		#Create a new pile for the cards
-		newPile = [None] * len(self.pile)
-		for i in range(0, len(self.pile) - 1):
-			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+		newPile = [] * len(self.pile)
+		for i in range(1, len(self.pile)):
+			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 
 		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
 
@@ -148,18 +154,23 @@ class CommunityCards:
 		#Get the card that is currently at top of pile
 		card = self.pile[0]
 
-		#Create a new pile for the cards
-		newPile = [] * len(self.pile)
-		for i in range(0, len(self.pile) - 1):
-			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
-			
-		if (card.getKind() != "Escape Jail"):
-			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
+		newPile = None
+		if (card.getKind() == "Escape Jail"):
+			newPile = [] * (len(self.pile) - 1)
+		else:
+			newPile = [] * len(self.pile)
 
-		#Set the new pile as the game piles
+		# Create a new pile for the cards
+		for i in range(1, len(self.pile)):
+			newPile[i - 1] = self.pile[i]  # Shift all cards to one card higher
+
+		if (card.getKind() != "Escape Jail"):
+			newPile[len(newPile) - 1] = card  # Place recently picked card to the bottom
+
+		# Set the new pile as the game piles
 		self.pile = newPile
 
-		#Return the card that was on top of pile to user
+		# Return the card that was on top of pile to user
 		return card
 
 	#Return the Jail Free Card back to the pile
@@ -168,9 +179,9 @@ class CommunityCards:
 			return None
 		
 		#Create a new pile for the cards
-		newPile = [None] * len(self.pile)
-		for i in range(0, len(self.pile) - 1):
-			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
+		newPile = [] * len(self.pile)
+		for i in range(1, (len(self.pile))):
+			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 
 		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
 

@@ -2,11 +2,7 @@ from Bank import *
 from Title import Title, Property #, Utility, Transports
 import math 
 
-"""Utility methods regarding the order of the player list"""
-#Determine the method of ordering of players in list
-def rollOrder(self, element): 
-    return element['order']
-
+"""Utility method regarding the order of the player list"""
 def checkTies(playerListOrder, dice): 
     #Check for ties in the rolling order of each player in game 
 
@@ -16,9 +12,11 @@ def checkTies(playerListOrder, dice):
     index = 0               #Current position in list
     tiedStartIndex = 0      #Starting index which ties first occur
 
+    print(playerListOrder)
+
     for current in playerListOrder:
         #If there is a tie with the current player with previous player in main list, add to PlayerTies list 
-        if (current.get('order') == previous.get('order')):
+        if ((previous != None) and current.get('order') == previous.get('order')):
 
             #Set the value to check for matches further in list, assuming value was not matched previously. 
             if (value == 0):
@@ -28,7 +26,7 @@ def checkTies(playerListOrder, dice):
             #Check if this element's ID already exists in ties list
             elementExists = False
             for player in playerTies: 
-                if player['userID'] == previous['userID']:
+                if player.get('userID') == previous.get('userID'):
                     elementExists = True
                     break
     
@@ -56,7 +54,7 @@ def checkTies(playerListOrder, dice):
                     previous = None
                     secondTie = False
                     for player in playerTies: 
-                        if player['order'] == previous['order']: 
+                        if player.get('order') == previous.get('order'):
                             secondTie = False
                         previous = player 
                     
@@ -65,7 +63,7 @@ def checkTies(playerListOrder, dice):
                         tieBroken = True
 
                 #Sort the players in the players tie list
-                playerTies.sort(key=rollOrder)
+                playerTies = sorted(playerTies, key=lambda item: item.get('order'))
 
                 #Once tie is broken, set new positions of players in main list, starting at index which tie begins
                 indexToReplace = tiedStartIndex

@@ -96,25 +96,26 @@ class Bank:
     #Remove a title deed from bank's possession 
     def removeTitleDeed(self, titleDeed): 
         titleType = titleDeed.getTitleType()
-        titleName = titleDeed.getName() 
+        titleName = titleDeed.getName()
+        titleDeedCard = None
 
         if (titleType == "Property"):  
             for propertyCard in self.propertyCards: 
                 if (propertyCard.getName() == titleName):
-                    self.propertyCards.remove(propertyCard) 
-                    return 
+                    titleDeedCard = self.propertyCards.remove(propertyCard)
         
         elif (titleType == "Utility"):
             for utilityCard in self.utilityCards: 
                 if (utilityCard.getName() == titleName):
-                    self.utilityCards.remove(utilityCard) 
-                    return 
+                    titleDeedCard = self.utilityCards.remove(utilityCard)
 
         elif (titleType == "Transports"):
             for transportsCard in self.transportsCards: 
                 if (transportsCard.getName() == titleName):
-                    self.transportsCards.remove(transportsCard) 
-                    return 
+                    titleDeedCard = self.transportsCards.remove(transportsCard)
+
+        print(titleDeedCard)
+        return titleDeedCard
     
     #Add a title deed to bank's possession (e.g. player sells the card)
     def addTitleDeed(self, titleDeed): 

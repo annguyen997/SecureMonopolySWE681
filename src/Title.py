@@ -15,7 +15,7 @@ class Title(object):
         self.owner = None
 
     def __str__(self):
-        dataString = "Title Type: " + self.titleType + "\nName: " + self.name + "\nPrinted Purchase Value: " + self.printed + "\nRent Amount: " + self.rent + "\nMortgage Amount: " + self.mortgage
+        dataString = "Title Type: " + self.titleType + "\nName: " + self.name + "\nPrinted Purchase Value: " + str(self.printed) + "\nRent Amount: " + str(self.rent) + "\nMortgage Amount: " + str(self.mortgage)
 
         #If there is a color group, display the group.
         if (self.colorGroup != None):
@@ -23,11 +23,13 @@ class Title(object):
 
         #If there are rental property information with the title deed, display the information
         if (self.rentCosts):
-            dataString += "\n\nRental Costs of Property" + "\nWith One House: " + self.rentCosts[0] + "\nWith Two Houses: " + self.rentCosts[1] + "\nWith Threee Houses: " + self.rentCosts[2] + "\nWith Four Houses: " + self.rentCosts[3] + "\nWith Hotel (no homes): " + self.rentCosts[4]
+            dataString += "\n\nRental Costs of Property" + "\nWith One House: " + str(self.rentCosts[0]) + "\nWith Two Houses: " + str(self.rentCosts[1]) + "\nWith Threee Houses: " + str(self.rentCosts[2]) + "\nWith Four Houses: " + str(self.rentCosts[3]) + "\nWith Hotel (no homes): " + str(self.rentCosts[4])
 
         #If there are building costs information with the title deed, display the information
         if (self.buildingCosts):
-            dataString += "\n\nBuilding Costs for Property" + "\nHouses Cost: " + self.buildingCosts[0] + " each house" + "\nHotel Cost: " + self.buildingCosts[1] + " each plus 4 houses" + "\nRemember: You can build houses only when you purchase all properties of a color group. "
+            dataString += "\n\nBuilding Costs for Property" + "\nHouses Cost: " + str(self.buildingCosts[0]) + " each house" + "\nHotel Cost: " + str(self.buildingCosts[1]) + " each plus 4 houses" + "\nRemember: You can build houses only when you purchase all properties of a color group. "
+
+        return dataString
 
     def getTitleType(self):
         return self.titleType
