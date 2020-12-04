@@ -1,7 +1,7 @@
 from Title import Property, Utility, Transports
 
 class Bank: 
-    #Dollar Demoniations Avaiable - traditionally there are 30 bills each 
+    #Dollar Types Available - traditionally there are 30 bills each
     #Typically about 20580, but this is not a hard number.  
     DOLLAR_AMOUNTS = [500, 100, 50, 20, 10, 5, 1]
     PASS_GO = 200
@@ -17,8 +17,8 @@ class Bank:
     #Interests
     MORTGAGE_INTEREST = 0.10
 
-    #Utility/Transport Multipler
-    RENT_MULTIPLER = 10
+    #Utility/Transport Multiplier
+    RENT_MULTIPLIER = 10
 
     #Numer of properties available - For this game bank has enough buildings for all properties 
     #As a result, the bank would not need to auction buildings if there are running out
@@ -31,14 +31,19 @@ class Bank:
     def __init__(self): 
         self.moneyReserves = 20580
 
+        #Title deeds objects
+        self.propertiesObject = Property()
+        self.utilitiesObject = Utility()
+        self.transportsObject = Transports()
+
         #Create the title cards for possession 
-        self.propertyCards = Property()
-        self.utilityCards = Utility()
-        self.transportsCards = Transports() 
+        self.propertyCards = self.propertiesObject.retrieveDeck()
+        self.utilityCards = self.utilitiesObject.retrieveDeck()
+        self.transportsCards = self.transportsObject.retrieveDeck()
 
         #Create the property quantities 
-        self.homesAvailable = HOMES_AVAILABLE
-        self.hotelsAvailable = HOTELS_AVAILABLE
+        self.homesAvailable = Bank.HOMES_AVAILABLE
+        self.hotelsAvailable = Bank.HOTELS_AVAILABLE
 
         #Properties for auction
         self.auctionPrice = 0

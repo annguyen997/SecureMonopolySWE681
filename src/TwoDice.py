@@ -28,9 +28,9 @@ class TwoDice:
 
         #Check if double have occurred
         if (dice1 == dice2): 
-            double = True
+            self.double = True
         else: 
-            double = False 
+            self.double = False
 
         #Return the total for the player to move
         return total
@@ -42,25 +42,25 @@ class TwoDice:
         
         #If rolling dice second time is same as the first, roll again 
         while (round1 == round2):
-            round2 = self.rollDice() 
-        
+            round2 = self.rollDice()
+
+        # Reset any double status if necessary
+        self.resetDoubleStatus()
+
         #Return the sum of two dice rounds
         return round1 + round2
 
-        #Reset any double status if necessary
-        self.resetDoubleStatus()
-
     #Get the value of first die
     def getFirstDice(self): 
-        return dice1
+        return self.dice1
     
     #Get the value of the second die
     def getSecondDice(self): 
-        return dice2
+        return self.dice2
 
     #Get the value of both dice 
     def getTotal(self):
-        return total 
+        return self.total
 
     #Get the double status
     def getDoubleStatus(self): 
@@ -69,5 +69,3 @@ class TwoDice:
     #Reset the double status
     def resetDoubleStatus(self):
         self.double = False
-            
-            

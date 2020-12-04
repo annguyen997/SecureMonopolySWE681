@@ -1,16 +1,19 @@
 import util
-import TwoDice, Player, Board, Card, Bank
-from Title import Title, Property, Utility, Transports
+import Board
+import Bank
+#import Title
+from TwoDice import *
+from Player import *
+from Card import *
 
 class Game:
-
     #Instiates a new game
     def __init__(self):
         self.players = []
         self.currentPlayer = None
         self.board = Board() 
-        self.chancePile = Card.ChanceCards() 
-        self.communityPile = Card.CommunityCards()
+        self.chancePile = ChanceCards()
+        self.communityPile = CommunityCards()
         self.dice = TwoDice() 
         self.bank = Bank() 
 
@@ -47,10 +50,11 @@ class Game:
         for player in self.players: 
             userID = player.getuserID()
             rollNumber = self.dice.rollDice() 
-            playerListOrder.append({'userID': userID, 'order' : rollNumber})
+            playerListOrder.append({'userID': userID, 'order': rollNumber})
 
         #Order the players by the set order
-        playerListOrder.sort(key=util.rollOrder)
+        #playerListOrder.sort(key=util.rollOrder())
+        playerListOrder = sorted(playerListOrder, key=lambda item: item.get('order'))
 
         #Check if list order has ties based on the new order
         playerListOrder = util.checkTies(playerListOrder, self.dice)
@@ -59,7 +63,7 @@ class Game:
         newPlayersList = [] #Temporary list
 
         for player in playerListOrder: #Insert players into temp list by order presented in sorted list
-            for playerObject in self.player:
+            for playerObject in player:
                 if (playerObject.getuserID == player['userID']):
                     newPlayersList.append(playerObject)
                     break
@@ -86,7 +90,7 @@ class Game:
         #Add money to each player before starting the first round
         for player in self.players: 
             player.changeMonetaryValue(Bank.STARTING_AMOUNT)
-            bank.subtract(Bank.STARTING_AMOUNT)
+            self.bank.subtract(Bank.STARTING_AMOUNT)
 
         #Play game until a winner is found 
         winner = False
@@ -110,7 +114,7 @@ class Game:
     def turn(self, player): 
         #Check if player is in jail, and if so process the options
         if (player.getInJailStatus()):
-            returnedCard = player.escapeJailOptions(bank, dice)
+            returnedCard = player.escapeJailOptions(self.bank, self.dice)
 
             #If card is returned, do the following actions to return card to deck
             if (returnedCard != None): 
@@ -123,7 +127,7 @@ class Game:
             moveNum = self.dice.rollDice()
 
             #Move the player to new position 
-            player.move(moveNum, dice, bank)
+            player.move(moveNum, self.dice, self.bank)
  
         #Get the board tile based on player position 
         boardTile = self.board.getTileType(player.getPosition())
@@ -144,11 +148,11 @@ class Game:
         
         #User pays the tax indicated on the board
         elif boardTile == "Tax":
-            player.payTax(bank)
+            player.payTax(self.bank)
             
         #Get chance card if player landed on chance tile
         elif boardTile == "Chance Card":
-            player.doChanceCard(self.chancePile.pullCard(), bank)
+            player.doChanceCard(self.chancePile.pullCard(), self.board, self.bank)
 
             #May need to check the new position of the player for a including a property/utility/transport
             newBoardTile = self.board.getTileType(player.getPosition())
@@ -160,7 +164,7 @@ class Game:
 
         #Get community card if player landed on community chest tile
         elif boardTile == "Community Card":
-            player.doCommunityCard(self.communityPile.pullCard(), self.bank)
+            player.doCommunityCard(self.communityPile.pullCard(), self.board, self.bank)
 
             #May need to check the new position of the player for a including a property/utility/transport
             newBoardTile = self.board.getTileType(player.getPosition())
@@ -184,16 +188,16 @@ class Game:
             
         #Check if the player is bankrupt (due to no cash and/or insufficient asset amounts)
         if (player.getBankruptStatus()):
-            player.declareBankruptcy(player, self.players, bank)
+            player.declareBankruptcy(player, self.players, self.bank)
             return #Player has left the game, stop turn here 
             
         #Go again if not on jail and has thrown double
-        if (not player.getInJailStatus() and (dice.getDoubleStatus())):
-            turn(player) 
+        if (not player.getInJailStatus() and (self.dice.getDoubleStatus())):
+            self.turn(player)
 
     #Get the title deed card and do the following actions based on the information provided.
     def checkTitleDeed(self, player, boardTile = "None"): 
-        titleDeedName = Board.TILE_LIST[player.getPosition()]
+        titleDeedName = Board.TILES_LIST[player.getPosition()]
         
         owner = None
         ownerExisting = False
@@ -208,10 +212,10 @@ class Game:
         #Check if this property is already owned by some player
         if (ownerExisting):
             if (owner.getuserID() == player.getuserID()):
-                #Player lands on their own property; can do any property handlings back in the caller turn() function 
+                #Player lands on their own property; can handle any title deeds back in the caller turn() function
                 return
-            else: #If another player owns the property; pay rent or mortgage
-                player.payRent(owner, titleDeedName, boardTile, dice)
+            else: #If another player owns the title deeds; pay rent or mortgage
+                player.payRent(owner, titleDeedName, boardTile, self.dice)
         else: 
             #This is when this property is not yet owned by some player 
 
@@ -228,7 +232,8 @@ class Game:
                     "If you want to purchase, please type the word 'Purchase'. \n" + 
                     "If you wish to auction, please type 'Auction'.")
 
-            #User types either "Purchase" or "Auction" 
+            #User types either "Purchase" or "Auction"
+            #Validate the input
             """
             ok = validateInputforTitle(value)
             if (not ok): 
@@ -308,7 +313,7 @@ class Game:
             "The starting bid for this auction is: " + str(startingPrice))
 
         numberAuctioned = 0
-        for player in self.player: 
+        for player in self.players:
             if (playerName == player.getName()):
                 auctionAmounts[numberAuctioned] = startingPrice
                 numberAuctioned += 1
@@ -317,7 +322,7 @@ class Game:
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
             #If user types in invalid value, re-enter.
             biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
-            self.auctionAmounts[numberAuctioned] = biddingPrice
+            auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
 
         #Process the amounts of first round - highest one is the new auction price
@@ -329,7 +334,7 @@ class Game:
             "The new starting bid for this round is: " + str(newBidAmount))
             
         numberAuctioned = 0
-        for player in self.player:
+        for player in self.players:
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
             biddingPrice = player.provideAmount("Auction", titleDeed.getName(), newBidAmount)
@@ -347,13 +352,13 @@ class Game:
               
         #Need the name of player to get the title deed. If there is a tie, one with higher order value wins. 
         indexHighest = auctionAmounts.index(highestAmount)
-        playerAuctionWinner = self.player[indexHighest]
+        playerAuctionWinner = self.players[indexHighest]
 
         winnerAnnounce = ""
         if (tieAmountExist): 
             winnerAnnounce += "There is a tie in the highest amount bidder.\n"
         
-        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + highestAmount + ". Congratulations!"
+        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + str(highestAmount) + ". Congratulations!"
         winnerAnnounce += "That player now owns this property, paying the specified amount."
 
         print(winnerAnnounce)
@@ -376,14 +381,14 @@ class Game:
         print("An auction has started for " + titleDeed.getName() + ".\n")
 
         numberAuctioned = 0
-        for player in self.player: 
+        for player in self.players:
             if (bankruptedPlayer == player.getName()):
                 continue #Skip that player since bankrupted
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
             #If user types in invalid value, re-enter. 
             biddingPrice = player.provideAmount("Auction", titleDeed.getName(), 0)
-            self.auctionAmounts[numberAuctioned] = biddingPrice
+            auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
 
         #Process the amounts of first round - highest one is the new auction price
@@ -395,7 +400,7 @@ class Game:
             "The new starting bid for this round is: " + str(newBidAmount))
             
         numberAuctioned = 0
-        for player in self.player:
+        for player in self.players:
             if (bankruptedPlayer == player.getName()):
                 continue #Skip that player since bankrupted
 
@@ -415,13 +420,13 @@ class Game:
               
         #Need the name of player to get the title deed. If there is a tie, one with higher order value wins. 
         indexHighest = auctionAmounts.index(highestAmount)
-        playerAuctionWinner = self.player[indexHighest]
+        playerAuctionWinner = self.players[indexHighest]
 
         winnerAnnounce = ""
         if (tieAmountExist): 
             winnerAnnounce += "There is a tie in the highest amount bidder.\n"
         
-        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + highestAmount + ". Congratulations!"
+        winnerAnnounce += "The winner of this auction is " + playerAuctionWinner.getName() + ", who bid for " + str(highestAmount) + ". Congratulations!"
         winnerAnnounce += "That player now owns this property, paying the auction amount."
 
         print(winnerAnnounce)
@@ -438,18 +443,7 @@ class Game:
         titleDeedsOwned = player.getTitleDeeds()
         titleDeedsNames = [titleDeed["Title Deed"].getName() for titleDeed in titleDeedsOwned]
 
-        displayOptions = "Type in one of the following options exactly as shown: "
-        + "\n 1. Mortgage a Property"  
-        + "\n 2. Repay a Mortgaged Property" 
-        + "\n 3. Purchase a House"
-        + "\n 4. Purchase a Hotel"
-        + "\n 5. Sell a House"
-        + "\n 6. Sell a Hotel" 
-        + "\n 7. Sell a Property"
-        + "\n 8. Sell a Utility"
-        + "\n 9. Sell a Transport"
-        + "\n 11. End Turn \n\n" 
-        + "Note for options 7, 8, and 9 - you can also sell mortgaged title deeds." 
+        displayOptions = "Type in one of the following options exactly as shown: " + "\n 1. Mortgage a Property" + "\n 2. Repay a Mortgaged Property" + "\n 3. Purchase a House" + "\n 4. Purchase a Hotel" + "\n 5. Sell a House" + "\n 6. Sell a Hotel" + "\n 7. Sell a Property" + "\n 8. Sell a Utility" + "\n 9. Sell a Transport" + "\n 11. End Turn \n\n" + "Note for options 7, 8, and 9 - you can also sell mortgaged title deeds."
 
         #May need a while loop to loop through options continuously until user wishes to end the round
         userHandling = True
@@ -478,7 +472,7 @@ class Game:
 
             #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
             elif (optionSelection == "Sell a House"): 
-                util.sellHouse(player, titleDeedsNames, titleDeedsOwned, self.bank)
+                util.sellHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
             elif (optionSelection == "Sell a Hotel"): 
@@ -487,17 +481,17 @@ class Game:
             #If user wishes to sell a property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Property"): 
                 playerRequest = util.selectPlayerToSell(player, "property")
-                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
+                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
                         
             #If user wishes to sell a utility to another user
             elif (optionSelection == "Sell a Utility"):
                playerRequest = util.selectPlayerToSell(player, "utility")
-               util.sellUtility(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
+               util.sellUtility(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a transports to another user
             elif (optionSelection == "Sell a Transport"): 
                 playerRequest = util.selectPlayerToSell(player, "transport")
-                util.sellTransport(player, playerRequest, titleDeedsNames, titleDeedsOwned, bank)
+                util.sellTransport(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to exit
             elif(optionSelection == "End Turn"): 
@@ -567,9 +561,9 @@ class Game:
                 #Search for that player in player list (of the game), and pay the debts
                 for indebitedPlayer in playersList: 
                     if (indebitedPlayer.getName() == repayPlayerName): 
-                        self.changeMonetaryValue(-1 * debtAmount)
+                        player.changeMonetaryValue(-1 * debtAmount)
                         indebitedPlayer.changeMonetaryValue(debtAmount)
-                        self.reduceDebt(repayPlayerName, debtAmount)
+                        player.reduceDebt(repayPlayerName, debtAmount)
             else: 
                 break #End the for loop to pay the debts
           

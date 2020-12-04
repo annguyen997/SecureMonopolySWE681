@@ -1,5 +1,5 @@
-import TwoDice, Bank
-from Title import Title, Property, Utility, Transports
+from Bank import *
+from Title import Title, Property #, Utility, Transports
 import math 
 
 """Utility methods regarding the order of the player list"""
@@ -18,11 +18,11 @@ def checkTies(playerListOrder, dice):
 
     for current in playerListOrder:
         #If there is a tie with the current player with previous player in main list, add to PlayerTies list 
-        if (current['order'] == previous['order']):
+        if (current.get('order') == previous.get('order')):
 
             #Set the value to check for matches further in list, assuming value was not matched previously. 
             if (value == 0):
-                value = current['order']
+                value = current.get('order')
                 tiedStartIndex = index - 1
 
             #Check if this element's ID already exists in ties list
@@ -87,7 +87,7 @@ def checkTies(playerListOrder, dice):
 
 """ Methods regarding user's processing of existing title deeds """ 
 #Helper function to process player's interest to get mortgage on a title deed. 
-def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank): 
+def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank = None):
     #Print all title deeds owned
     for titleDeed in titleDeedsNames: 
         print(titleDeed) 
@@ -148,7 +148,7 @@ def getMortgage(self, player, titleDeedsNames, titleDeedsOwned, bank):
         "Returning to the previous menu.")
     
 #Helper function to process player's request to repay a mortgaged property back to bank
-def repayMortgage(self, player, titleDeedsOwned, bank): 
+def repayMortgage(self, player, titleDeedsOwned, bank = None):
     #Print all title deeds owned that are mortgaged
     for titleDeedRecord in titleDeedsOwned: 
         if (titleDeedRecord["Mortgaged"]): 
@@ -550,15 +550,16 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, 
 
     #Make the selling price 
     agreementReached = False
-    amountWishToSell = 0 
+    amountWishToSell = 0
 
-    while (not agreementReached): 
-        amountWishToSell = makeSellTitleDeedDeal(playerOwner, playerReceiver, titleDeedRecord["Title Deed"].getName())
+    titleDeedName = titleDeedRecord["Title Deed"].getName()
+    while (not agreementReached):
+        amountWishToSell = makeSellTitleDeedDeal(playerOwner, playerReceiver, titleDeedName)
         if (amountWishToSell > 0): 
             agreementReached = True
 
     #If agreement reached, make the sell - owner begins the selling
-    titleDeedInTransit = playerOwner.sellTitle(titleDeedRecord["Title Deed"].getName(), amountWishToSell)
+    titleDeedInTransit = playerOwner.sellTitle(titleDeedName, amountWishToSell)
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
     #Clear any debt to the receiver
@@ -683,7 +684,7 @@ def reduceDebtAfterSell(playerOwner, playerReceiver):
 
 """ Helper functions to assist in selling title deeds """ 
 #Helper function to select player to receive a title deed from a possible sale
-def selectPlayerToSell(self, player, titleDeedType):
+def selectPlayerToSell(self, player, titleDeedType = "none"):
     playerReceiver = None 
 
     #Get the names of the players
@@ -698,6 +699,7 @@ def selectPlayerToSell(self, player, titleDeedType):
     #Request for player name, and validate the input.
     validSender = False
 
+    playerRequest = None
     while (not validSender): 
         playerRequest = input("Select a player which you wish to sell a " + titleDeedType + " title deed: ") 
 
@@ -711,7 +713,7 @@ def selectPlayerToSell(self, player, titleDeedType):
     return playerReceiver
 
 #Helper function to make the selling arrangement between two players 
-def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName):
+def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName = ""):
     amountWishToSell = playerReceiver.provideAmount("Selling", titleDeedName)
     ownerResponse = playerOwner.decideAmount(playerReceiver.getName(), titleDeedName, amountWishToSell)
 

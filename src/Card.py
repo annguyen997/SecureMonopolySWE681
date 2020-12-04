@@ -17,11 +17,11 @@ class Card(object):
 		return self.kind
 	
 	def getValue(self): 
-		return self.Value
+		return self.value
 
 #Chance Cards
-class ChanceCards: 
-    #Listing of all CHANCE cards in Monopoly. There are 16 chance cards. 
+class ChanceCards:
+	#Listing of all CHANCE cards in Monopoly. There are 16 chance cards.
 	CHANCE_CARDS = [
 		Card("Chance", "Advance", "Go"),  										#Advance to Go, collect 200
 		Card("Chance", "Advance", Board.TILES_LIST.index("Illinois Avenue")),   #If pass Go, collect 200
@@ -41,10 +41,15 @@ class ChanceCards:
 		Card("Chance", "Credit", 100)											#Crossword win 
 	]
 
-	def __init__(self): 
-        #Generate the random order of the CHANCE cards
-		self.pile = random.sample(range(0, len(self.CHANCE_CARDS)), len(self.CHANCE_CARDS))
-		self.jailFreeUsed = False 
+	def __init__(self):
+		#Generate the random order of the CHANCE cards
+		seedValue = random.randrange(sys.maxsize)
+		random.seed(seedValue)
+
+		self.pile = ChanceCards.CHANCE_CARDS.copy()
+		random.shuffle(self.pile)
+		#self.pile = random.sample(range(0, len(ChanceCards.CHANCE_CARDS)), len(ChanceCards.CHANCE_CARDS))
+		self.jailFreeUsed = False
 	
 	def __str__(self):
 		# Start with calling that is a pile of cards
@@ -53,29 +58,31 @@ class ChanceCards:
 		# Print all the chance cards in deck 
 		for cardIndex in self.pile:
 			string += " - "
-			string += str(self.CARDS[cardIndex])
+			string += str(self.CHANCE_CARDS[cardIndex])
 			string += "\n"
 
 		# Return the generated string
 		return string
 
-	def pullCard(self): 
+	def pullCard(self):
+		print(self.pile[0])
+
 		#Get the card that is currently at top of pile
 		card = self.pile[0]
 
 		#Create a new pile for the cards
-		newPile = [None] * len(self.pile)
+		newPile = [] * len(self.pile)
 		for i in range(0, len(self.pile) - 1):
 			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
 			
 		if (card.getKind() != "Escape Jail"):
 			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
 
-        #Set the new pile as the game piles
+		#Set the new pile as the game piles
 		self.pile = newPile
 
-        #Return the card that was on top of pile to user
-		return self.CHANCE_CARDS[card]
+		#Return the card that was on top of pile to user
+		return card
 	
 	#Return the Jail Free Card back to the pile
 	def returnJailFreeCard(self, jailFreeCard): #Verify if the card returned is a Jail Free Card
@@ -93,7 +100,7 @@ class ChanceCards:
 
 #Community Cards 
 class CommunityCards:
-    #Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
+	#Listing of all COMMUNITY cards in Monopoly. There are 16 community cards.
 	COMMUNITY_CARDS = [
 		Card("Community", "Advance", "Go"),  					#Advance to Go, collect 200
 		Card("Community", "Credit", 200),						#Bank error - collect 200
@@ -114,13 +121,14 @@ class CommunityCards:
 		Card("Community", "Credit", 100)						#Inherited 100
 	]
     
-	def __init__(self): 
-		#Create a seed, and them seed the random number generator
+	def __init__(self):
+		# Generate the random order of the CHANCE cards
 		seedValue = random.randrange(sys.maxsize)
 		random.seed(seedValue)
 
-		#Generate the random order of the CHANCE cards
-		self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
+		cardList = CommunityCards.COMMUNITY_CARDS.copy()
+		self.pile = random.shuffle(cardList)
+		#self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
 		self.jailFreeUsed = False 
 	
 	def __str__(self):
@@ -130,7 +138,7 @@ class CommunityCards:
 		# Print all the community cards in deck
 		for cardIndex in self.pile:
 			string += " - "
-			string += str(self.CARDS[cardIndex])
+			string += str(self.COMMUNITY_CARDS[cardIndex])
 			string += "\n"
 
 		# Return the generated string
@@ -141,18 +149,18 @@ class CommunityCards:
 		card = self.pile[0]
 
 		#Create a new pile for the cards
-		newPile = [None] * len(self.pile)
+		newPile = [] * len(self.pile)
 		for i in range(0, len(self.pile) - 1):
 			newPile[i] = self.pile[i+1] #Shift all cards to one card higher
 			
 		if (card.getKind() != "Escape Jail"):
 			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
 
-        #Set the new pile as the game piles
+		#Set the new pile as the game piles
 		self.pile = newPile
 
-        #Return the card that was on top of pile to user
-		return self.COMMUNITY_CARDS[card]
+		#Return the card that was on top of pile to user
+		return card
 
 	#Return the Jail Free Card back to the pile
 	def returnJailFreeCard(self, jailFreeCard): #Verify if the card returned is a Jail Free Card

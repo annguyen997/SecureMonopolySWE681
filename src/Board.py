@@ -95,6 +95,3 @@ class Board:
 	#Get the number of times a tile has been reached, for purposes like property purchasing.
 	def getNumberofHits(self, tileNum): 
 		return self.hits[tileNum]
-	
-
-    

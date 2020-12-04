@@ -1,5 +1,6 @@
-import Board, Bank
-from Title import Title, Property, Utility, Transports
+from Board import *
+from Bank import *
+from Title import Property, Utility
 import math 
 
 class Player():
@@ -17,7 +18,7 @@ class Player():
         self.bankrupt = False                   #Bankrupt status
         
         self.inJail = False                     #Check if user is in jail 
-        self.jail_cards = []                    #Jail cards in posession 
+        self.jail_cards = []                    #Jail cards in possession
         self.jail_turns = 0                     #Number of remaining turns in jail
 
         self.debt = []                          #Records of debts - money owned to other players 
@@ -116,13 +117,13 @@ class Player():
 
         #Remove the title deed from the list
         for titleDeed in self.titleDeeds: 
-            if titleDeed["Title Deed"].getName() == titleDeedName: 
-                record = self.titleDeeds.remove(titleDeed) 
-                titleDeedCard = record["Title Deed"]
+            if titleDeed["Title Deed"].getName() == titleDeedName:
+                titleDeedCard = titleDeed["Title Deed"]
+                record = self.titleDeeds.remove(titleDeed)
             
         #Reduce the number of properties owned by this player
         if (titleDeedCard.getTitleType() == "Property"): 
-            colorGroup = record["Color Group"]
+            colorGroup = titleDeedCard.getColorGroup()
 
             #Check if removing property would result in player to lose monopoly
             #This already assumes the color group has no property already
@@ -170,7 +171,7 @@ class Player():
     def setInJailStatus(self, status): 
         self.inJail = status
 
-    #Add a jail-free card to player's possesssion 
+    #Add a jail-free card to player's possession
     def addEscapeJailCard(self, card): 
         self.jail_cards.append(card)
 
@@ -234,7 +235,7 @@ class Player():
                 debtRecord["Debt Owned"] = debtRecord["Debt Owned"] - amount
                 
                 #Should the debt amount reaches below or at zero, remove record
-                if (debt["Debt Owned"] <= 0): 
+                if (debtRecord["Debt Owned"] <= 0):
                     self.debt.remove(debtRecord) 
 
     """Methods associated with the player interacting in the game """
@@ -254,7 +255,7 @@ class Player():
                 self.setPosition(Board.TILES_JAIL[0])
                 self.consecutiveDoubles = 0 
 
-                #Rese the dice's double status
+                #Reset the dice double status
                 dice.resetDoubleStatus()
 
                 return #If going to jail, end the turn right here
@@ -284,7 +285,7 @@ class Player():
         self.setPosition(newPosition)
     
     #Read and do the chance card 
-    def doChanceCard(self, card, bank): 
+    def doChanceCard(self, card, board, bank):
         #Get user's position 
         position = self.getPosition() 
 
@@ -293,17 +294,17 @@ class Player():
         cardValue = card.getValue() 
 
         #Do actions based on chance card 
-        if cardKind == "Advance": 
+        if cardKind == "Advance":
             #Record user was on this space first
-            self.board.hit(position)
+            board.hit(position)
 
-            #Read the values, and do the actions based on the vaue
+            #Read the values, and do the actions based on the value
             if cardValue == "Go": 
                 self.setPosition(Board.TILES_GO[0])
 
                 #Collect money
-                self.changeMonetaryValue(Board.PASS_GO)
-                bank.subtract(Board.PASS_GO)
+                self.changeMonetaryValue(Bank.PASS_GO)
+                bank.subtract(Bank.PASS_GO)
 
             elif cardValue == "Utility":
                 #Keep track if nearest utility is found 
@@ -395,7 +396,7 @@ class Player():
             self.addEscapeJailCard(card)
     
     #Read and do the community card 
-    def doCommunityCard(self, card, bank): 
+    def doCommunityCard(self, card, board, bank):
         #Get user's position 
         position = self.getPosition() 
 
@@ -406,15 +407,15 @@ class Player():
         #Do actions based on community card 
         if cardKind == "Advance": 
             #Record user was on this space first
-            self.board.hit(position)
+            board.hit(position)
 
-            #Read the values, and do the actions based on the vaue
+            #Read the values, and do the actions based on the value
             if cardValue == "Go": 
                 self.setPosition(Board.TILES_GO[0])
                 
                 #Collect money
-                self.changeMonetaryValue(Board.PASS_GO)
-                bank.subtract(Board.PASS_GO)
+                self.changeMonetaryValue(Bank.PASS_GO)
+                bank.subtract(Bank.PASS_GO)
 
             elif cardValue == "Go to Jail": 
                 print("You have been sent to jail.")
@@ -483,10 +484,7 @@ class Player():
         card = None
         validOptionSelected = False
 
-        jailMessage = "You are currently in jail, and you have " + self.getJailTurns() + " left in jail."
-        + "\nYou do have the following options if you wish to get out of jail early." 
-        + "\n1. Pay 50 dollar fine - Type 'Pay 50' to use this option." 
-        + "\n2. Roll a double - Type 'Roll Dice' to use this option."
+        jailMessage = "You are currently in jail, and you have " + str(self.getJailTurns()) + " left in jail." + "\nYou do have the following options if you wish to get out of jail early." + "\n1. Pay 50 dollar fine - Type 'Pay 50' to use this option." + "\n2. Roll a double - Type 'Roll Dice' to use this option."
         
         if (self.jailCardsAvailable()): 
             jailMessage += "\n3. Use a get out of jail free card - Type 'Jail Free Card' to use this option."
@@ -498,7 +496,7 @@ class Player():
             #Pay 50 fine, user may not go forward until the next turn
             if (jailOption == "Pay 50"): 
                 #User must have sufficient funds to pay the bank 
-                if (self.getMonetaryValue > 0): 
+                if (self.getMonetaryValue() > 0):
                     self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
                     bank.add(Bank.JAIL_PAYMENT)
 
@@ -554,7 +552,7 @@ class Player():
                     self.subtractJailTurns()
 
                     #If this results in no more jail turns left, player must pay 50. If so reset statuses. 
-                    if (self.getJailStatus == 0): 
+                    if (self.getInJailStatus() == 0):
                         print("\nYou may now escape jail as a result, but you must pay 50 to the bank.")
                         self.changeMonetaryValue(-1 * Bank.JAIL_PAYMENT)
                         bank.add(Bank.JAIL_PAYMENT)
@@ -616,7 +614,7 @@ class Player():
                     rentAmount = titleDeedCard.getRentCosts(Property.HOMES_RENT[num_Houses - 1])
                 elif (num_Hotels): 
                     #There may be no homes on the property, but there is a hotel 
-                    rentAmount = titleDeedCard.getRentCosts(Property.HOTELS_RENT)
+                    rentAmount = titleDeedCard.getRentCosts(Property.HOTELS_COST)
                 else: 
                     #This is an undeveloped site 
                     rentAmount = titleDeedCard.getRentValue() * Property.DOUBLE_RENT
@@ -631,9 +629,9 @@ class Player():
             
             #If owner has both utilities - use 10 
             if (owner.getUtilityOwned() == Utility.UTILITY_BOTH):
-                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_BOTH - 1] * Bank.RENT_MULTIPLER
+                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_BOTH - 1] * Bank.RENT_MULTIPLIER
             else: #If owner owns this utility only - use 4
-                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_ONE - 1] * Bank.RENT_MULTIPLER
+                rentAmount = diceRoll * titleDeedCard.getRentCosts[Utility.UTILITY_ONE - 1] * Bank.RENT_MULTIPLIER
 
         #If transports, calculate the rent amount based on number of transports title deeds owned by owner
         elif (boardTile == "Transports"):
@@ -677,7 +675,7 @@ class Player():
                 if (record["Player"] == owner.getName()): 
                     self.reduceDebt(owner.getName(), rentAmount)
             
-        #Reset the dice's doubles
+        #Reset the dice doubles
         dice.resetDoubleStatus() 
 
     """Methods associated with adding by purchasing or auctioning from the bank (or by bankruptcy of another player) """
