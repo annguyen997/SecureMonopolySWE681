@@ -2,13 +2,13 @@ import random, sys
 import Board
 
 class Card(object): 
-    def __init__(self, cardType, kind, value):
-        self.cardType = cardType
-        self.kind = kind
-        self.value = value 
-    
-    def __str__(self):
-        return "%s(Kind: %s, Value: %s)" % (self.cardType, self.kind, str(self.value))
+	def __init__(self, cardType, kind, value):
+		self.cardType = cardType
+		self.kind = kind
+		self.value = value 
+
+	def __str__(self):
+		return "%s(Kind: %s, Value: %s)" % (self.cardType, self.kind, str(self.value))
 
 	def getCardType(self):
 		return self.cardType 
