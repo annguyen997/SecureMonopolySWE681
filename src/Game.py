@@ -71,10 +71,14 @@ class Game:
         self.dice.resetDoubleStatus()
 
     #Determine winner of the game   
-    def determineWinner(self, timerExpired = false):
-        pass
+    def determineWinner(self, timerExpired = False):
+        if (len(self.players) == 1): 
+            winner = self.players[0]
+            print(winner.getName() + " wins the game!")
+        else:
+            print("No winner at this time.")
 
-    #Run the game 
+    #Run the game
     def run(self): 
         #Determine who plays first 
         self.determineFirstPlayer()
@@ -101,8 +105,6 @@ class Game:
         for player in self.players: 
             self.setCurrentPlayer(player)
             self.turn(player)
-    
-    #Implement timer 
 
     #Conduct the turn of a player
     def turn(self, player): 
@@ -297,7 +299,6 @@ class Game:
                 player.setBankruptStatus(False)
 
     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
-    #A timer may be needed for each user to input a value; if runs out user does not play. - 1 minute max
     def auctionProperty(self, startingPrice, titleDeed, playerName):
         auctionAmounts = [0] * len(self.players)
         self.bank.startAuction(startingPrice)
@@ -314,7 +315,7 @@ class Game:
                 continue #Skip that player since they inputted starting bid.
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
-            #If user types in invalid value, re-enter. If time expires, player forfeits this round.
+            #If user types in invalid value, re-enter.
             biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
             self.auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
@@ -380,7 +381,7 @@ class Game:
                 continue #Skip that player since bankrupted
 
             #Validate input here - including price must be higher than auction bid. To skip auction, user enters "zero".
-            #If user types in invalid value, re-enter. If time expires, player forfeits this round.
+            #If user types in invalid value, re-enter. 
             biddingPrice = player.provideAmount("Auction", titleDeed.getName(), 0)
             self.auctionAmounts[numberAuctioned] = biddingPrice
             numberAuctioned += 1
@@ -627,7 +628,7 @@ class Game:
             for titleDeedRecord in titleDeedRecords: 
                 titleDeedCard = player.sellTitle(titleDeedRecord["Title Deed"].getName(), 0)
                 deedMortgaged = titleDeedRecord["Mortgaged"]
-                self.bankruptAuction(titleDeedCard, deedMortgaged, bankruptedPlayer)
+                self.bankruptAuction(titleDeedCard, deedMortgaged, player.getName())
 
             #Give away any jail cards back to the game piles
             while (player.jailCardsAvailable()): 
@@ -635,9 +636,9 @@ class Game:
 
                 #Return card to deck based on the card Type
                 if (jailCard.getCardType() == "Chance"):
-                    self.chancePile.returnJailFreeCard(returnedCard)
+                    self.chancePile.returnJailFreeCard(jailCard)
                 elif (jailCard.getCardType() == "Community"):
-                    self.communityPile.returnJailFreeCard(returnedCard) 
+                    self.communityPile.returnJailFreeCard(jailCard) 
             
             #Give any cash (from selling properties) remaining to the bank, assuming it is greater than zero 
             if (player.getMonetaryValue() > 0): 

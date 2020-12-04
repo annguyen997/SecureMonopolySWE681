@@ -562,7 +562,7 @@ def sellProperty(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, 
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
     #Clear any debt to the receiver
-    self.reduceDebtAfterSell(playerOwner, playerReceiver)
+    reduceDebtAfterSell(playerOwner, playerReceiver)
 
     print(playerOwner.getName() + ", has sold the property " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
@@ -609,7 +609,7 @@ def sellUtility(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned, b
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
     #Clear any debt to the receiver
-    self.reduceDebtAfterSell(playerOwner, playerReceiver)
+    reduceDebtAfterSell(playerOwner, playerReceiver)
     
     print(playerOwner.getName() + ", has sold the utility " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
@@ -656,8 +656,8 @@ def sellTransport(playerOwner, playerReceiver, titleDeedsNames, titleDeedsOwned,
     playerReceiver.inheritTitle(titleDeedInTransit, amountWishToSell, mortgaged, bank)
 
     #Clear any debt to the receiver
-    self.reduceDebtAfterSell(playerOwner, playerReceiver)
-    
+    reduceDebtAfterSell(playerOwner, playerReceiver)
+
     print(playerOwner.getName() + ", has sold the transport " + titleDeedRecord["Title Deed"].getName() + " to " + playerReceiver.getName() + "\n" + "Returning to the previous menu.")
 
 #Helper function to determine if player owns any debt to another player after sell transaction 
