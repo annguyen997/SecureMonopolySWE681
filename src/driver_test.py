@@ -1,26 +1,33 @@
-#! /usr/bin/python	
+#! /usr/bin/python3
 from Driver import *
 
-import afl
-import sys
+
+import random
+import io
 
 '''
 	fuzzing stuff
 '''
 
-def main():
+# We gonna fuzz stuff
+# first we need a corpus
+# this will just be valid input into our functions
+# AKA just strings of password and user name.
+# I will grab it just from the web
+# https://github.com/danielmiessler/SecLists/blob/master/Passwords/Common-Credentials/10-million-password-list-top-100000.txt
 
-	afl.init()
+corpus = set()
 
-	a = Driver()
+with open('./corpus/top_100000_pass.txt', 'r') as data:
+	corpus_all = data.readlines()
 
-	try:
-		a.createUser('test_user',sys.stdin.read())
-		a.authUser('test_user','sajAdnbash1jdas!')
+	for data in corpus_all:
+		#print(data)
+		corpus.add(data)
 
-	except Exception as e:
-		print("[!!!] FUZZING: EXCEPTION CAUGHT: %s" % (str()))
-	return
+# go back to list,
+# since we are done with set cuz for dupping not unique input
 
-if __name__ == '__main__':
-	main()
+corpus = list(corpus)
+
+print(len(corpus))
