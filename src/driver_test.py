@@ -3,7 +3,19 @@ from Driver import *
 
 
 import random
-import io
+
+# fuzz case. 1 fuzz case
+def fuzz(thread_id,  input):
+	assert isinstance(input, bytes)
+	assert isinstance(thread_id, int)
+
+	# write out the input to temp files?
+	# this let you see what is being produce
+	# as the fuzzer going
+	with open(f"./corpus/tmp_inputs/tmp{thread_id}", "wb") as file:
+		file.write(input)
+
+
 
 '''
 	fuzzing stuff
@@ -29,5 +41,6 @@ with open('./corpus/top_100000_pass.txt', 'r') as data:
 # since we are done with set cuz for dupping not unique input
 
 corpus = list(corpus)
+#print(len(corpus))
 
-print(len(corpus))
+fuzz(123, b"asdasdas")
