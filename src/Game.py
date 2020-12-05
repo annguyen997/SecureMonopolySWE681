@@ -111,7 +111,10 @@ class Game:
             self.turn(player)
 
     #Conduct the turn of a player
-    def turn(self, player): 
+    def turn(self, player):
+        #Print current player
+        print("It is now " + player.getName() + "'s turn.\n")
+
         #Check if player is in jail, and if so process the options
         if (player.getInJailStatus()):
             returnedCard = player.escapeJailOptions(self.bank, self.dice)
@@ -126,9 +129,17 @@ class Game:
             #Get the number of eyes on dice for movement
             moveNum = self.dice.rollDice()
 
+            #Inform the dice roll
+            print("Dice 1: " + str(self.dice.getFirstDice()))
+            print("Dice 2: " + str(self.dice.getSecondDice()))
+            print("Dice Roll Total: " + str(moveNum))
+
             #Move the player to new position 
             player.move(moveNum, self.dice, self.bank)
- 
+
+        #Print current tile position
+        print("\nPlayer " + player.getName() + " is now at " + Board.TILES_LIST[player.getPosition()] + ".\n")
+
         #Get the board tile based on player position 
         boardTile = self.board.getTileType(player.getPosition())
 
@@ -188,7 +199,7 @@ class Game:
             
         #Check if the player is bankrupt (due to no cash and/or insufficient asset amounts)
         if (player.getBankruptStatus()):
-            player.declareBankruptcy(player, self.players, self.bank)
+            self.declareBankruptcy(player, self.players, self.bank)
             return #Player has left the game, stop turn here 
             
         #Go again if not on jail and has thrown double
@@ -227,29 +238,27 @@ class Game:
 
             #Get the printed value price, print card's information, and request user input
             printedValue = titleDeed.getPrintedValue()
-            print(titleDeed) 
-            value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
-                    " or do you wish to auction? \n" +
-                    "If you want to purchase, please type the word 'Purchase'. \n" + 
-                    "If you wish to auction, please type 'Auction'.")
+            print(titleDeed)
 
-            #User types either "Purchase" or "Auction"
-            #Validate the input
-            """
-            ok = validateInputforTitle(value)
-            if (not ok): 
-                revalidate input again 
-                Use while loop here 
-            """
+            # User types either "Purchase" or "Auction"
+            newTitleDeedDecided = False
+            while (not newTitleDeedDecided):
+                #Validate the input here
+                value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
+                            " or do you wish to auction? \n" +
+                            "If you want to purchase, please type the word 'Purchase'. \n" +
+                            "If you wish to auction, please type 'Auction'.")
 
-            if (value == "Purchase"): 
-                player.acquireTitleDeed(titleDeed, printedValue, self.bank)
-            elif (value == "Auction"):   #Get the starting value
-                #Validate the starting value - ensure value is not too high 
-                startingPrice = input("Please supply the starting price for auction: ")
-                self.auctionProperty(startingPrice, titleDeed, player.getName())
-            else: 
-                print("Invalid response was provided.")
+                if (value == "Purchase"):
+                    player.acquireTitleDeed(titleDeed, printedValue, self.bank)
+                    newTitleDeedDecided = True
+                elif (value == "Auction"):   #Get the starting value
+                    #Validate the starting value - ensure value is not too high
+                    startingPrice = input("Please supply the starting price for auction: ")
+                    self.auctionProperty(startingPrice, titleDeed, player.getName())
+                    newTitleDeedDecided = True
+                else:
+                    print("Invalid response was provided.")
     
     #Check if player has assets if run out of cash. If no sufficient assets, declare bankruptcy 
     def checkForAssets(self, player):
@@ -371,8 +380,7 @@ class Game:
         self.bank.resetAuctionPrice()
 
     
-     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
-    
+    #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
     #Auction the title deed as a result of a bankruptcy of owner
     def bankruptAuction(self, titleDeed, mortgaged, bankruptedPlayer):
         auctionAmounts = [0] * (len(self.players) - 1)

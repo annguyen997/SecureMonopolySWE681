@@ -77,7 +77,7 @@ def checkTies(playerListOrder, dice):
 
         #Replace previous element with current element. That element would then be checked with the next element. This is the default set of code
         previous = current
-        index += 1 
+        index += 1
     
     #Return the list order to the caller
     return playerListOrder

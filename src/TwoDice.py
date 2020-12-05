@@ -20,14 +20,14 @@ class TwoDice:
         random.seed(seedValue)
 
         #Roll the two dice   - Add a seed to the the random; don't hard code seed - true randomness of the seed  
-        dice1 = random.randint(1,6)
-        dice2 = random.randint(1,6)
+        self.dice1 = random.randint(1,6)
+        self.dice2 = random.randint(1,6)
         
         #Calculate the total 
-        total = dice1 + dice2
+        total = self.dice1 + self.dice2
 
         #Check if double have occurred
-        if (dice1 == dice2): 
+        if (self.dice1 == self.dice2):
             self.double = True
         else: 
             self.double = False

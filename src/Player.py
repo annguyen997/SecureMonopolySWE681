@@ -74,7 +74,8 @@ class Player():
     
     #Add a title deed to the player's list of possessions
     def addTitleDeed(self, titleDeed, mortgaged = False): 
-        titleType = titleDeed.getTitleType() 
+        titleType = titleDeed.getTitleType()
+        titleName = titleDeed.getName()
 
         if (titleType == "Property"): 
             self.titleDeeds.append({"Title Deed": titleDeed, "Mortgaged": mortgaged, "Houses": 0, "Hotels": 0, "Color Group": titleDeed.getColorGroup()})
@@ -86,7 +87,7 @@ class Player():
 
             createMonopoly = True
             for propertyItem in colorGroupList:
-                if (propertyItem == titleDeed.getName()):
+                if (propertyItem == titleName):
                     #Property item refers to the title deed being added 
                     continue
                 for titleDeed in self.titleDeeds:
@@ -728,6 +729,8 @@ class Player():
             for record in debtOwned: 
                 if (record["Player"] == "Bank"): 
                     self.reduceDebt("Bank", purchaseValue)
+
+        print("The title deed " + titleDeed.getName() + " has been added.")
     
     """Methods associated with existing properties or making changes including selling and mortgaging""" 
     #Add a mortgage to a property
