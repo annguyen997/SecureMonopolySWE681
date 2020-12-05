@@ -77,9 +77,9 @@ class Driver:
             print("[!] LOG: user %s with password - '%s' - doesn't meet password length req: actual - %i" 
                     % (str(user), str(password), str(len(password)  )))
             return False
+
         #complexity
         # a-z A-Z 0-9 special chars
-        # here come theee regex fuck me
         # @#!~;:<>,.-_$%^&+={}\[\]
 
         #print(password)
@@ -109,11 +109,10 @@ class Driver:
     def __checkUser(self, user):
         with open('./plEAzeDAddyNOO.txt', 'r') as file:
             data = file.readlines()
-            
-                for user_data in data:
-                    # find user in list
-                    if (str(user) == str(user_data.split(':')[0])):
-                        return True
+            for user_data in data:
+                # find user in list
+                if (str(user) == str(user_data.split(':')[0])):
+                    return True
         return False
 
     #Create new user
@@ -221,10 +220,10 @@ class Driver:
                             return False
             return True
 
-        except Exception as fuck:
+        except Exception as e:
             print("[!] LOG: Failed to check SessionID for user %s - Session ID failed"
-                    % (str(user)) )
-            print(fuck)
+                    % (str(user)))
+            print(e)
 
             return False
 
@@ -265,11 +264,10 @@ class Driver:
                         else:
                             print("[!] LOG: User - '%s' authentication failed - user auth FAILED"
                                 % (str(user)))
-                            return False
-                print("[!] LOG: User '%s' doesn't exist." 
-                        % (str(user)))
+                            return False  #Should this be None? 
+                print("[!] LOG: User '%s' doesn't exist." % (str(user)))
 
-            # just casually save that shit to a file.
+        # just casually save it to a file.
         except Exception as e:
             print("[!] LOG: Login failed: user - '%s' - auth user FAILED"
                 % (str(user)))

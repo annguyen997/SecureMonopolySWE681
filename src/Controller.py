@@ -4,28 +4,39 @@ import Driver
 
 class Controller: 
     #GET
-    with socket.socket()
+    #with socket.socket()
 
     def __init__(): 
-        driver = Driver() 
-
+        self.driver = Driver() 
+        self.sessionID = None
+        #Should there be a group of session IDs stored per Controller? 
 
     #POST 
     #Game information would need to be displayed to web client.... 
 
-    #Validate the input of the player
-    def parseInput(self):
-        pass
+    def incomingUser(self, username, password, mode):
+        if (mode == "Authenticate"): 
+            self.sessionID = self.driver.authUser(username, password)
+        if (mode == "Create"): 
+            self.createUser(username, password)
+            
 
-    #Asynchronous 
+    #Asynchronous calls
     #session Ids will be returned as base-64
     def checkSessionID(self):
         #Call Driver's check session ID 
-        driver.checkSession(user,) 
+        driver.checkSession(user, self.sessionID) 
 
         #It should return a new line with the returned byte/float value automatically 
         #Stripping new line may be needed 
         random.urandom(32)....
+    
+    
+    #Validate the input of the player 
+    #ResponseType corresponds to the context of the input in relation to the game
+    def parseInput(self, input, responseType):
+        #Regex parts here 
+
 
 
 #???
