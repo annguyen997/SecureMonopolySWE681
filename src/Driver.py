@@ -176,6 +176,8 @@ class Driver:
         return 0
 
     def removeSessionID(self, user):
+        user = str(user).strip("\n")
+        
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "wr") as file:
                 lines = file.readlines()
@@ -191,7 +193,8 @@ class Driver:
             return False
 
     def checkSession(self, user, encodedSessionID):
-        user = str(user).strip("\n")  #Checks the session ID - ensure it is a float or byte
+        user = str(user).strip("\n") #Checks the session ID - ensure it is a float or byte
+        encodedSessionID = str(encodedSessionID).strip("\n")
 
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "r") as file:
