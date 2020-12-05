@@ -1,7 +1,7 @@
 import random, sys
 from Board import *	
 
-class Card(object): 
+class Card():
 	def __init__(self, cardType, kind, value):
 		self.cardType = cardType
 		self.kind = kind
@@ -64,45 +64,53 @@ class ChanceCards:
 		# Return the generated string
 		return string
 
-	def pullCard(self):
-		print(self.pile[0])
+	# Inner function to replace the deck
+	def replaceDeck(self, newPile):
+		self.pile = newPile.copy()
 
+	def pullCard(self):
 		#Get the card that is currently at top of pile
 		card = self.pile[0]
 
-		newPile = None
+		newPile = []
 		if (card.getKind() == "Escape Jail"):
-			newPile = [] * (len(self.pile) - 1)
+			newPile = [None] * (len(self.pile) - 1)
+			self.jailFreeUsed = True
 		else:
-			newPile = [] * len(self.pile)
+			newPile = [None] * len(self.pile)
 
 		#Create a new pile for the cards
 		for i in range(1, len(self.pile)):
-			print(self.pile[i])
 			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 			
 		if (card.getKind() != "Escape Jail"):
 			newPile[len(newPile) - 1] = card #Place recently picked card to the bottom
 
 		#Set the new pile as the game piles
-		self.pile = newPile
+		self.replaceDeck(newPile)
 
 		#Return the card that was on top of pile to user
 		return card
-	
+
 	#Return the Jail Free Card back to the pile
 	def returnJailFreeCard(self, jailFreeCard): #Verify if the card returned is a Jail Free Card
 		if (jailFreeCard.getKind() != "Escape Jail"):
 			return None
 		
 		#Create a new pile for the cards
-		newPile = [] * len(self.pile)
+		newPile = [None] * len(self.pile)
 		for i in range(1, len(self.pile)):
 			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 
 		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
 
-		self.pile = newPile
+		self.replaceDeck(newPile)
+
+		self.jailFreeUsed = False
+
+	# Get if the jail card is used
+	def getJailFreeCardStatus(self):
+		return self.jailFreeUsed
 
 #Community Cards 
 class CommunityCards:
@@ -132,9 +140,8 @@ class CommunityCards:
 		seedValue = random.randrange(sys.maxsize)
 		random.seed(seedValue)
 
-		cardList = CommunityCards.COMMUNITY_CARDS.copy()
-		self.pile = random.shuffle(cardList)
-		#self.pile = random.sample(range(0, len(self.COMMUNITY_CARDS)), len(self.COMMUNITY_CARDS))
+		self.pile = CommunityCards.COMMUNITY_CARDS.copy()
+		random.shuffle(self.pile)
 		self.jailFreeUsed = False 
 	
 	def __str__(self):
@@ -149,16 +156,21 @@ class CommunityCards:
 
 		# Return the generated string
 		return string
+
+	# Inner function to replace the deck
+	def replaceDeck(self, newPile):
+		self.pile = newPile.copy()
 	
-	def pullCard(self): 
-		#Get the card that is currently at top of pile
+	def pullCard(self):
+		# Get the card that is currently at top of pile
 		card = self.pile[0]
 
-		newPile = None
+		newPile = [None]
 		if (card.getKind() == "Escape Jail"):
-			newPile = [] * (len(self.pile) - 1)
+			newPile = [None] * (len(self.pile) - 1)
+			self.jailFreeUsed = True
 		else:
-			newPile = [] * len(self.pile)
+			newPile = [None] * len(self.pile)
 
 		# Create a new pile for the cards
 		for i in range(1, len(self.pile)):
@@ -168,7 +180,7 @@ class CommunityCards:
 			newPile[len(newPile) - 1] = card  # Place recently picked card to the bottom
 
 		# Set the new pile as the game piles
-		self.pile = newPile
+		self.replaceDeck(newPile)
 
 		# Return the card that was on top of pile to user
 		return card
@@ -179,11 +191,17 @@ class CommunityCards:
 			return None
 		
 		#Create a new pile for the cards
-		newPile = [] * len(self.pile)
+		newPile = [None] * len(self.pile)
 		for i in range(1, (len(self.pile))):
 			newPile[i-1] = self.pile[i] #Shift all cards to one card higher
 
 		newPile[len(newPile) - 1] = jailFreeCard #Place jail free card back to the pile
 
-		self.pile = newPile 
+		self.replaceDeck(newPile)
+
+		self.jailFreeUsed = False
+
+	#Get if the jail card is used
+	def getJailFreeCardStatus(self):
+		return self.jailFreeUsed
 	
