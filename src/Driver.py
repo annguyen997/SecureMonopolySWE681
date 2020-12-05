@@ -5,6 +5,7 @@ import io
 from hashlib import pbkdf2_hmac
 from os import urandom
 from re import compile, search
+import base64
 
 class Driver: 
     salt = None
@@ -123,7 +124,7 @@ class Driver:
         except Exception as e:
             print("[!] LOG: failed to saved new user hash to file: user - '%s' - hash '%s' - create user FAILED"
                 % (str(user), str(hash) ))
-            #print(e)
+            print(e)
             return False
         return True
 

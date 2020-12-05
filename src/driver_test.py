@@ -1,21 +1,31 @@
 #! /usr/bin/python3
 from Driver import *
-
+import time
 
 import random
 
 # fuzz case. 1 fuzz case
-def fuzz(thread_id,  input):
-	assert isinstance(input, bytes)
+def fuzz(thread_id,  inp):
+	assert isinstance(inp, bytes)
 	assert isinstance(thread_id, int)
 
 	# write out the input to temp files?
 	# this let you see what is being produce
 	# as the fuzzer going
 	with open(f"./corpus/tmp_inputs/tmp{thread_id}", "wb") as file:
-		file.write(input)
+		file.write(inp)
 
+	username = "fuzz-test{input}"
+	a = Driver()
+	return_code = a.createUser(user = username , password = inp)
 
+	# watch for False return aka any thing fail within 
+	'''
+	if not return_code:
+		with open(f"./corpus/crashes/") as crash_file:
+			crash_file.write(input)
+
+	'''
 
 '''
 	fuzzing stuff
@@ -43,4 +53,14 @@ with open('./corpus/top_100000_pass.txt', 'r') as data:
 corpus = list(corpus)
 #print(len(corpus))
 
-fuzz(123, b"asdasdas")
+start = time.time()
+
+for case in range(1, 100000000):
+	fuzz(0, str.encode(random.choice(corpus)))
+
+	current = time.time() - start
+	print(f"[{current:10.4}] Fuzz case {case} done")
+
+
+
+
