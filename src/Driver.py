@@ -172,14 +172,19 @@ class Driver:
         return 0
 
     def removeSessionID(self, user):
-        with open("./Fuq_M3_uP_DazDy.txt", "wr") as file:
-            lines = file.readlines()
+        try:
+            with open("./Fuq_M3_uP_DazDy.txt", "wr") as file:
+                lines = file.readlines()
 
-            for line in lines:
-                if not str(user) in line:
-                    file.write(line)
+                for line in lines:
+                    if not str(user) in line:
+                        file.write(line)
 
-        return True
+                return True
+        except Exception as e:
+            print("[!] LOG: failed to remove user %s current SESSION ID"
+                    % (str(user)) )
+            return False
 
     def checkSession(self, user, encodedSessionID):
         user = str(user).strip("\n")
