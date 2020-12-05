@@ -100,8 +100,25 @@ class Driver:
             return False
         return True
 
+    def __checkUser(self, user):
+        with open('./plEAzeDAddyNOO.txt', 'r') as file:
+            data = file.readlines()
+            
+                for user_data in data:
+                    # find user in list
+                    if (str(user) == str(user_data.split(':')[0])):
+                        return True
+        return False
+
     #Create new user
     def createUser(self, user, password):
+        
+        # check if user is already there
+        if not self.__checkUser(str(user)):
+            print("[!] LOG: create user %s failed - user already registered: FAILED" 
+                    % (str(user) ))
+            return False
+
         #store user and hash to a file 
         if not self.__checkPasswordStrength(str(user), str(password)):
             print("[!] LOG: user %s - password strength check (checkPasswordStrength): FAILED" 
