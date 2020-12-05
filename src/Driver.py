@@ -112,7 +112,7 @@ class Driver:
 
     #Create new user
     def createUser(self, user, password):
-        
+
         # check if user is already there
         if not self.__checkUser(str(user)):
             print("[!] LOG: create user %s failed - user already registered: FAILED" 
@@ -147,23 +147,54 @@ class Driver:
 
     # assigned a session id
     def __StartSession(self, user):
-
+        sessionID = self.__generateSessionID()
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "a") as file:
 
                 file.writelines(str(user)
                                 + ":"
-                                + str(self.__generateSessionID())
+                                + str(base64.b64encode(sessionID).decode('utf-8'))
                                 + ":"
                                 + str(time()))
 
-            return True
+            return sessionID
 
         except Exception as e:
             print("[!] LOG: Failed to assgined Session ID for user %s"
                 % (str(user)))
-            print(e)
-        return False
+            #print(e)
+        return 0
+
+    def checkSession(self, user, encodedSessionID):
+        try:
+            with open("./Fuq_M3_uP_DazDy.txt", "a") as file:
+                data = file.readlines()
+            
+                for user_data in data:
+                    # find user in list
+                    if (str(user) == str(user_data.split(':')[0])):
+                        stored_ID = base64.b64decode(user_data.split(':')[1])
+                        stored_time = user_data.split(':')[-1]
+
+                        current_time = time.time()
+
+                        # longer than a day? nah nah nahhhhhh
+                        if (current_time - float(stored_time) > 86400.00):
+                            # remove the current entry
+
+                            return False
+
+                        # check for the session id
+                        
+
+            return False
+        except Exception as fuck:
+            print("[!] LOG: Failed to check SessionID for user %s - Session ID failed"
+                    % (str(user)) )
+            print(fuck)
+
+            return False
+
 
     #Authenticate existing user 
     def authUser(self, user, password):
@@ -192,8 +223,8 @@ class Driver:
                                 % (str(user)))
 
                             # NEED SESSION ID
-                            self.__StartSession(str(user))
-                            return True
+                            
+                            return self.__StartSession(str(user))
                         else:
                             print("[!] LOG: User - '%s' authentication failed - user auth FAILED"
                                 % (str(user)))
