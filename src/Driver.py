@@ -1,11 +1,13 @@
 import Game
 
 import io
+import base64
+import time
 
 from hashlib import pbkdf2_hmac
 from os import urandom
 from re import compile, search
-import base64
+
 
 class Driver: 
     salt = None
@@ -112,6 +114,8 @@ class Driver:
 
     #Create new user
     def createUser(self, user, password):
+        user = str(user).strip("\n")
+        password = str(password).strip("\n")
 
         # check if user is already there
         if not self.__checkUser(str(user)):
@@ -147,6 +151,8 @@ class Driver:
 
     # assigned a session id
     def __StartSession(self, user):
+
+        user = str(user).strip("\n")
         sessionID = self.__generateSessionID()
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "a") as file:
@@ -165,9 +171,21 @@ class Driver:
             #print(e)
         return 0
 
+    def removeSessionID(self, user):
+        with open("./Fuq_M3_uP_DazDy.txt", "wr") as file:
+            lines = file.readlines()
+
+            for line in lines:
+                if not str(user) in line:
+                    file.write(line)
+
+        return True
+
     def checkSession(self, user, encodedSessionID):
+        user = str(user).strip("\n")
+
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "a") as file:
+            with open("./Fuq_M3_uP_DazDy.txt", "r") as file:
                 data = file.readlines()
             
                 for user_data in data:
@@ -181,13 +199,16 @@ class Driver:
                         # longer than a day? nah nah nahhhhhh
                         if (current_time - float(stored_time) > 86400.00):
                             # remove the current entry
-
+                            self.removeSessionID(str(user))
                             return False
 
                         # check for the session id
-                        
+                        if not (base64.b64decode(encodedSessionID) == stored_ID):
+                            # remove the current entry
+                            self.removeSessionID(str(user))
+                            return False
+            return True
 
-            return False
         except Exception as fuck:
             print("[!] LOG: Failed to check SessionID for user %s - Session ID failed"
                     % (str(user)) )
@@ -204,6 +225,10 @@ class Driver:
         salt_from_storage = storage[:32] # 32 is the length of the salt
         key_from_storage = storage[32:]
         '''
+
+        user = str(user).strip("\n")
+        password = str(password).strip("\n")
+
         try:
             with open('./plEAzeDAddyNOO.txt', 'r') as file:
                 data = file.readlines()
