@@ -13,7 +13,8 @@ class Controller:
         pass
 
     #Asynchronous 
-    def checkSessionID(self): 
+    #session Ids will be returned as base-64
+    def checkSessionID(self):
 
 
 
