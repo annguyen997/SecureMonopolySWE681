@@ -12,6 +12,10 @@ from re import compile, search
 class Driver: 
     salt = None
 
+    #Empty constructor
+    def __init__(self):
+        self.salt = None
+        
     #View win/loss statistics of players and others
     def viewStatistics(self):
         pass
@@ -187,7 +191,7 @@ class Driver:
             return False
 
     def checkSession(self, user, encodedSessionID):
-        user = str(user).strip("\n")
+        user = str(user).strip("\n")  #Checks the session ID - ensure it is a float or byte
 
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "r") as file:

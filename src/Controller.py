@@ -1,8 +1,13 @@
 import socket 
 
+import Driver
+
 class Controller: 
     #GET
     with socket.socket()
+
+    def __init__(): 
+        driver = Driver() 
 
 
     #POST 
@@ -15,7 +20,12 @@ class Controller:
     #Asynchronous 
     #session Ids will be returned as base-64
     def checkSessionID(self):
+        #Call Driver's check session ID 
+        driver.checkSession(user,) 
 
+        #It should return a new line with the returned byte/float value automatically 
+        #Stripping new line may be needed 
+        random.urandom(32)....
 
 
 #???
