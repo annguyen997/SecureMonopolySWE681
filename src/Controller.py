@@ -17,7 +17,7 @@ class Controller:
     #POST 
     #Game information would need to be displayed to web client.... 
 
-    def incomingUser(self, username, password, mode):
+    def __incomingUser(self, username, password, mode):
         if (mode == "Authenticate"): 
             #session Ids will be returned as base-64
             generatedSessionID = self.driver.authUser(username, password)
@@ -62,10 +62,39 @@ class Controller:
 
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
-    def parseInput(self, input, responseType):
+    def parseInput(self, inp):
+        assert isinstance (inp, dict)
         #Regex parts here 
 
         # this will see what to call and interpret the api calls
+        # i think it is best to devide up to 3 catergories
+        # user stuff
+        # management
+        # and game
+
+        # so I will interpret the data as so
+        # dict {'user_': [data]} - user stuff
+        # dict {'mana_': [data], 'sessionID_': data} - management stuff such as sessionID
+        # dict {'game_': [data], 'sessionID_': data} - game data
+        # 
+
+        #user stuff
+        # within [data] -> FIRST FIELD ALWAYS BE WHAT TO DO aka Authenticate/Create
+        # [data] [1] = user, [data] [2] = password 
+        if 'user_' in inp:
+            # __incomingUser(self, username, password, mode):
+            return self.__incomingUser(str(inp['user_'][1]),    # username offset in 'user_' value
+                                        str(inp['user_'][2]),   # passwd offset in 'user_' value
+                                        str(inp['user_'][0]))   # mode
+
+        # management stuff
+        if 'mana_' in inp:
+
+
+        # game data stuff
+        if 'game_' in inp: 
+
+
 
 
 #???
@@ -94,10 +123,19 @@ def main():
             try: 
                 data = connection.recv(2048)
 
+                # REGEX PARTS HERE
+
                 # handle data 
                 # can you parse input and stuff and save it as a data structure or something
                 # HOA
+
+                '''
+                if data is not valid:
+                    connection.send("data contains invalid input")
+
+                '''
                 controllerClient.parseInput(data)
+
 
                 response = 'Server message: ' + data.decode('utf-8')
 
@@ -109,7 +147,7 @@ def main():
             
              
             
-            connection.sendall(str.encode(response))
+            connection.send(str.encode(response))
             except: 
                 break
         
