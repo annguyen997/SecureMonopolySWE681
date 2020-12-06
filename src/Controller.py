@@ -43,7 +43,8 @@ class Controller:
 
         #If session does not exist, end player's connection
         if (not sessionExist): 
-            pass
+            print("Ending the session.")
+
 
         #random.urandom(32)....
     
@@ -68,6 +69,8 @@ def main():
     host = ''
     port = 2004
     ThreadCount = 0 
+
+    controllerClient = None
     
     print("Waiting for the connection response.")
     try: 
@@ -91,7 +94,7 @@ def main():
                     print("Received: ", response)
                     print("Sending: ", response) 
             
-            controllerUser = Controller() 
+            controllerClient = Controller() 
             
             connection.sendall(str.encode(response))
             except: 
@@ -106,6 +109,7 @@ def main():
         ThreadCount += 1
         print('Thread Number: ' + str(ThreadCount))
     ServerSideSocket.close()
+
 
 if __name__ = "__main__":
     main() 
