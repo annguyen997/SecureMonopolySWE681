@@ -1,4 +1,6 @@
 import socket 
+import os 
+from _thread import * 
 
 import Driver
 
@@ -16,6 +18,7 @@ class Controller:
 
     def incomingUser(self, username, password, mode):
         if (mode == "Authenticate"): 
+            #session Ids will be returned as base-64
             generatedSessionID = self.driver.authUser(username, password)
             #It should return a new line with the returned byte/float value automatically 
             #Stripping new line may be needed 
@@ -25,6 +28,7 @@ class Controller:
 
             if userCreated: 
                 #Once created user, authenticate to generate session ID
+                #session Ids will be returned as base-64
                 generatedSessionID = self.driver.authUser(username, password)
                 #It should return a new line with the returned byte/float value automatically 
                 #Stripping new line may be needed 
@@ -32,10 +36,13 @@ class Controller:
             
 
     #Asynchronous calls
-    #session Ids will be returned as base-64
     def checkSessionID(self):
         #Call Driver's check session ID 
-        sessionExist = driver.checkSession(user, self.sessionID) 
+        sessionExist = self.driver.checkSession(user, self.sessionID) 
+
+        #If session does not exist, end player's connection
+        if (not sessionExist): 
+            pass
 
         #random.urandom(32)....
     
@@ -45,11 +52,13 @@ class Controller:
         #Regex parts here 
 
     #Create a game session - requires at least two players to play
-    def createGame(self, ): 
+    def createGame(self, ):
+         
     
+    #Join an existing game 
     def joinExistingGame(self, gameSessionID): 
         pass
-    
+
 #???
 def main(): 
     ServerSideSocket = socket.socket()

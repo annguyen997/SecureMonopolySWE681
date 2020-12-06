@@ -84,6 +84,11 @@ class Game:
 
     #Run the game
     def run(self): 
+
+        if (len(self.players) < Player.PLAYER_MINIMUM): 
+            print("Game must have at least two players")
+            return #Do not run game 
+            
         #Determine who plays first 
         self.determineFirstPlayer()
         
