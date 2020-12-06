@@ -1,6 +1,7 @@
 import socket 
 import os 
 from _thread import * 
+import base64
 
 import Driver
 
@@ -11,7 +12,6 @@ class Controller:
     #Controller instance (for each user)
     def __init__(): 
         self.driver = Driver() 
-        self.sessionID = None
         #Should there be a group of session IDs stored per Controller? 
 
     #POST 
@@ -37,9 +37,10 @@ class Controller:
             
 
     #Asynchronous call
-    def checkSessionID(self):
+    def checkSessionID(self, sessionID):
         #Call Driver's check session ID 
-        sessionExist = self.driver.checkSession(user, self.sessionID) 
+        #
+        sessionExist = self.driver.checkSession(user, sessionID) 
 
         #If session does not exist, end player's connection
         if (not sessionExist): 
@@ -48,20 +49,24 @@ class Controller:
 
         #random.urandom(32)....
     
-    #Validate the input of the player 
-    #ResponseType corresponds to the context of the input in relation to the game
-    def parseInput(self, input, responseType):
-        #Regex parts here 
 
     #Create a game session - requires at least two players to play
-    def createGame(self):
+    def __createGame(self):
         #Generate session ID
         
          
     
     #Join an existing game 
-    def joinExistingGame(self, gameSessionID): 
+    def __joinExistingGame(self, gameSessionID): 
         pass
+
+    #Validate the input of the player 
+    #ResponseType corresponds to the context of the input in relation to the game
+    def parseInput(self, input, responseType):
+        #Regex parts here 
+
+        # this will see what to call and interpret the api calls
+
 
 #???
 def main(): 
@@ -83,9 +88,17 @@ def main():
 
     def multi_threaded_client(connection):
         connection.send(str.encode('Server is working:'))
+
+        controllerClient = Controller()
         while True:
             try: 
                 data = connection.recv(2048)
+
+                # handle data 
+                # can you parse input and stuff and save it as a data structure or something
+                # HOA
+                controllerClient.parseInput(data)
+
                 response = 'Server message: ' + data.decode('utf-8')
 
                 if not data:
@@ -94,7 +107,7 @@ def main():
                     print("Received: ", response)
                     print("Sending: ", response) 
             
-            controllerClient = Controller() 
+             
             
             connection.sendall(str.encode(response))
             except: 
