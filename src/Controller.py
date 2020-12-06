@@ -106,3 +106,6 @@ def main():
         ThreadCount += 1
         print('Thread Number: ' + str(ThreadCount))
     ServerSideSocket.close()
+
+if __name__ = "__main__":
+    main() 
