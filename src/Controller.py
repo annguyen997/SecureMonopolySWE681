@@ -6,8 +6,9 @@ import Driver
 
 class Controller: 
     #GET
-    #with socket.socket()
+    game_sessions = [] 
 
+    #Controller instance (for each user)
     def __init__(): 
         self.driver = Driver() 
         self.sessionID = None
@@ -35,7 +36,7 @@ class Controller:
                 self.sessionID = str(generatedSessionID).strip("\n")
             
 
-    #Asynchronous calls
+    #Asynchronous call
     def checkSessionID(self):
         #Call Driver's check session ID 
         sessionExist = self.driver.checkSession(user, self.sessionID) 
@@ -52,7 +53,9 @@ class Controller:
         #Regex parts here 
 
     #Create a game session - requires at least two players to play
-    def createGame(self, ):
+    def createGame(self):
+        #Generate session ID
+        
          
     
     #Join an existing game 
@@ -66,22 +69,34 @@ def main():
     port = 2004
     ThreadCount = 0 
     
+    print("Waiting for the connection response.")
     try: 
          ServerSideSocket.bind((host, port))
     except socket.error as e:
         print(str(e))
 
-    print('Socket is listening..')
+    print('Socket is listening for a connection')
     ServerSideSocket.listen(5)
 
     def multi_threaded_client(connection):
         connection.send(str.encode('Server is working:'))
         while True:
-            data = connection.recv(2048)
-            response = 'Server message: ' + data.decode('utf-8')
-            if not data:
-                break
+            try: 
+                data = connection.recv(2048)
+                response = 'Server message: ' + data.decode('utf-8')
+
+                if not data:
+                    break
+                else: 
+                    print("Received: ", response)
+                    print("Sending: ", response) 
+            
+            controllerUser = Controller() 
+            
             connection.sendall(str.encode(response))
+            except: 
+                break
+        
         connection.close()
 
     while True:
