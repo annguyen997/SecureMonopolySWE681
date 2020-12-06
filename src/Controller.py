@@ -16,29 +16,40 @@ class Controller:
 
     def incomingUser(self, username, password, mode):
         if (mode == "Authenticate"): 
-            self.sessionID = self.driver.authUser(username, password)
+            generatedSessionID = self.driver.authUser(username, password)
+            #It should return a new line with the returned byte/float value automatically 
+            #Stripping new line may be needed 
+            self.sessionID = str(generatedSessionID).strip("\n")
         if (mode == "Create"): 
-            self.createUser(username, password)
+            userCreated = self.createUser(username, password)
+
+            if userCreated: 
+                #Once created user, authenticate to generate session ID
+                generatedSessionID = self.driver.authUser(username, password)
+                #It should return a new line with the returned byte/float value automatically 
+                #Stripping new line may be needed 
+                self.sessionID = str(generatedSessionID).strip("\n")
             
 
     #Asynchronous calls
     #session Ids will be returned as base-64
     def checkSessionID(self):
         #Call Driver's check session ID 
-        driver.checkSession(user, self.sessionID) 
+        sessionExist = driver.checkSession(user, self.sessionID) 
 
-        #It should return a new line with the returned byte/float value automatically 
-        #Stripping new line may be needed 
-        random.urandom(32)....
-    
+        #random.urandom(32)....
     
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, input, responseType):
         #Regex parts here 
 
-
-
+    #Create a game session - requires at least two players to play
+    def createGame(self, ): 
+    
+    def joinExistingGame(self, gameSessionID): 
+        pass
+    
 #???
 def main(): 
     ServerSideSocket = socket.socket()
