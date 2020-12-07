@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Game</h1>
+    {{ message }}
+	<br/>
+    <form action="" method="post" novalidate>
+    <label for="input">Enter your input</label><br>
+    <input type="text" id="input" name="input"><br> 
+    <input type="submit" value="Submit">
+    </form>
+{% endblock %}
