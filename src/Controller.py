@@ -28,12 +28,8 @@ class Controller:
     def __init__(self): 
         self.driver = Driver() 
         self.user = None
-<<<<<<< HEAD
-=======
-        self.sessionID = None
         self.game = None
         #Should there be a group of session IDs stored per Controller? 
->>>>>>> a20e4710e6f925bbd4fe0d0e1ddfb3c13adeade4
 
     #POST 
     #Game information would need to be displayed to web client.... 
@@ -160,7 +156,7 @@ class Controller:
                 
         # game data stuff
         if 'game_' in inp:
-            if not (self.__checkSessionID(  str(inp['username_']),
+            if not (self.__checkSessionID( str(inp['username_']),
                                            str(base64.b64encode(inp['sessionID_']).decode('utf-8'))
                                            )):
                 print("[!] LOG: Session for user %s has expired"
