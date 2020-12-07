@@ -166,7 +166,7 @@ class Driver:
                                 + ":"
                                 + str(time()))
 
-            return str(base64.b64encode(sessionID).decode('utf-8'))
+            return ssessionID
 
         except Exception as e:
             print("[!] LOG: Failed to assigned Session ID for user %s"

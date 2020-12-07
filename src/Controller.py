@@ -28,8 +28,6 @@ class Controller:
     def __init__(self): 
         self.driver = Driver() 
         self.user = None
-        self.sessionID = None
-        #Should there be a group of session IDs stored per Controller? 
 
 
     #POST 
@@ -44,8 +42,8 @@ class Controller:
             #Stripping new line may be needed 
             if (generatedSessionID == 0): 
                 return 
-            self.sessionID = generatedSessionID
             self.user = username 
+            return generatedSessionID
 
         if (mode == "Create"): 
             userCreated = self.createUser(username, password)
@@ -59,12 +57,12 @@ class Controller:
                 #Stripping new line may be needed 
                 if (generatedSessionID == 0): 
                     return 
-                self.sessionID = generatedSessionID
                 #self.id = str(generatedSessionID).strip("\n")
                 self.user = username
+                return generatedSessionID
             
     #Asynchronous call
-    def checkSessionID(self, sessionID):
+    def __checkSessionID(self, user, sessionID):
         #Call Driver's check session ID 
         #
         sessionExist = self.driver.checkSession(user, sessionID) 
@@ -76,20 +74,22 @@ class Controller:
             for game in game_sessions: 
                 if self.sessionID in game["Player"]: 
                     game["Player"].remove(self.sessionID)
-
+        return sessionExist
         #random.urandom(32)....
 
     #Create a game session - requires at least two players to play
-    def createGame(self):
+    def __createGame(self, sessionID):
         #Generate game session ID
         gameID = uuid.uuid4()
 
         #Add session ID with player 
-        players = [self.sessionID]
-        Controller.game_sessions.append({"Session": gameID, "Player": players, "Active": False}) 
+        players = [sessionID]
+        Controller.game_sessions.append({"Session": gameID, "Player": players, "Active": False})
+        
+        return gameID
 
     #Join an existing game 
-    def joinExistingGame(self, playerID, gameSessionID): 
+    def __joinExistingGame(self, playerID, gameSessionID): 
         for game in game_sessions: 
             if str(gameSessionID) == str(game["Session"]): 
                 game["Player"].append(self.sessionID)
@@ -108,8 +108,8 @@ class Controller:
 
         # so I will interpret the data as so
         # dict {'user_': [data]} - user stuff
-        # dict {'mana_': [data], 'sessionID_': data} - management stuff such as sessionID
-        # dict {'game_': [data], 'sessionID_': data} - game data
+        # dict {'mana_': [data], 'username_': username, 'sessionID_': data} - management stuff such as sessionID
+        # dict {'game_': [data], 'username_': username, 'sessionID_': data} - game data
         # 
 
         #user stuff
@@ -123,16 +123,46 @@ class Controller:
 
         # management stuff
         if 'mana_' in inp:
+        # check session id if before anything
+        # __checkSessionID(self, user, sessionID)
+            if not (self.__checkSessionID(  str(inp['username_']),
+                                            str(base64.b64encode(inp['sessionID_']).decode('utf-8'))
+                                            )):
+                print("[!] LOG: Session for user %s has expired"
+                        % (str(inp['username_'])) )
+                return False
+
+            ###############
+            #   joinExistingGame
+            ###############
+            if (str(inp['mana_'][0]) == 'joinExistingGame'):
+                # __joinExistingGame(self, playerID, gameSessionID): 
+                self.__joinExistingGame(str(inp['mana_'][1]),   # playerID or username
+                                        inp['mana_'][2])        # game session id
+                return
 
 
+            ###############
+            #   createGame
+            ###############
+            if (str(inp['mana_'][0]) == 'createGame'):
+                # __createGame(self, sessionID): 
+                return self.__createGame(inp['sessionID_'])        # player session id
+                
         # game data stuff
-        if 'game_' in inp: 
+        if 'game_' in inp:
+            if not (self.__checkSessionID(  str(inp['username_']),
+                                           str(base64.b64encode(inp['sessionID_']).decode('utf-8'))
+                                           )):
+                print("[!] LOG: Session for user %s has expired"
+                        % (str(inp['username_'])) )
+                return False
 
 
 #???
 def main(): 
     ServerSideSocket = socket.socket()
-    host = ''
+    host = '127.0.0.1'
     port = 2004
     ThreadCount = 0 
 
@@ -177,7 +207,6 @@ def main():
                     print("Received: ", response)
                     print("Sending: ", response) 
             
-                controllerClient = Controller() 
                 connection.sendall(str.encode(response))
             except: 
                 break
