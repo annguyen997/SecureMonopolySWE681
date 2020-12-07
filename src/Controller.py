@@ -3,8 +3,9 @@ import os
 from _thread import *
 import uuid 
 import base64
+import json
 
-import Driver
+from Driver import Driver
 
 class Controller: 
     #GET
@@ -35,6 +36,8 @@ class Controller:
     #Game information would need to be displayed to web client.... 
 
     def __incomingUser(self, username, password, mode):
+        print("Incoming...")
+        
         if (mode == "Authenticate"): 
             #session Ids will be returned as base-64
             generatedSessionID = self.driver.authUser(username, password)
@@ -47,13 +50,12 @@ class Controller:
             return generatedSessionID
 
         if (mode == "Create"): 
-            userCreated = self.createUser(username, password)
+            userCreated = self.driver.createUser(username, password)
 
             if userCreated: 
                 #Once created user, authenticate to generate session ID
                 #session Ids will be returned as base-64
                 generatedSessionID = self.driver.authUser(username, password)
-                
                 #It should return a new line with the returned byte/float value automatically 
                 #Stripping new line may be needed 
                 if (generatedSessionID == 0): 
@@ -102,7 +104,7 @@ class Controller:
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
-        assert isinstance (inp, dict)
+        #assert isinstance (inp, dict)
         #Regex parts here 
 
         # this will see what to call and interpret the api calls
@@ -121,8 +123,9 @@ class Controller:
         # within [data] -> FIRST FIELD ALWAYS BE WHAT TO DO aka Authenticate/Create
         # [data] [1] = user, [data] [2] = password 
         if 'user_' in inp:
+            inp=json.loads(inp)
             # __incomingUser(self, username, password, mode):
-            return self.__incomingUser(str(inp['user_'][1]),    # username offset in 'user_' value
+            return self.__incomingUser(str(inp['user_'][1]),    # username offset in 'user_' valueprint("We in parse Input")
                                         str(inp['user_'][2]),   # passwd offset in 'user_' value
                                         str(inp['user_'][0]))   # mode
 
@@ -201,7 +204,7 @@ def main():
                     connection.send("data contains invalid input")
 
                 '''
-                controllerClient.parseInput(data)
+                controllerClient.parseInput(data.decode('utf-8'))
 
 
                 response = 'Server message: ' + data.decode('utf-8')
