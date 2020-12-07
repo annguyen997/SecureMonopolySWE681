@@ -29,8 +29,8 @@ class Controller:
         self.driver = Driver() 
         self.user = None
         self.sessionID = None
+        self.game = None
         #Should there be a group of session IDs stored per Controller? 
-
 
     #POST 
     #Game information would need to be displayed to web client.... 
@@ -94,6 +94,10 @@ class Controller:
             if str(gameSessionID) == str(game["Session"]): 
                 game["Player"].append(self.sessionID)
 
+    #Set the game variable to controller (of each client)
+    def setGameInstance(self, game): 
+        self.game = game
+    
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
