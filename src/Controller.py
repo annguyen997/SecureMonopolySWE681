@@ -1,28 +1,36 @@
 import socket 
 import os 
-<<<<<<< HEAD
 from _thread import *
 import uuid 
-=======
-from _thread import * 
 import base64
->>>>>>> 572524a9603349e63980b03c2e4409e3d27d7b48
 
 import Driver
 
 class Controller: 
     #GET
     game_sessions = [] 
+   
+    #Create a new game - asynchronous 
+    @staticmethod
+    def createNewGame(self, gameSessionID): 
+        gamePlayers = None 
+        
+        for gameSession in game_sessions: 
+            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
+                gamePlayers = gameSession["Player"]
+                gameSession["Active"] = True #This means enough players are available to start playing new game
 
+        if (gamePlayers): 
+            return driver.createNewGame() 
+            
+    """ CONTROLLER INSTANCES """ 
     #Controller instance (for each user)
     def __init__(self): 
         self.driver = Driver() 
-<<<<<<< HEAD
         self.user = None
         self.sessionID = None
-=======
->>>>>>> 572524a9603349e63980b03c2e4409e3d27d7b48
         #Should there be a group of session IDs stored per Controller? 
+
 
     #POST 
     #Game information would need to be displayed to web client.... 
@@ -56,27 +64,20 @@ class Controller:
                 self.user = username
             
     #Asynchronous call
-    def __checkSessionID(self, user ,sessionID):
+    def checkSessionID(self, sessionID):
         #Call Driver's check session ID 
-        
+        #
         sessionExist = self.driver.checkSession(user, sessionID) 
 
         #If session does not exist, end player's connection
-        if not sessionExist: 
+        if (not sessionExist): 
             print("Ending the session.")
 
             for game in game_sessions: 
                 if self.sessionID in game["Player"]: 
                     game["Player"].remove(self.sessionID)
 
-
-        return sessionExist
-
-    #Validate the input of the player 
-    #ResponseType corresponds to the context of the input in relation to the game
-    def parseInput(self, input, responseType):
-        #Regex parts here 
-        pass
+        #random.urandom(32)....
 
     #Create a game session - requires at least two players to play
     def createGame(self):
@@ -85,37 +86,13 @@ class Controller:
 
         #Add session ID with player 
         players = [self.sessionID]
-        Controller.game_sessions.append({"Session": gameID, "Player": players}) 
+        Controller.game_sessions.append({"Session": gameID, "Player": players, "Active": False}) 
 
     #Join an existing game 
     def joinExistingGame(self, playerID, gameSessionID): 
         for game in game_sessions: 
             if str(gameSessionID) == str(game["Session"]): 
                 game["Player"].append(self.sessionID)
-            
-    #Create a new game - asynchronous 
-    def createNewGame(self, gameSessionID): 
-        gamePlayers = None 
-        
-        for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
-                gamePlayers = gameSession["Player"]
-
-        if (gamePlayers): 
-
-
-
-
-
-    #Create a game session - requires at least two players to play
-    def __createGame(self):
-        #Generate session ID
-        
-         
-    
-    #Join an existing game 
-    def __joinExistingGame(self, gameSessionID): 
-        pass
 
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
@@ -131,8 +108,8 @@ class Controller:
 
         # so I will interpret the data as so
         # dict {'user_': [data]} - user stuff
-        # dict {'mana_': [data], 'username_': data, 'sessionID_': data} - management stuff such as sessionID
-        # dict {'game_': [data], 'username_': data, 'sessionID_': data} - game data
+        # dict {'mana_': [data], 'sessionID_': data} - management stuff such as sessionID
+        # dict {'game_': [data], 'sessionID_': data} - game data
         # 
 
         #user stuff
@@ -146,28 +123,10 @@ class Controller:
 
         # management stuff
         if 'mana_' in inp:
-            # check session ID first then anything else after
-            # __checkSessionID(self, user ,sessionID):
-            if not self.__checkSessionID(   str(inp[username_])
-                                        str(base64.b64encode(inp[sessionID_]).decode('utf-8'))):
-                print("[!] LOG: Session for user %s has EXPIRED."
-                    % (str(inp[username_])))
-                return
-            # Valid session continuing on
 
 
         # game data stuff
         if 'game_' in inp: 
-            # check session ID first then anything else after
-            # __checkSessionID(self, user ,sessionID):
-            if not self.__checkSessionID(   str(inp[username_])
-                                        str(base64.b64encode(inp[sessionID_]).decode('utf-8'))):
-                print("[!] LOG: Session for user %s has EXPIRED."
-                    % (str(inp[username_])))
-                return
-            # Valid session continuing on
-
-
 
 
 #???
@@ -217,9 +176,9 @@ def main():
                 else: 
                     print("Received: ", response)
                     print("Sending: ", response) 
-                         
             
-            connection.send(str.encode(response))
+                controllerClient = Controller() 
+                connection.sendall(str.encode(response))
             except: 
                 break
         
@@ -234,5 +193,5 @@ def main():
     ServerSideSocket.close()
 
 
-if __name__ = "__main__":
+if __name__ == "__main__":
     main() 
