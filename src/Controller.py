@@ -37,17 +37,10 @@ class Controller:
             
 
     #Asynchronous call
-    def checkSessionID(self, sessionID):
+    def __checkSessionID(self, user ,sessionID):
         #Call Driver's check session ID 
         #
-        sessionExist = self.driver.checkSession(user, sessionID) 
-
-        #If session does not exist, end player's connection
-        if (not sessionExist): 
-            print("Ending the session.")
-
-
-        #random.urandom(32)....
+        return self.driver.checkSession(user, sessionID) 
     
 
     #Create a game session - requires at least two players to play
@@ -74,8 +67,8 @@ class Controller:
 
         # so I will interpret the data as so
         # dict {'user_': [data]} - user stuff
-        # dict {'mana_': [data], 'sessionID_': data} - management stuff such as sessionID
-        # dict {'game_': [data], 'sessionID_': data} - game data
+        # dict {'mana_': [data], 'username_': data, 'sessionID_': data} - management stuff such as sessionID
+        # dict {'game_': [data], 'username_': data, 'sessionID_': data} - game data
         # 
 
         #user stuff
@@ -89,10 +82,26 @@ class Controller:
 
         # management stuff
         if 'mana_' in inp:
+            # check session ID first then anything else after
+            # __checkSessionID(self, user ,sessionID):
+            if not self.__checkSessionID(   str(inp[username_])
+                                        str(base64.b64encode(inp[sessionID_]).decode('utf-8'))):
+                print("[!] LOG: Session for user %s has EXPIRED."
+                    % (str(inp[username_])))
+                return
+            # Valid session continuing on
 
 
         # game data stuff
         if 'game_' in inp: 
+            # check session ID first then anything else after
+            # __checkSessionID(self, user ,sessionID):
+            if not self.__checkSessionID(   str(inp[username_])
+                                        str(base64.b64encode(inp[sessionID_]).decode('utf-8'))):
+                print("[!] LOG: Session for user %s has EXPIRED."
+                    % (str(inp[username_])))
+                return
+            # Valid session continuing on
 
 
 
