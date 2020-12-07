@@ -1,6 +1,7 @@
 import socket 
 import os 
-from _thread import * 
+from _thread import *
+import uuid 
 
 import Driver
 
@@ -9,8 +10,9 @@ class Controller:
     game_sessions = [] 
 
     #Controller instance (for each user)
-    def __init__(): 
+    def __init__(self): 
         self.driver = Driver() 
+        self.user = None
         self.sessionID = None
         #Should there be a group of session IDs stored per Controller? 
 
@@ -21,9 +23,14 @@ class Controller:
         if (mode == "Authenticate"): 
             #session Ids will be returned as base-64
             generatedSessionID = self.driver.authUser(username, password)
+
             #It should return a new line with the returned byte/float value automatically 
             #Stripping new line may be needed 
-            self.sessionID = str(generatedSessionID).strip("\n")
+            if (generatedSessionID == 0): 
+                return 
+            self.sessionID = generatedSessionID
+            self.user = username 
+
         if (mode == "Create"): 
             userCreated = self.createUser(username, password)
 
@@ -31,11 +38,15 @@ class Controller:
                 #Once created user, authenticate to generate session ID
                 #session Ids will be returned as base-64
                 generatedSessionID = self.driver.authUser(username, password)
+                
                 #It should return a new line with the returned byte/float value automatically 
                 #Stripping new line may be needed 
-                self.sessionID = str(generatedSessionID).strip("\n")
+                if (generatedSessionID == 0): 
+                    return 
+                self.sessionID = generatedSessionID
+                #self.id = str(generatedSessionID).strip("\n")
+                self.user = username
             
-
     #Asynchronous call
     def checkSessionID(self):
         #Call Driver's check session ID 
@@ -45,6 +56,9 @@ class Controller:
         if (not sessionExist): 
             print("Ending the session.")
 
+            for game in game_sessions: 
+                if self.sessionID in game["Player"]: 
+                    game["Player"].remove(self.sessionID)
 
         #random.urandom(32)....
     
@@ -52,16 +66,36 @@ class Controller:
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, input, responseType):
         #Regex parts here 
+        pass
 
     #Create a game session - requires at least two players to play
     def createGame(self):
-        #Generate session ID
-        
-         
-    
+        #Generate game session ID
+        gameID = uuid.uuid4()
+
+        #Add session ID with player 
+        players = [self.sessionID]
+        Controller.game_sessions.append({"Session": gameID, "Player": players}) 
+
     #Join an existing game 
-    def joinExistingGame(self, gameSessionID): 
-        pass
+    def joinExistingGame(self, playerID, gameSessionID): 
+        for game in game_sessions: 
+            if str(gameSessionID) == str(game["Session"]): 
+                game["Player"].append(self.sessionID)
+            
+    #Create a new game - asynchronous 
+    def createNewGame(self, gameSessionID): 
+        gamePlayers = None 
+        
+        for gameSession in game_sessions: 
+            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
+                gamePlayers = gameSession["Player"]
+
+        if (gamePlayers): 
+
+
+
+
 
 #???
 def main(): 
@@ -94,9 +128,8 @@ def main():
                     print("Received: ", response)
                     print("Sending: ", response) 
             
-            controllerClient = Controller() 
-            
-            connection.sendall(str.encode(response))
+                controllerClient = Controller() 
+                connection.sendall(str.encode(response))
             except: 
                 break
         
