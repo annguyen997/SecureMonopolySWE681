@@ -117,14 +117,17 @@ class Driver:
 
     #Create new user
     def createUser(self, user, password):
+        print("creating user")
         user = str(user).strip("\n")
         password = str(password).strip("\n")
+        print(user)
+        print(password)
 
         # check if user is already there
-        if not self.__checkUser(str(user)):
-            print("[!] LOG: create user %s failed - user already registered: FAILED" 
-                    % (str(user) ))
-            return False
+        #if not self.__checkUser(str(user)):
+        #    print("[!] LOG: create user %s failed - user already registered: FAILED" 
+        #            % (str(user) ))
+        #    return False
 
         #store user and hash to a file 
         if not self.__checkPasswordStrength(str(user), str(password)):
@@ -135,14 +138,14 @@ class Driver:
         hash = self.__getHash(str(password))
         a= self.__getSaltValue() + hash
         b = base64.b64encode(a).decode('utf-8')
-
+        print(b)
         #store
         try:
             with open("./plEAzeDAddyNOO.txt", 'a') as file:
                     #print("aaa")
                     file.writelines(str(
                             user) + ':' 
-                            + str(b))
+                            + str(b)+"\n")
                 # username:hash+password
             # just casually save that shit to a file.
         except Exception as e:
@@ -158,7 +161,7 @@ class Driver:
         user = str(user).strip("\n")
         sessionID = self.__generateSessionID()
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "a") as file:
+            with open("./Fuq_M3_uP_DazDy.txt", "a+") as file:
 
                 file.writelines(str(user)
                                 + ":"
