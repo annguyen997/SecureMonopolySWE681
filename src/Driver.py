@@ -116,11 +116,9 @@ class Driver:
 
     #Create new user
     def createUser(self, user, password):
-        print("creating user")
+        
         user = str(user).strip("\n")
         password = str(password).strip("\n")
-        print(user)
-        print(password)
 
         # check if user is already there
         #if not self.__checkUser(str(user)):
@@ -159,6 +157,7 @@ class Driver:
 
         user = str(user).strip("\n")
         sessionID = self.__generateSessionID()
+        print(sessionID)
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "a+") as file:
 
@@ -166,14 +165,14 @@ class Driver:
                                 + ":"
                                 + str(base64.b64encode(sessionID).decode('utf-8'))
                                 + ":"
-                                + str(time()))
+                                + str(time.time())+'\n')
 
-            return ssessionID
+            return str(base64.b64encode(sessionID).decode('utf-8'))
 
         except Exception as e:
             print("[!] LOG: Failed to assigned Session ID for user %s"
                 % (str(user)))
-            #print(e)
+            print(e)
         return 0
 
     def removeSessionID(self, user):
@@ -202,6 +201,7 @@ class Driver:
                 data = file.readlines()
             
                 for user_data in data:
+                    user_data=str(user_data).strip("\n")
                     # find user in list
                     if (str(user) == str(user_data.split(':')[0])):
                         stored_ID = base64.b64decode(user_data.split(':')[1])
