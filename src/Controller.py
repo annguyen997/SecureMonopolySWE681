@@ -52,7 +52,7 @@ class Controller:
 
     #Create a new game once there is sufficient number of players - asynchronous 
     @staticmethod
-    def createNewGame(self, gameSessionID): 
+    def createNewGame(self, gameSessionID, driver): 
         gamePlayers = None 
         
         for gameSession in game_sessions: 
@@ -149,7 +149,7 @@ class Controller:
     #Check if game can be created
     def __createGame(self, gameSessionID): 
         if (Controller.sufficientNumberPlayers()): 
-            Controller.createNewGame() 
+            Controller.createNewGame(gameSessionID, self.driver) 
         
         self.__setGameInstance(Controller.getGameInstance())
 
