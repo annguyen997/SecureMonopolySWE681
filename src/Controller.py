@@ -189,10 +189,11 @@ class Controller:
 
         # management stuff
         if 'mana_' in inp:
+            inp=json.loads(inp)
         # check session id if before anything
         # __checkSessionID(self, user, sessionID)
             if not (self.__checkSessionID(  str(inp['username_']),
-                                            str(base64.b64encode(inp['sessionID_']).decode('utf-8'))
+                                            str(inp['sessionID_'])
                                             )):
                 print("[!] LOG: Session for user %s has expired"
                         % (str(inp['username_'])) )
@@ -202,6 +203,7 @@ class Controller:
             #   joinExistingGame
             ###############
             if (str(inp['mana_'][0]) == 'joinExistingGame'):
+                inp=json.loads(inp)
                 # __joinExistingGame(self, playerID, gameSessionID): 
                 self.__joinExistingGame(str(inp['mana_'][1]),   # playerID or username
                                         inp['mana_'][2])        # game session id
@@ -212,13 +214,15 @@ class Controller:
             #   createGame
             ###############
             if (str(inp['mana_'][0]) == 'createGame'):
+                inp=json.loads(inp)
                 # __createGame(self, sessionID): 
                 return self.__createGame(inp['sessionID_'])        # player session id
                 
         # game data stuff
         if 'game_' in inp:
+            inp=json.loads(inp)
             if not (self.__checkSessionID( str(inp['username_']),
-                                           str(base64.b64encode(inp['sessionID_']).decode('utf-8'))
+                                           str(inp['sessionID_'])
                                            )):
                 print("[!] LOG: Session for user %s has expired"
                         % (str(inp['username_'])) )
@@ -260,7 +264,6 @@ def main():
                 '''
                 if data is not valid:
                     connection.send("data contains invalid input")
-
                 '''
                 controllerClient.parseInput(data.decode('utf-8'))
 
