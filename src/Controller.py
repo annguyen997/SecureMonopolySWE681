@@ -6,7 +6,6 @@ import base64
 import json
 
 from Driver import Driver
-import GameInstances
 
 class Controller:
     game_sessions = [] 
@@ -35,46 +34,16 @@ class Controller:
         for game in game_sessions: 
             if str(gameSessionID) == str(game["Session"]): 
                 game["Player"].append(self.playerID)
-        
-    #Create a new game - asynchronous 
+    
+    #Check if the game is active 
     @staticmethod
-    def createNewGame(self, gameSessionID): 
-        gamePlayers = None 
-        
+    def checkGameActive(self, gameSessionID): 
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
-                gamePlayers = gameSession["Player"]
-                gameSession["Active"] = True #This means enough players are available to start playing new game
-
-        if (gamePlayers): 
-            return driver.createNewGame() 
-            game_sessions = [] 
-
-    #Check if the number of players in that game session enough to play
-    @staticmethod
-    def sufficientNumberPlayers(self, gameSessionID): 
-        gamePlayers = None 
-        
-        for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
+            if (str(gameSessionID) == str(gameSession["Session"]) and gameSession["Active"]):
                 return True
         
         return False
-    
-    #Return the number of players of that game session 
-    @staticmethod
-    def numberOfPlayers(self, gameSessionID): 
-        for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"])):
-                return len(gameSession["Player"])
 
-    #Add session ID to an existing game session
-    @staticmethod
-    def joinExistingSession(self, playerID, gameSessionID):
-        for game in game_sessions: 
-            if str(gameSessionID) == str(game["Session"]): 
-                game["Player"].append(self.playerID)
-        
     #Create a new game - asynchronous 
     @staticmethod
     def createNewGame(self, gameSessionID): 
@@ -84,15 +53,22 @@ class Controller:
             if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
                 gamePlayers = gameSession["Player"]
                 gameSession["Active"] = True #This means enough players are available to start playing new game
+                gameSession["Game Instance"] = driver.createNewGame() 
 
-        if (gamePlayers): 
-            return driver.createNewGame() 
-                
+    #Get the game instance to controller
+    def getGameInstance(self, gameSessionID): 
+        for gameSession in game_sessions: 
+            if (str(gameSessionID) == str(gameSession["Session"]) and gameSession["Game Instance"]):
+                return gameSession["Game Instance"]
+        
+        return None
+
     """ CONTROLLER INSTANCES """ 
     #Controller instance (for each user)
     def __init__(self): 
         self.driver = Driver() 
         self.user = None
+        self.gameSession = None 
         self.game = None
         #Should there be a group of session IDs stored per Controller? 
 
@@ -131,7 +107,6 @@ class Controller:
     #Asynchronous call
     def __checkSessionID(self, user, sessionID):
         #Call Driver's check session ID 
-        #
         sessionExist = self.driver.checkSession(user, sessionID) 
 
         #If session does not exist, end player's connection
@@ -145,22 +120,29 @@ class Controller:
         #random.urandom(32)....
 
     #Create a game session - requires at least two players to play
-    def __createGame(self, sessionID):
+    def __createGameSession(self, sessionID):
         #Generate game session ID
         gameID = uuid.uuid4()
 
         #Add session ID with player 
         players = [sessionID]
-        GameInstances.game_sessions.append({"Session": gameID, "Player": players, "Active": False})
+        Controller.game_sessions.append({"Session": gameID, "Player": players, "Active": False, "Game Instance": None})
         
+        self.gameSession = gameID  #Is this needed? 
+
         return gameID
 
     #Join an existing game 
     def __joinExistingGame(self, playerID, gameSessionID): 
-        GameInstances.joinExistingSession(playerID, gameSessionID)
-    
+        Controller.joinExistingSession(playerID, gameSessionID)
+        self.gameSession = gameSessionID
+
+        if (Controller.checkGameActive): 
+            self.setGameInstance(Controller.getGameInstance)
+
+
     #Set the game variable to controller (of each client)
-    def setGameInstance(self, game): 
+    def __setGameInstance(self, game): 
         self.game = game
     
     #Validate the input of the player 
