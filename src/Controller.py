@@ -222,6 +222,9 @@ class Controller:
                         % (str(inp['username_'])) )
                 return False
 
+        
+        #Use the current instance of game to send user input to the game instance
+        #A remote-controller function would be added to route the input to the appropriate location in the game. 
 
 #???
 def main(): 

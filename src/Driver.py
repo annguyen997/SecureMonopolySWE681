@@ -48,7 +48,6 @@ class Driver:
     def __generateSessionID(self):
         return urandom(32)
 
-
     # https://nitratine.net/blog/post/how-to-hash-passwords-in-python/
     def __getHash(self, password):
         # does this vuln to timing attack?

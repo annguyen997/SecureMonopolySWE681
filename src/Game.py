@@ -84,7 +84,6 @@ class Game:
 
     #Run the game
     def run(self): 
-
         if (len(self.players) < Player.PLAYER_MINIMUM): 
             print("Game must have at least two players")
             return #Do not run game 
@@ -107,7 +106,10 @@ class Game:
                 winner = True
             else: 
                 #Generate more money in the bank, and start another round
-                self.bank.generateCash() 
+                self.bank.generateCash()
+        
+        #Report the winner of the game
+        self.determineWinner()
     
     #Go through all players in round
     def round(self): 
@@ -383,8 +385,7 @@ class Game:
 
         #Reset bank's auction amount
         self.bank.resetAuctionPrice()
-
-    
+   
     #If auctioning property, there will be two rounds to do auction from all players - this is a modified change from the actual game for simplicity purposes
     #Auction the title deed as a result of a bankruptcy of owner
     def bankruptAuction(self, titleDeed, mortgaged, bankruptedPlayer):
