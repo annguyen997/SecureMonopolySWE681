@@ -16,7 +16,6 @@ class Game:
         self.communityPile = CommunityCards()
         self.dice = TwoDice() 
         self.bank = Bank() 
-        self.gameMessages = None
 
     #Return first player of game based on the rolling
     def firstPlayer(self): 

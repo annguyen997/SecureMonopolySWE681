@@ -203,7 +203,6 @@ class Controller:
             #   joinExistingGame
             ###############
             if (str(inp['mana_'][0]) == 'joinExistingGame'):
-                inp=json.loads(inp)
                 # __joinExistingGame(self, playerID, gameSessionID): 
                 self.__joinExistingGame(str(inp['mana_'][1]),   # playerID or username
                                         inp['mana_'][2])        # game session id
@@ -214,8 +213,8 @@ class Controller:
             #   createGame
             ###############
             if (str(inp['mana_'][0]) == 'createGame'):
-                inp=json.loads(inp)
                 # __createGame(self, sessionID): 
+                print("creating game")
                 return self.__createGame(inp['sessionID_'])        # player session id
                 
         # game data stuff
@@ -228,6 +227,9 @@ class Controller:
                         % (str(inp['username_'])) )
                 return False
 
+        
+        #Use the current instance of game to send user input to the game instance
+        #A remote-controller function would be added to route the input to the appropriate location in the game. 
 
 #???
 def main(): 
@@ -248,7 +250,7 @@ def main():
     ServerSideSocket.listen(5)
 
     def multi_threaded_client(connection):
-        connection.send(str.encode('Server is working:'))
+        #connection.send(str.encode('Server is working:'))
 
         controllerClient = Controller()
         while True:
@@ -265,18 +267,20 @@ def main():
                 if data is not valid:
                     connection.send("data contains invalid input")
                 '''
-                controllerClient.parseInput(data.decode('utf-8'))
+                print(data.decode('utf-8'))
+                response=controllerClient.parseInput(data.decode('utf-8'))
 
 
-                response = 'Server message: ' + data.decode('utf-8')
+                response = response.decode('utf-8')
+
 
                 if not data:
                     break
                 else: 
-                    print("Received: ", response)
+                    print("Received: ", data)
                     print("Sending: ", response) 
             
-                connection.sendall(str.encode(response))
+                print(connection.sendall(response))
             except: 
                 break
         
