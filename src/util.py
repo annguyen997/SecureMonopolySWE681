@@ -724,5 +724,6 @@ def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName = "")
 """ Information sent to and being retrieved from Controller.py """ 
 @staticmethod 
 def dataHandling(dataInput):
-    #Post the data to Controller
-    
+    #Post the data for Controller
+    self.gameMessages = dataInput 
+

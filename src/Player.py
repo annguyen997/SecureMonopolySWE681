@@ -1055,8 +1055,8 @@ class Player():
                 auctionMessage = "Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'."
                 auctionMessage += "\nEnter bid here: "
 
-                name of some function to send to Controller....
-                #util.
+                #name of some function to send to Controller....
+                util.dataHandling(auctionMessage) 
 
                 #print("Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'.") 
 
