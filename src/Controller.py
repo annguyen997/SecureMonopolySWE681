@@ -33,8 +33,14 @@ class Controller:
     def joinExistingSession(self, playerID, gameSessionID):
         for game in game_sessions: 
             if str(gameSessionID) == str(game["Session"]): 
-                game["Player"].append(self.playerID)
-    
+
+                #Check if the player's ID is not in the list for this session.
+                #If player's ID is already in list, user just needs to join the game
+                if (self.playerID in game["Player"]):
+                    return #Player already in list, exit to previous caller
+                else: 
+                    game["Player"].append(self.playerID)
+                
     #Check if the game is active 
     @staticmethod
     def checkGameActive(self, gameSessionID): 
@@ -44,13 +50,13 @@ class Controller:
         
         return False
 
-    #Create a new game - asynchronous 
+    #Create a new game once there is sufficient number of players - asynchronous 
     @staticmethod
     def createNewGame(self, gameSessionID): 
         gamePlayers = None 
         
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
+            if (str(gameSessionID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameSessionID) >= 2):
                 gamePlayers = gameSession["Player"]
                 gameSession["Active"] = True #This means enough players are available to start playing new game
                 gameSession["Game Instance"] = driver.createNewGame() 
@@ -137,9 +143,15 @@ class Controller:
         Controller.joinExistingSession(playerID, gameSessionID)
         self.gameSession = gameSessionID
 
-        if (Controller.checkGameActive): 
+        if (Controller.checkGameActive()): 
             self.setGameInstance(Controller.getGameInstance)
 
+    #Check if game can be created
+    def __createGame(self, gameSessionID): 
+        if (Controller.sufficientNumberPlayers()): 
+            Controller.createNewGame() 
+        
+        self.__setGameInstance(Controller.getGameInstance())
 
     #Set the game variable to controller (of each client)
     def __setGameInstance(self, game): 
