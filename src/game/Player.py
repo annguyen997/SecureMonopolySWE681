@@ -1052,16 +1052,16 @@ class Player():
         while (not inputValid): 
             if (currentPlayStatus == "Auction"): 
                 
-                auctionMessage = "Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'."
-                auctionMessage += "\nEnter bid here: "
+                #auctionMessage = "Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'."
+                #auctionMessage += "\nEnter bid here: "
 
-                name of some function to send to Controller....
+                #name of some function to send to Controller....
                 #util.
 
-                #print("Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'.") 
+                print("Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'.") 
 
                 #Validate the input 
-                #amount = input("\nEnter bid here: ") 
+                amount = input("\nEnter bid here: ") 
             
             elif (currentPlayStatus == "Selling"):
                 print("Please enter the amount you wish to purchase for " + titleDeedName + ".")

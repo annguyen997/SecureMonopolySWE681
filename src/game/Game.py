@@ -5,8 +5,6 @@ import Bank
 from TwoDice import *
 from Player import *
 from Card import *
-import pygame 
-
 
 class Game:
     #Instiates a new game
