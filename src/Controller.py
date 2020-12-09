@@ -23,28 +23,29 @@ class Controller:
 
     #Check if the number of players in that game session enough to play
     @staticmethod
-    def sufficientNumberPlayers(self, gameSessionID): 
-        gamePlayers = None 
+    def sufficientNumberPlayers(self, gameID): 
         print("Get to sufficient number player")
+        gamePlayers = None 
+        print("Get to sufficient number player2")
         print(len(gameSession["Player"]))
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
+            if (str(gameID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
                 return True
         
         return False
     
     #Return the number of players of that game session 
     @staticmethod
-    def numberOfPlayers(self, gameSessionID): 
+    def numberOfPlayers(self, gameID): 
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"])):
+            if (str(gameID) == str(gameSession["Session"])):
                 return len(gameSession["Player"])
 
     #Add session ID to an existing game session
     @staticmethod
-    def joinExistingSession(self, playerID, gameSessionID):
+    def joinExistingSession(self, playerID, gameID):
         for game in game_sessions: 
-            if str(gameSessionID) == str(game["Session"]): 
+            if str(gameID) == str(game["Session"]): 
 
                 #Check if the player's ID is not in the list for this session.
                 #If player's ID is already in list, user just needs to join the game
@@ -55,28 +56,28 @@ class Controller:
                 
     #Check if the game is active 
     @staticmethod
-    def checkGameActive(self, gameSessionID): 
+    def checkGameActive(self, gameID): 
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and gameSession["Active"]):
+            if (str(gameID) == str(gameSession["Session"]) and gameSession["Active"]):
                 return True
         
         return False
 
     #Create a new game once there is sufficient number of players - asynchronous 
     @staticmethod
-    def createNewGame(self, gameSessionID, driver): 
+    def createNewGame(self, gameID, driver): 
         gamePlayers = None 
         
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameSessionID) >= 2):
+            if (str(gameID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameID) >= 2):
                 gamePlayers = gameSession["Player"]
                 gameSession["Active"] = True #This means enough players are available to start playing new game
                 gameSession["Game Instance"] = driver.createNewGame() 
 
     #Get the game instance to controller
-    def getGameInstance(self, gameSessionID): 
+    def getGameInstance(self, gameID): 
         for gameSession in game_sessions: 
-            if (str(gameSessionID) == str(gameSession["Session"]) and gameSession["Game Instance"]):
+            if (str(gameID) == str(gameSession["Session"]) and gameSession["Game Instance"]):
                 return gameSession["Game Instance"]
         
         return None
@@ -131,32 +132,34 @@ class Controller:
     #Create a game session - requires at least two players to play
     def __createGameSession(self, sessionID):
         #Generate game session ID
-        gameID = uuid.uuid4()
+        gameID = str(uuid.uuid4())
 
         #Add session ID with player 
         players = [sessionID]
         self.game_sessions.append({"Session": gameID, "Player": players, "Active": False, "Game Instance": None})
         
         self.gameSession = gameID  #Is this needed? 
+        print(gameID)
 
         return gameID
 
     #Join an existing game 
-    def __joinExistingGame(self, playerID, gameSessionID): 
-        self..joinExistingSession(playerID, gameSessionID)
-        self.gameSession = gameSessionID
+    def __joinExistingGame(self, playerID, gameID): 
+        self.joinExistingSession(playerID, gameID)
+        self.gameSession = gameID
+        print("Joining Existing Game")
 
         if (self.checkGameActive()): 
             self.setGameInstance(self.getGameInstance())
 
     #Check if game can be created
-    def __createGame(self, gameSessionID): 
+    def __createGame(self, gameID): 
         print("entering __createGame")\
 
-        run? = self.sufficientNumberPlayers(gameSessionID)
+        run = self.sufficientNumberPlayers(gameID)
         print("asdasdqw")
-        if (run?):
-            self.createNewGame(gameSessionID, self.driver) 
+        if (run):
+            self.createNewGame(gameID, self.driver) 
             print("after __createGame")
 
         
@@ -210,9 +213,9 @@ class Controller:
             #   joinExistingGame
             ###############
             if (str(inp['mana_'][0]) == 'joinExistingGame'):
-                # __joinExistingGame(self, playerID, gameSessionID): 
-                self.__joinExistingGame(str(inp['mana_'][1]),   # playerID or username
-                                        inp['mana_'][2])        # game session id
+                # __joinExistingGame(self, playerID, gameID): 
+                self.__joinExistingGame(str(inp['username_']),   # playerID or username
+                                        inp['mana_'][1])        # game session id
                 return
 
 
@@ -222,7 +225,7 @@ class Controller:
             if (str(inp['mana_'][0]) == 'createGame'):
                 # __createGame(self, sessionID): 
                 print("creating game")
-                return self.__createGame(inp['sessionID_'])        # player session id
+                return self.__createGameSession(inp['sessionID_'])        # player session id
                 
         # game data stuff
         if 'game_' in inp:
@@ -278,10 +281,13 @@ def main():
                 response=controllerClient.parseInput(data.decode('utf-8'))
 
 
-                response = response.decode('utf-8')
+
+                print("response..2")
+                print(response)
 
 
                 if not data:
+                    print("Did i break?")
                     break
                 else: 
                     print("Received: ", data)
