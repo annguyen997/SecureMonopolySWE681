@@ -12,6 +12,15 @@ from Driver import Driver
 class Controller:
     game_sessions = [] 
 
+    """ CONTROLLER INSTANCES """ 
+    #Controller instance (for each user)
+    def __init__(self): 
+        self.driver = Driver() 
+        self.user = None
+        self.gameSession = None 
+        self.game = None
+        #Should there be a group of session IDs stored per Controller? 
+
     #Check if the number of players in that game session enough to play
     @staticmethod
     def sufficientNumberPlayers(self, gameSessionID): 
@@ -72,15 +81,6 @@ class Controller:
         
         return None
 
-    """ CONTROLLER INSTANCES """ 
-    #Controller instance (for each user)
-    def __init__(self): 
-        self.driver = Driver() 
-        self.user = None
-        self.gameSession = None 
-        self.game = None
-        #Should there be a group of session IDs stored per Controller? 
-
     #POST 
     #Game information would need to be displayed to web client.... 
 
@@ -135,7 +135,7 @@ class Controller:
 
         #Add session ID with player 
         players = [sessionID]
-        Controller.game_sessions.append({"Session": gameID, "Player": players, "Active": False, "Game Instance": None})
+        self.game_sessions.append({"Session": gameID, "Player": players, "Active": False, "Game Instance": None})
         
         self.gameSession = gameID  #Is this needed? 
 
@@ -143,21 +143,24 @@ class Controller:
 
     #Join an existing game 
     def __joinExistingGame(self, playerID, gameSessionID): 
-        Controller.joinExistingSession(playerID, gameSessionID)
+        self..joinExistingSession(playerID, gameSessionID)
         self.gameSession = gameSessionID
 
-        if (Controller.checkGameActive()): 
-            self.setGameInstance(Controller.getGameInstance)
+        if (self.checkGameActive()): 
+            self.setGameInstance(self.getGameInstance())
 
     #Check if game can be created
     def __createGame(self, gameSessionID): 
-        print("entering __createGame")
-        if (self.sufficientNumberPlayers(gameSessionID)): 
+        print("entering __createGame")\
+
+        run? = self.sufficientNumberPlayers(gameSessionID)
+        print("asdasdqw")
+        if (run?):
             self.createNewGame(gameSessionID, self.driver) 
             print("after __createGame")
 
         
-        self.__setGameInstance(Controller.getGameInstance())
+        self.__setGameInstance(self.getGameInstance())
 
     #Set the game variable to controller (of each client)
     def __setGameInstance(self, game): 
