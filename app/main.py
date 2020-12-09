@@ -26,13 +26,22 @@ def index():
 @app.route('/new_game', methods=['GET', 'POST'])
 def new_game():
 	if(request.method == 'GET' and 'sessionID' in request.cookies and 'userName' in request.cookies):
-		print(request.cookies)
 		output=sendToController('{"mana_":["createGame"],"username_": "'+request.cookies.get('userName')+'","sessionID_":"'+request.cookies.get('sessionID')+'"}')
-		return render_template('text_noform.html', title="You're good!", message=output)
+		#resp.set_cookie('sessionID',output)
+		return render_template('text_noform.html', title="You're good!", message="Here is your game ID, please use this to join a new game"+output)
 		#{"mana_":["createGame"],"username_": "Hoa_test1","sessionID_":"TFdcXBlITLFyCAUsI7hSOxuAHZdfFYj1oVDmYvqItwY="}
 	else:
 		return render_template('text_noform.html', title="You're good!", message="Please login or create an account")
 
+
+@app.route('/join_game', methods=['GET', 'POST'])
+def join_game():
+	if(request.method == 'GET' and 'sessionID' in request.cookies and 'userName' in request.cookies):
+		output=sendToController('{"game_":["listExistingGame"],"username_": "'+request.cookies.get('userName')+'","sessionID_":"'+request.cookies.get('sessionID')+'"}')
+		return render_template('text_noform.html', title="", message=output)
+		#{"mana_":["createGame"],"username_": "Hoa_test1","sessionID_":"TFdcXBlITLFyCAUsI7hSOxuAHZdfFYj1oVDmYvqItwY="}
+	else:
+		return render_template('text_noform.html', title="You're good!", message="Please login or create an account")
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
