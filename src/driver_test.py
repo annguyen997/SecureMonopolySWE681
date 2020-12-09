@@ -3,29 +3,31 @@ from Driver import *
 import time
 
 import random
+import threading
+import io
+import base64
 
 # fuzz case. 1 fuzz case
-def fuzz(thread_id,  inp):
-	assert isinstance(inp, bytes)
-	assert isinstance(thread_id, int)
+def fuzz(case,  inp):
 
 	# write out the input to temp files?
 	# this let you see what is being produce
 	# as the fuzzer going
-	with open(f"./corpus/tmp_inputs/tmp{thread_id}", "wb") as file:
-		file.write(inp)
+	with open(f"/Users/tnorria/Desktop/SecureMonopolySWE681/src/corpus/tmp_inputs/tmp{case}", "w") as file:
+		file.write(str(base64.b64encode(inp).decode('utf-8')))
 
-	username = "fuzz-test{input}"
+	username = f"fuzz-test{inp}"
 	a = Driver()
-	return_code = a.createUser(user = username , password = inp)
-
+	try : 
+		a.createUser(user = username , password = inp)
 	# watch for False return aka any thing fail within 
-	'''
-	if not return_code:
-		with open(f"./corpus/crashes/") as crash_file:
-			crash_file.write(input)
+	
+	except Exception as e:
+		with open(f"./corpus/crashes/tmp{case}", "w") as crash_file:
+			crash_file.write(str(base64.b64encode(inp).decode('utf-8')))
+			crash_file.write("\n\n\n\n"+str(e))
+			print("CRASHED!!!!")
 
-	'''
 
 '''
 	fuzzing stuff
@@ -45,21 +47,44 @@ with open('./corpus/top_100000_pass.txt', 'r') as data:
 
 	for data in corpus_all:
 		#print(data)
-		corpus.add(data)
+		corpus.add(data.encode('utf-8'))
 
 # go back to list,
 # since we are done with set cuz for dupping not unique input
 
-corpus = list(corpus)
+corpus = list(map(bytearray, corpus))
 #print(len(corpus))
 
 start = time.time()
 
-for case in range(1, 100000000):
-	fuzz(0, str.encode(random.choice(corpus)))
+cases = 0
 
-	current = time.time() - start
-	print(f"[{current:10.4}] Fuzz case {case} done")
+def worker(thred_id):
+	global start, corpus, cases
+	while True:
+		inp = bytearray(random.choice(corpus))
+
+		# godly mutating fuzzer
+		for _ in range(random.randint(1,8)):
+			inp[random.randint(0, len(inp) - 1)] = random.randint(0,255)
+
+		fuzz(cases, inp)
+
+		cases += 1
+
+		current = time.time() - start
+
+
+
+		fuzz_per_sec = float(cases) / current
+		print(f"[{current:10.4f}] Fuzz case {cases} done | case per sec: {fuzz_per_sec:10.4f}")
+
+# 4 threads fuzzing
+for thr_id in range(2):
+	threading.Thread(target=worker, args=[thr_id]).start()
+
+while threading.active_count() > 0:
+	time.sleep(0.1)
 
 
 
