@@ -57,7 +57,7 @@ class Game:
     def getFunctionCallName(self): 
         #For example, if the variable is "Purchase/Auction", the input must be alphabetical only (no numbers or special chars)
         return self.functionCallName
-        
+
     #Forfeit the game from the controller 
     def forfeitGame(self, id): 
         self.removePlayer(id) 
@@ -946,6 +946,36 @@ class Controller:
     def __setGameInstance(self, game): 
         self.game = game
     
+    #Display the current game information to the web browser (i.e. client) of players and any messages of game's current state.  
+    def __getCurrentGameState(self): 
+        currentGameInfo = None 
+
+        #Get the game messages 
+        currentGameInfo += self.game.getGameMessages() 
+
+        #Display the current stats of all players
+        currentGameInfo += self.game.displayPlayersStats() 
+
+    #Get the current function call state of the game for validating user input (for correct syntax in context of the game's current state) 
+    def __getCurrentFunctionCall(self): 
+        return self.game.getFunctionCallName() 
+
+    #Store the user input to the game (after validating) and process the input accordingly
+    def __storeInputToGame(self, input): 
+        self.game.storeUserInput(input) 
+        
+        #Process the user's input in relation to the game's current state to produce results 
+        self.game.routeInput() 
+        
+        
+    #Player wishes to forfeit the game
+    def __forfeitGame(self):
+        #validate if the game and session is valid
+        # 
+
+        self.forfeitGame(self.user) 
+        
+
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
