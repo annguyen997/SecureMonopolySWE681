@@ -727,3 +727,9 @@ def dataHandling(dataInput):
     #Post the data for Controller
     self.gameMessages = dataInput 
 
+
+def validateInput(data, mode): 
+    regexN
+
+    if (mode == "Integer"): 
+        A
