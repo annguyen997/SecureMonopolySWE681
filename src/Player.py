@@ -14,7 +14,7 @@ class Player():
     def __init__(self, id, name):
         self.id = id                            #Identification Number
         self.name = name                        #Name of player
-        self.money = 1500                       #Cash on hand - starts with 1500
+        self.money = 0                          #Cash on hand
         self.position = 0                       #Position ranges from 0 - 40 (for game's 41 spaces) - Start at "Go" tile
         self.bankrupt = False                   #Bankrupt status
         

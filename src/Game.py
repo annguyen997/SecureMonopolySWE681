@@ -15,7 +15,7 @@ class Game:
         self.chancePile = ChanceCards()
         self.communityPile = CommunityCards()
         self.dice = TwoDice() 
-        self.bank = Bank() 
+        self.bank = Bank()
         self.gameMessages = None
 
     #Return first player of game based on the rolling
@@ -30,10 +30,23 @@ class Game:
     def setCurrentPlayer(self, player):
         self.currentPlayer = player
 
+    #Get the number of players in game
+    def getNumberOfPlayers(self): 
+        return len(self.players)
+
     #Add player to the game - if players are added post-roll, they are included at the end
     def addPlayer(self, id, name): 
         if (len(self.players) < Player.PLAYER_MAXIMUM):
             self.players.append(Player(id, name))
+
+    #The controller can call this to add the players already available
+    """ 
+        def addPlayers(self, listPlayers): 
+        playerNumber = 1
+
+        for playerUsername in listPlayers:   #List of the username IDs
+            self.addPlayer(self, playerUsername, "Player " + playerNumber)
+    """ 
 
     #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
     #This would not affect the ordering of other players.
@@ -83,6 +96,10 @@ class Game:
         else:
             print("No winner at this time.")
 
+    #Forfeit the game 
+    def forfeitGame(self, id): 
+        removePlayer(id) 
+    
     #Run the game
     def run(self): 
         if (len(self.players) < Player.PLAYER_MINIMUM): 
@@ -252,10 +269,17 @@ class Game:
             newTitleDeedDecided = False
             while (not newTitleDeedDecided):
                 #Validate the input here
-                value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
-                            " or do you wish to auction? \n" +
-                            "If you want to purchase, please type the word 'Purchase'. \n" +
-                            "If you wish to auction, please type 'Auction'.")
+                #value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
+                           # " or do you wish to auction? \n" +
+                           # "If you want to purchase, please type the word 'Purchase'. \n" +
+                           # "If you wish to auction, please type 'Auction'.")
+                
+                message = self.printPlayerStats(player) + \
+                        "Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
+                        " or do you wish to auction? \n" + \
+                        "If you want to purchase, please type the word 'Purchase'. \n" + \
+                        "If you wish to auction, please type 'Auction'."
+                self.gameMessages = message
 
                 if (value == "Purchase"):
                     player.acquireTitleDeed(titleDeed, printedValue, self.bank)
@@ -659,3 +683,12 @@ class Game:
         #Remove player from the game
         playerID = player.getuserID()
         self.removePlayer(playerID)
+
+    #Print all the statistics of the player
+    def printPlayerStats(self, player): 
+        playerStats = "" 
+
+        playerStats += "Current Net Worth: " + str(player.getMonetaryValue()) + "\n"                #This gets the current amount of the player
+        playerStats += "Current Position: " + str(Board.TILES_LIST[player.getPosition()]) + "\n"    #This gets the current location of player on the board 
+
+        return playerStats

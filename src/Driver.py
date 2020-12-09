@@ -32,7 +32,6 @@ class Driver:
     def joinExistingGame(self, game): 
         pass
 
-    
     # get a random salt values so it doesnt have to be same salt all the times
     def __generateSalt(self):
         self.salt = urandom(32)

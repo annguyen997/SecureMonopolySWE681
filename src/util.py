@@ -1,6 +1,7 @@
 from Bank import *
 from Title import Title, Property #, Utility, Transports
 import math 
+import re
 
 """Utility method regarding the order of the player list"""
 def checkTies(playerListOrder, dice): 
@@ -729,7 +730,17 @@ def dataHandling(dataInput):
 
 
 def validateInput(data, mode): 
-    regexN
+    
+    lowercase = compile(r'[a-z]')
+    uppercase = compile(r'[A-Z]')
+    number = compile(r'[0-9]')
+    special = compile(r'[^A-Za-z0-9]')
 
     if (mode == "Integer"): 
-        A
+        if (number.search(str(data) is None)): 
+            pass
+    elif (mode == "Alphabet"): 
+        pass
+    elif (mode == "Alphanumeric"): 
+        pass 
+
