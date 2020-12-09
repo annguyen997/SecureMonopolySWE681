@@ -74,7 +74,7 @@ class Driver:
         ## check password req
         # length
         if (len(password) < 8 or len(password) > 32):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet password length req: actual - %i" 
+            print("[!] LOG: user %s with password - '%s' - doesn't meet password length req: actual - %s" 
                     % (str(user), str(password), str(len(password)  )))
             return False
 
