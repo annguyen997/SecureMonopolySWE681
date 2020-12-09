@@ -88,20 +88,20 @@ class Driver:
         special = compile(r'[^A-Za-z0-9]')
 
         if (lowercase.search(str(password)) is None):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: LOWERCASE" 
-                    % (str(user), str(password) ))
+            print("[!] LOG: user %s with password ' - doesn't meet the password complexity: LOWERCASE" 
+                    % (str(user) ))
             return False
         if (uppercase.search(str(password)) is None):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: UPPERCASE" 
-                    % (str(user), str(password) ))
+            print("[!] LOG: user %s with password  - doesn't meet the password complexity: UPPERCASE" 
+                    % (str(user) ))
             return False
         if (number.search(str(password)) is None):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: NUMBER" 
-                    % (str(user), str(password) ))
+            print("[!] LOG: user %s with password - doesn't meet the password complexity: NUMBER" 
+                    % (str(user) ))
             return False
         if (special.search(str(password)) is None):
-            print("[!] LOG: user %s with password - '%s' - doesn't meet the password complexity: SPECIAL" 
-                    % (str(user), str(password) ))
+            print("[!] LOG: user %s with password  - doesn't meet the password complexity: SPECIAL" 
+                    % (str(user)))
             return False
         return True
 
@@ -120,6 +120,15 @@ class Driver:
         user = str(user).strip("\n")
         password = str(password).strip("\n")
 
+
+        # check user name parse
+        special = compile(r'[^A-Za-z0-9]')
+
+        if (special.search(str(password)) is None):
+            print("[!] LOG: user name %s - contains illegal characters : SPECIAL" 
+                    % (str(user)))
+            return False
+
         # check if user is already there
         if self.__checkUser(str(user)):
             print("[!] LOG: create user %s failed - user already registered: FAILED" 
@@ -135,7 +144,7 @@ class Driver:
         hash = self.__getHash(str(password))
         a= self.__getSaltValue() + hash
         b = base64.b64encode(a).decode('utf-8')
-        print(b)
+        #print(b)
         #store
         try:
             with open("./plEAzeDAddyNOO.txt", 'a+') as file:
@@ -152,7 +161,7 @@ class Driver:
         except Exception as e:
             print("[!] LOG: failed to saved new user hash to file: user - '%s' - hash '%s' - create user FAILED"
                 % (str(user), str(hash) ))
-            print(e)
+            #print(e)
             return False
         return True
 
@@ -161,7 +170,7 @@ class Driver:
 
         user = str(user).strip("\n")
         sessionID = self.__generateSessionID()
-        print(sessionID)
+        #print(sessionID)
         try:
             with open("./Fuq_M3_uP_DazDy.txt", "a+") as file:
 
@@ -175,7 +184,7 @@ class Driver:
         except Exception as e:
             print("[!] LOG: Failed to assigned Session ID for user %s"
                 % (str(user)))
-            print(e)
+            #print(e)
         return 0
 
     def removeSessionID(self, user):
@@ -195,7 +204,7 @@ class Driver:
         except Exception as e:
             print("[!] LOG: failed to remove user %s current SESSION ID"
                     % (str(user)) )
-            print(e)
+            #print(e)
             return False
 
     def checkSession(self, user, encodedSessionID):
@@ -234,7 +243,7 @@ class Driver:
         except Exception as e:
             print("[!] LOG: Failed to check SessionID for user %s - Session ID failed"
                     % (str(user)))
-            print(e)
+            #print(e)
 
             return False
 
@@ -250,6 +259,13 @@ class Driver:
 
         user = str(user).strip("\n")
         password = str(password).strip("\n")
+
+        special = compile(r'[^A-Za-z0-9]')
+
+        if (special.search(str(password)) is None):
+            print("[!] LOG: user name %s - contains illegal characters : SPECIAL" 
+                    % (str(user)))
+            return False
 
         try:
             with open('./plEAzeDAddyNOO.txt', 'r') as file:
