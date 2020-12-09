@@ -25,12 +25,13 @@ class Driver:
         pass
 
     #Starts a new game
-    def createNewGame(self): 
-        return Game()
+    #@staticmethod
+    #def createNewGame(): 
+        #return Game()
 
     #Join existing game that needs players      
-    def joinExistingGame(self, game): 
-        pass
+    #def joinExistingGame(self, game): 
+        #pass
 
     # get a random salt values so it doesnt have to be same salt all the times
     def __generateSalt(self):
