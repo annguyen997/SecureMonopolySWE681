@@ -955,14 +955,18 @@ class Controller:
         currentGameInfo = None 
 
         #Get the game messages 
-        currentGameInfo += self.game.getGameMessages() 
+        currentGameInfo += self.game.getGameMessages() + "\n"
 
         #Display order of players
-        playerList = self.game.getPlayersList()
-        currentGameInfo += self.game.getPlayersList()
+        currentGameInfo += "Current Players: "
+        currentPlayerList = self.game.getPlayersList()
+        for player in currentPlayerList: 
+            currentGameInfo += player.getName() + "\t"
 
         #Display the current stats of all players
         currentGameInfo += self.game.displayPlayersStats() 
+
+        return currentGameInfo
 
     #Get the current function call state of the game for validating user input (for correct syntax in context of the game's current state) 
     def __getCurrentFunctionCall(self): 
