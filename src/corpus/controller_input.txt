@@ -1,0 +1,5 @@
+{"user_": ["Create","Hoa!@!!!!","P@ssw0rd!!"]}
+{"mana_":["createGame"],"username_": "newPlayer1","sessionID_":"b50+lV5XmdBPhot7Ee2F/oJhmctP08noB8uwO44ETGk="}
+{"game_":["listExistingGame"],"username_": "tester123","sessionID_":"+vpuC28PPQ9TLTOhAyeJ5refUKt4vGaUR/YQJ5nXWQ0="}
+{"mana_":["joinExistingGame","2a0fd710-b2f5-4bb3-9282-4b82bbaa3a86"],"username_": "Hoa!@","sessionID_":"GXQkNDeNIlWZZWTjRCgG0VFyLwYgPBWMlLBUn+pnNDM="}
+{"mana_":["startGame","2a0fd710-b2f5-4bb3-9282-4b82bbaa3a86"],"username_": "Hoa!@","sessionID_":"GXQkNDeNIlWZZWTjRCgG0VFyLwYgPBWMlLBUn+pnNDM="}

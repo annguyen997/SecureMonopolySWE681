@@ -1,5 +1,5 @@
 #! /usr/bin/python3
-from Driver import *
+from Controller import *
 import time
 
 import random
@@ -16,17 +16,17 @@ def fuzz(case,  inp):
 	with open(f"/Users/tnorria/Desktop/SecureMonopolySWE681/src/corpus/tmp_inputs/tmp{case}", "w") as file:
 		file.write(str(base64.b64encode(inp).decode('utf-8')))
 
-	username = f"fuzz-test{inp}"
-	a = Driver()
+	#username = f"fuzz-test{inp}"
+	a = Controller()
 	try : 
-		a.createUser(user = username , password = inp)
+		a.parseInput(inp = inp)
 	# watch for False return aka any thing fail within 
 	
 	except Exception as e:
 		with open(f"./corpus/crashes/tmp{case}", "w") as crash_file:
 			crash_file.write(str(base64.b64encode(inp).decode('utf-8')))
 			crash_file.write("\n\n\n\n"+str(e)+"\n")
-			print("EXCEPTION!!!!")
+			print("EXCEPTION, oh fuckkkkk!!!!")
 
 
 '''
@@ -42,7 +42,7 @@ def fuzz(case,  inp):
 
 corpus = set()
 
-with open('./corpus/top_100000_pass.txt', 'r') as data:
+with open('./corpus/controller_input.txt', 'r') as data:
 	corpus_all = data.readlines()
 
 	for data in corpus_all:
@@ -73,6 +73,7 @@ def worker(thred_id):
 		cases += 1
 
 		current = time.time() - start
+
 
 
 		fuzz_per_sec = float(cases) / current

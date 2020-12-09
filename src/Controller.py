@@ -251,7 +251,8 @@ class Controller:
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
-        #assert isinstance (inp, dict)
+        if not isinstance (inp, str):
+            return False
         #Regex parts here 
 
         # this will see what to call and interpret the api calls
