@@ -14,7 +14,8 @@ class Controller:
     @staticmethod
     def sufficientNumberPlayers(self, gameSessionID): 
         gamePlayers = None 
-        
+        print("Get to sufficient number player")
+        print(len(gameSession["Player"]))
         for gameSession in game_sessions: 
             if (str(gameSessionID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
                 return True
@@ -148,8 +149,11 @@ class Controller:
 
     #Check if game can be created
     def __createGame(self, gameSessionID): 
-        if (Controller.sufficientNumberPlayers()): 
-            Controller.createNewGame(gameSessionID, self.driver) 
+        print("entering __createGame")
+        if (self.sufficientNumberPlayers(gameSessionID)): 
+            self.createNewGame(gameSessionID, self.driver) 
+            print("after __createGame")
+
         
         self.__setGameInstance(Controller.getGameInstance())
 
