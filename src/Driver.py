@@ -121,10 +121,10 @@ class Driver:
         password = str(password).strip("\n")
 
         # check if user is already there
-        #if not self.__checkUser(str(user)):
-        #    print("[!] LOG: create user %s failed - user already registered: FAILED" 
-        #            % (str(user) ))
-        #    return False
+        if self.__checkUser(str(user)):
+            print("[!] LOG: create user %s failed - user already registered: FAILED" 
+                    % (str(user) ))
+            return False
 
         #store user and hash to a file 
         if not self.__checkPasswordStrength(str(user), str(password)):
@@ -138,11 +138,15 @@ class Driver:
         print(b)
         #store
         try:
-            with open("./plEAzeDAddyNOO.txt", 'a') as file:
+            with open("./plEAzeDAddyNOO.txt", 'a+') as file:
                     #print("aaa")
                     file.writelines(str(
                             user) + ':' 
                             + str(b)+"\n")
+
+            with open("./win_loss.txt", 'a+') as file:
+                    #print("aaa")
+                    file.writelines(str(user) + ':0:0\n')
                 # username:hash+password
             # just casually save that shit to a file.
         except Exception as e:
@@ -178,17 +182,20 @@ class Driver:
         user = str(user).strip("\n")
         
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "wr") as file:
+            with open("./Fuq_M3_uP_DazDy.txt", "r+") as file:
                 lines = file.readlines()
+                file.seek(0)
 
                 for line in lines:
                     if not str(user) in line:
                         file.write(line)
 
+                file.truncate()
                 return True
         except Exception as e:
             print("[!] LOG: failed to remove user %s current SESSION ID"
                     % (str(user)) )
+            print(e)
             return False
 
     def checkSession(self, user, encodedSessionID):
@@ -207,6 +214,9 @@ class Driver:
                         stored_time = user_data.split(':')[-1]
 
                         current_time = time.time()
+                        if (self.__checkUser(str(user))):
+                            False
+
 
                         # longer than a day? nah nah nahhhhhh
                         if (current_time - float(stored_time) > 86400.00):
