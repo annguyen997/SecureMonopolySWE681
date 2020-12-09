@@ -96,6 +96,10 @@ class Game:
     def getNumberOfPlayers(self): 
         return len(self.players)
 
+    #Get the players in order of the game
+    def getPlayerList(self): 
+        return self.players
+
     #Add player to the game - if players are added post-roll, they are included at the end
     def addPlayer(self, id, name): 
         if (len(self.players) < Player.PLAYER_MAXIMUM):
@@ -952,6 +956,10 @@ class Controller:
 
         #Get the game messages 
         currentGameInfo += self.game.getGameMessages() 
+
+        #Display order of players
+        playerList = self.game.getPlayersList()
+        currentGameInfo += self.game.getPlayersList()
 
         #Display the current stats of all players
         currentGameInfo += self.game.displayPlayersStats() 
