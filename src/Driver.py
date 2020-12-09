@@ -25,7 +25,8 @@ class Driver:
         pass
 
     #Starts a new game
-    def createNewGame(self): 
+    @staticmethod
+    def createNewGame(): 
         return Game()
 
     #Join existing game that needs players      
