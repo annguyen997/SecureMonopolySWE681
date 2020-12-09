@@ -915,8 +915,8 @@ class Controller:
         self.gameSession = gameID
         print("Joining Existing Game")
 
-        #if (Controller.checkGameActive()): 
-            #self.setGameInstance(Controller.getGameInstance(self.gameSession))
+        if (Controller.checkGameActive()): 
+            self.setGameInstance(Controller.getGameInstance(self.gameSession))
 
     #Check if game can be created
     def __startGame(self, gameID): 
