@@ -1022,7 +1022,22 @@ class Controller:
                 # __joinExistingGame(self, playerID, gameID): 
                 return self.__joinExistingGame(str(inp['username_']),   # playerID or username
                                         inp['mana_'][1])        # game session id
-                
+
+            ###############
+            #   View Win Loss
+            ###############
+
+            if (str(inp['mana_'][0]) == 'viewWinLoss'):
+                f = open("win_loss.txt", "r")
+                stats=f.read()
+                f.close()
+                return str(stats)
+
+            if (str(inp['mana_'][0]) == 'audit'):
+                f = open("audit.txt", "r")
+                audit=f.read()
+                f.close()
+                return str(audit)
 
 
             ###############
