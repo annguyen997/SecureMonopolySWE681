@@ -97,7 +97,7 @@ class Controller:
         for gameSession in cls.game_sessions: 
             if (str(gameID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameID) >= 2):
                 gameSession["Active"] = True #This means enough players are available to start playing new game
-                gameSession["Game Instance"] = Driver.createNewGame() 
+                gameSession["Game Instance"] = Game()
 
     #Get the game instance to controller
     @classmethod
