@@ -33,6 +33,21 @@ class Controller:
         
         return False
     
+    #Print the current game session IDs and number of players
+    @classmethod
+    def printCurrentGameSessionIDs(cls): 
+        #Print each game session avaiable in the system
+        for gameSession in cls.game_sessions: 
+            gameInfo = "Session ID: " + gameSession["Session"] + "\t# of Players: " + gameSession["Player"]
+            if (gameSession["Active"]):
+                gameInfo += "Game Active: Yes"
+            else: 
+                gameInfo += "Game Active: No"
+            
+            print(gameInfo)
+        
+        print("Game Active indicates if there is a game available for this session. A game session with sufficient number of players may not have a game active.")
+    
     #Return the number of players of that game session 
     @classmethod
     def numberOfPlayers(cls, gameID): 
@@ -50,7 +65,7 @@ class Controller:
                 #If player's ID is already in list, user just needs to join the game
                 if (playerID in game["Player"]):
                     return #Player already in list, exit to previous caller
-                else: 
+                elif (len(game["Player"] <= 8)): #If player in game is less than 8 players available 
                     game["Player"].append(playerID)
                 
     #Check if the game is active 
@@ -162,6 +177,10 @@ class Controller:
 
         
         self.__setGameInstance(Controller.getGameInstance())
+    
+    #Get all game instances available for viewing
+    def __getGameInstancesAvailable(self): 
+        Controller.printCurrentGameSessionIDs() 
 
     #Set the game variable to controller (of each client)
     def __setGameInstance(self, game): 
