@@ -37,16 +37,22 @@ class Controller:
     @classmethod
     def printCurrentGameSessionIDs(cls): 
         #Print each game session avaiable in the system
+        gameInfo=""
+        print("entering printCurrentGameSessionIDs FOR loop")
+        print(cls.game_sessions)
         for gameSession in cls.game_sessions: 
-            gameInfo = "Session ID: " + gameSession["Session"] + "\t# of Players: " + gameSession["Player"]
+            gameInfo += "Session ID: " + gameSession["Session"] + "\t# of Players: " + str(len(gameSession["Player"]))+"\n"
+            print(gameSession["Active"])
             if (gameSession["Active"]):
-                gameInfo += "Game Active: Yes"
-            else: 
-                gameInfo += "Game Active: No"
+                print("Active Yes!")
+                gameInfo += " Game Active: Yes\n"
+            else:
+                print("Active No!") 
+                gameInfo += " Game Active: No\n"
             
             print(gameInfo)
         
-        print("Game Active indicates if there is a game available for this session. A game session with sufficient number of players may not have a game active.")
+        return(gameInfo+"\nGame Active indicates if there is a game available for this session. A game session with sufficient number of players may not have a game active.\n")
     
     #Return the number of players of that game session 
     @classmethod
@@ -60,12 +66,13 @@ class Controller:
     def joinExistingSession(cls, playerID, gameID):
         for game in cls.game_sessions: 
             if str(gameID) == str(game["Session"]): 
+                print("please help")
 
                 #Check if the player's ID is not in the list for this session.
                 #If player's ID is already in list, user just needs to join the game
                 if (playerID in game["Player"]):
                     return #Player already in list, exit to previous caller
-                elif (len(game["Player"] <= 8)): #If player in game is less than 8 players available 
+                elif (len(game["Player"]) <= 8): #If player in game is less than 8 players available 
                     game["Player"].append(playerID)
                 
     #Check if the game is active 
@@ -158,25 +165,27 @@ class Controller:
 
     #Join an existing game 
     def __joinExistingGame(self, playerID, gameID): 
+        print("You got here congrats.1@#!@#!@")
         Controller.joinExistingSession(playerID, gameID)
         self.gameSession = gameID
         print("Joining Existing Game")
 
         if (Controller.checkGameActive()): 
-            self.setGameInstance(Controller.getGameInstance())
+            self.setGameInstance(Controller.getGameInstance(self.gameSession))
 
     #Check if game can be created
-    def __createGame(self, gameID): 
-        print("entering __createGame")\
+    def __startGame(self, gameID): 
+        print("entering __startGame")
+        print(Controller.sufficientNumberPlayers(gameID))
 
         run = Controller.sufficientNumberPlayers(gameID)
         print("asdasdqw")
         if (run):
             Controller.createNewGame(gameID, self.driver) 
-            print("after __createGame")
+            print("after __startGame")
 
         
-        self.__setGameInstance(Controller.getGameInstance())
+        self.__setGameInstance(Controller.getGameInstance(self.gameSession))
     
     #Get all game instances available for viewing
     def __getGameInstancesAvailable(self): 
@@ -231,9 +240,9 @@ class Controller:
             ###############
             if (str(inp['mana_'][0]) == 'joinExistingGame'):
                 # __joinExistingGame(self, playerID, gameID): 
-                self.__joinExistingGame(str(inp['username_']),   # playerID or username
+                return self.__joinExistingGame(str(inp['username_']),   # playerID or username
                                         inp['mana_'][1])        # game session id
-                return
+                
 
 
             ###############
@@ -243,16 +252,26 @@ class Controller:
                 # __createGame(self, sessionID): 
                 print("creating game")
                 return self.__createGameSession(inp['sessionID_'])        # player session id
+            if (str(inp['mana_'][0]) == 'startGame'):
+                # __createGame(self, sessionID): 
+                print("starting game")
+                return self.__startGame(inp['mana_'][1])   
                 
         # game data stuff
         if 'game_' in inp:
             inp=json.loads(inp)
+            print("Got to game_")
             if not (self.__checkSessionID( str(inp['username_']),
                                            str(inp['sessionID_'])
                                            )):
                 print("[!] LOG: Session for user %s has expired"
                         % (str(inp['username_'])) )
                 return False
+            if (str(inp['game_'][0]) == 'listExistingGame'):
+                print("Got to list")
+                return Controller.printCurrentGameSessionIDs()        # game session id
+                
+
 
         
         #Use the current instance of game to send user input to the game instance
