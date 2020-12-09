@@ -26,6 +26,10 @@ class Game:
         self.bank = Bank()
         self.gameMessages = None
 
+    #Return the game messages
+    def getGameMessages(self): 
+        return self.gameMessages 
+        
     #Return first player of game based on the rolling
     def firstPlayer(self): 
         return self.players[0]
