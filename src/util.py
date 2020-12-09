@@ -723,12 +723,8 @@ def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName = "")
         return 0
 
 """ Information sent to and being retrieved from Controller.py """ 
-@staticmethod 
-def dataHandling(dataInput):
-    #Post the data for Controller
-    self.gameMessages = dataInput 
 
-
+""" 
 def validateInput(data, mode): 
     
     lowercase = compile(r'[a-z]')
@@ -743,4 +739,15 @@ def validateInput(data, mode):
         pass
     elif (mode == "Alphanumeric"): 
         pass 
+""" 
+
+def purchaseOrAuction(self, player, value, titleDeed, printedValue): 
+    if (value.str.lower() == "purchase"):
+        player.acquireTitleDeed(titleDeed, printedValue, self.bank)
+    elif (value.str.lower() == "auction"):   #Get the starting value
+        #Validate the starting value - ensure value is not too high
+        startingPrice = input("Please supply the starting price for auction: ")
+        self.auctionProperty(startingPrice, titleDeed, player.getName())
+    else:
+        print("Invalid response was provided.")
 

@@ -7,7 +7,7 @@ import json
 
 from Driver import Driver
 
-import util
+import util as SupportingUtility
 import Board
 import Bank
 from TwoDice import *
@@ -24,12 +24,58 @@ class Game:
         self.communityPile = CommunityCards()
         self.dice = TwoDice() 
         self.bank = Bank()
-        self.gameMessages = None
 
+        """Instance variables for the Controller""" 
+        self.gameMessages = None
+        self.controllerInput = None
+        self.functionCallName = None 
+        self.supportingData = None 
+
+    """METHODS FOR THE CONTROLLER """ 
     #Return the game messages
     def getGameMessages(self): 
         return self.gameMessages 
+
+    #Display the current stats of all players
+    def displayPlayersStats(self): 
+        playersStats = None 
+        for player in self.players: 
+            playersStats += player.getName() + "\n"
+            playersStats += self.printPlayerStats(player) + "\n"
+
+        return playersStats 
+    
+    #The controller can call this to add the players already available
+    """ 
+        def addPlayers(self, listPlayers): 
+        playerNumber = 1
+
+        for playerUsername in listPlayers:   #List of the username IDs
+            self.addPlayer(self, playerUsername, "Player " + playerNumber)
+    """ 
+    #Get the function call name for input validation purposes 
+    def getFunctionCallName(self): 
+        #For example, if the variable is "Purchase/Auction", the input must be alphabetical only (no numbers or special chars)
+        return self.functionCallName
         
+    #Forfeit the game from the controller 
+    def forfeitGame(self, id): 
+        self.removePlayer(id) 
+
+    #Store the user's input for the controller
+    def storeUserInput(self, input): 
+        self.controllerInput = input 
+
+    #Call the appropriate function call to process the user input
+    def routeInput(self): 
+        if (self.functionCallName == "Purchase/Auction"): 
+            data = self.supportingData
+            SupportingUtility.purchaseOrAuction(self.currentPlayer, self.controllerInput, data["Title Deed"], data["Printed Value"]) 
+
+
+
+
+
     #Return first player of game based on the rolling
     def firstPlayer(self): 
         return self.players[0]
@@ -37,6 +83,10 @@ class Game:
     #Return current player in game
     def getCurrentPlayer(self):
         return self.currentPlayer
+    
+    def getCurrentPlayerName(self): 
+        player = self.getCurrentPlayer() 
+        return player.getName() 
 
     #Set the current player in round
     def setCurrentPlayer(self, player):
@@ -50,15 +100,6 @@ class Game:
     def addPlayer(self, id, name): 
         if (len(self.players) < Player.PLAYER_MAXIMUM):
             self.players.append(Player(id, name))
-
-    #The controller can call this to add the players already available
-    """ 
-        def addPlayers(self, listPlayers): 
-        playerNumber = 1
-
-        for playerUsername in listPlayers:   #List of the username IDs
-            self.addPlayer(self, playerUsername, "Player " + playerNumber)
-    """ 
 
     #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
     #This would not affect the ordering of other players.
@@ -83,7 +124,7 @@ class Game:
         playerListOrder = sorted(playerListOrder, key=lambda item: item.get('order'))
 
         #Check if list order has ties based on the new order
-        playerListOrder = util.checkTies(playerListOrder, self.dice)
+        playerListOrder = SupportingUtility.checkTies(playerListOrder, self.dice)
 
         #Order the main players list (self.players) based on player order 
         newPlayersList = [] #Temporary list
@@ -108,10 +149,6 @@ class Game:
         else:
             print("No winner at this time.")
 
-    #Forfeit the game 
-    def forfeitGame(self, id): 
-        removePlayer(id) 
-    
     #Run the game
     def run(self): 
         if (len(self.players) < Player.PLAYER_MINIMUM): 
@@ -278,31 +315,23 @@ class Game:
             print(titleDeed)
 
             # User types either "Purchase" or "Auction"
-            newTitleDeedDecided = False
-            while (not newTitleDeedDecided):
+            #newTitleDeedDecided = False
+            #while (not newTitleDeedDecided):
                 #Validate the input here
-                #value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
-                           # " or do you wish to auction? \n" +
-                           # "If you want to purchase, please type the word 'Purchase'. \n" +
-                           # "If you wish to auction, please type 'Auction'.")
+                #value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
+                            #" or do you wish to auction? \n" + \
+                            #"If you want to purchase, please type the word 'Purchase'. \n" + \
+                            #"If you wish to auction, please type 'Auction'.")
                 
-                message = self.printPlayerStats(player) + \
-                        "Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
-                        " or do you wish to auction? \n" + \
-                        "If you want to purchase, please type the word 'Purchase'. \n" + \
-                        "If you wish to auction, please type 'Auction'."
-                self.gameMessages = message
+            message = self.printPlayerStats(player) + "\nPrinted Value: " + str(titleDeed.getPrintedValue()) + \
+            "Title Deed Info: " + str(titleDeed) + "\n\n" + \
+            "Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
+            " or do you wish to auction? \n" + \
+            "If you want to purchase, please type the word 'Purchase'. \n" + \
+            "If you wish to auction, please type 'Auction'."
+            supportingData = {"Title Deed": titleDeed, "Printed Value": titleDeed.getPrintedValue()}
 
-                if (value == "Purchase"):
-                    player.acquireTitleDeed(titleDeed, printedValue, self.bank)
-                    newTitleDeedDecided = True
-                elif (value == "Auction"):   #Get the starting value
-                    #Validate the starting value - ensure value is not too high
-                    startingPrice = input("Please supply the starting price for auction: ")
-                    self.auctionProperty(startingPrice, titleDeed, player.getName())
-                    newTitleDeedDecided = True
-                else:
-                    print("Invalid response was provided.")
+            self.dataHandling(message, "Purchase/Auction", supportingData) 
     
     #Check if player has assets if run out of cash. If no sufficient assets, declare bankruptcy 
     def checkForAssets(self, player):
@@ -506,44 +535,44 @@ class Game:
             #If user wishes to mortgage on a particular property - if so check if there are homes/hotels in any cards in group
             #Note other players cannot assist player on a mortgaged property, though can collect rent on other properties of that same color group.
             if (optionSelection == "Mortgage a Property"):
-                util.getMortgage(player, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.getMortgage(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to repay the mortgage on a particular property - pay 10% interest to the nearest 10
             elif (optionSelection == "Repay a Mortgaged Property"):
-                util.repayMortgage(player, titleDeedsOwned, self.bank)
+                SupportingUtility.repayMortgage(player, titleDeedsOwned, self.bank)
 
             #If user wishes to purchase a house - check if (1) player owns a monopoly on a color group, and then (2) homes are evenly purchased on other properties
             #The property also must not be mortgaged as well as others in color group
             elif (optionSelection == "Purchase a House"):
-                util.purchaseHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.purchaseHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to purchase a hotel - check if (1) player owns a monopoly on a color group, and then (2) 4 homes are evenly purchased for each property
             #The property also must not be mortgaged as well as others in color group
             elif (optionSelection == "Purchase a Hotel"): 
-                util.purchaseHotel(player, titleDeedsNames, titleDeedsOwned, self.bank) 
+                SupportingUtility.purchaseHotel(player, titleDeedsNames, titleDeedsOwned, self.bank) 
 
             #If user wishes to sell a house, get property name. Ensure homes are evenly available on other properties before selling
             elif (optionSelection == "Sell a House"): 
-                util.sellHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.sellHome(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a hotel, get property name. Also get 4 homes back. 
             elif (optionSelection == "Sell a Hotel"): 
-                util.sellHotel(player, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.sellHotel(player, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a property to another user - ensure there are no buildings
             elif (optionSelection == "Sell a Property"): 
                 playerRequest = util.selectPlayerToSell(player, "property")
-                util.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.sellProperty(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
                         
             #If user wishes to sell a utility to another user
             elif (optionSelection == "Sell a Utility"):
-               playerRequest = util.selectPlayerToSell(player, "utility")
-               util.sellUtility(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
+                playerRequest = util.selectPlayerToSell(player, "utility")
+                SupportingUtility.sellUtility(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to sell a transports to another user
             elif (optionSelection == "Sell a Transport"): 
                 playerRequest = util.selectPlayerToSell(player, "transport")
-                util.sellTransport(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
+                SupportingUtility.sellTransport(player, playerRequest, titleDeedsNames, titleDeedsOwned, self.bank)
 
             #If user wishes to exit
             elif(optionSelection == "End Turn"): 
@@ -696,6 +725,8 @@ class Game:
         playerID = player.getuserID()
         self.removePlayer(playerID)
 
+
+    """Methods for the controller """ 
     #Print all the statistics of the player
     def printPlayerStats(self, player): 
         playerStats = "" 
@@ -704,6 +735,12 @@ class Game:
         playerStats += "Current Position: " + str(Board.TILES_LIST[player.getPosition()]) + "\n"    #This gets the current location of player on the board 
 
         return playerStats
+
+    def dataHandling(self, dataInput, functionCallName, supportingData):
+    #Post the data for Controller
+        self.gameMessages = dataInput 
+        self.functionCallName = functionCallName
+        self.supportingData = supportingData
 
 class Controller:
     game_sessions = [] 
@@ -751,6 +788,7 @@ class Controller:
         return(gameInfo+"\nGame Active indicates if there is a game available for this session. A game session with sufficient number of players may not have a game active.\n")
     
     #Get the set of usernames from the game session IDs list
+    @classmethod
     def getUsernamesOfGameSessionID(cls, gameID): 
         for gameSession in cls.game_sessions: 
             if (str(gameID) == str(gameSession["Session"])):

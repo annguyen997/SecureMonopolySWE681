@@ -1,7 +1,8 @@
+#import Title 
+
 import util
 import Board
 import Bank
-#import Title
 from TwoDice import *
 from Player import *
 from Card import *
@@ -18,6 +19,34 @@ class Game:
         self.bank = Bank()
         self.gameMessages = None
 
+    """METHODS FOR THE CONTROLLER """ 
+    #Return the game messages
+    def getGameMessages(self): 
+        return self.gameMessages 
+
+    #Display the current stats of all players
+    def displayPlayersStats(self): 
+        playersStats = None 
+        for player in self.players: 
+            playersStats += player.getName() + "\n"
+            playersStats += self.printPlayerStats(player) + "\n"
+
+        return playersStats 
+    
+    #The controller can call this to add the players already available
+    """ 
+        def addPlayers(self, listPlayers): 
+        playerNumber = 1
+
+        for playerUsername in listPlayers:   #List of the username IDs
+            self.addPlayer(self, playerUsername, "Player " + playerNumber)
+    """ 
+
+    #Forfeit the game 
+    def forfeitGame(self, id): 
+        self.removePlayer(id) 
+
+
     #Return first player of game based on the rolling
     def firstPlayer(self): 
         return self.players[0]
@@ -25,6 +54,10 @@ class Game:
     #Return current player in game
     def getCurrentPlayer(self):
         return self.currentPlayer
+    
+    def getCurrentPlayerName(self): 
+        player = self.getCurrentPlayer() 
+        return player.getName() 
 
     #Set the current player in round
     def setCurrentPlayer(self, player):
@@ -38,15 +71,6 @@ class Game:
     def addPlayer(self, id, name): 
         if (len(self.players) < Player.PLAYER_MAXIMUM):
             self.players.append(Player(id, name))
-
-    #The controller can call this to add the players already available
-    """ 
-        def addPlayers(self, listPlayers): 
-        playerNumber = 1
-
-        for playerUsername in listPlayers:   #List of the username IDs
-            self.addPlayer(self, playerUsername, "Player " + playerNumber)
-    """ 
 
     #Remove player from game - due to bankruptcy, connection timeout, quit, or etc. 
     #This would not affect the ordering of other players.
@@ -96,10 +120,6 @@ class Game:
         else:
             print("No winner at this time.")
 
-    #Forfeit the game 
-    def forfeitGame(self, id): 
-        removePlayer(id) 
-    
     #Run the game
     def run(self): 
         if (len(self.players) < Player.PLAYER_MINIMUM): 
@@ -269,10 +289,10 @@ class Game:
             newTitleDeedDecided = False
             while (not newTitleDeedDecided):
                 #Validate the input here
-                #value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) +
-                           # " or do you wish to auction? \n" +
-                           # "If you want to purchase, please type the word 'Purchase'. \n" +
-                           # "If you wish to auction, please type 'Auction'.")
+                value = input("Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
+                            " or do you wish to auction? \n" + \
+                            "If you want to purchase, please type the word 'Purchase'. \n" + \
+                            "If you wish to auction, please type 'Auction'.")
                 
                 message = self.printPlayerStats(player) + \
                         "Do you wish to purchase to this property at the printed value of " + str(printedValue) + \
