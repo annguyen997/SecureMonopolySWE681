@@ -266,7 +266,7 @@ class Controller:
         # dict {'mana_': [data], 'username_': username, 'sessionID_': data} - management stuff such as sessionID
         # dict {'game_': [data], 'username_': username, 'sessionID_': data} - game data
         # 
-
+    
         #user stuff
         # within [data] -> FIRST FIELD ALWAYS BE WHAT TO DO aka Authenticate/Create
         # [data] [1] = user, [data] [2] = password 
