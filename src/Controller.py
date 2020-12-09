@@ -967,7 +967,6 @@ class Controller:
         #Process the user's input in relation to the game's current state to produce results 
         self.game.routeInput() 
         
-        
     #Player wishes to forfeit the game
     def __forfeitGame(self):
         #validate if the game and session is valid

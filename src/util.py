@@ -742,9 +742,9 @@ def validateInput(data, mode):
 """ 
 
 def purchaseOrAuction(self, player, value, titleDeed, printedValue): 
-    if (value.str.lower() == "purchase"):
+    if (value.lower() == "purchase"):
         player.acquireTitleDeed(titleDeed, printedValue, self.bank)
-    elif (value.str.lower() == "auction"):   #Get the starting value
+    elif (value.lower() == "auction"):   #Get the starting value
         #Validate the starting value - ensure value is not too high
         startingPrice = input("Please supply the starting price for auction: ")
         self.auctionProperty(startingPrice, titleDeed, player.getName())
