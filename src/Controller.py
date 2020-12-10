@@ -40,6 +40,9 @@ class Controller:
         print("entering printCurrentGameSessionIDs FOR loop")
         print(cls.game_sessions)
         for gameSession in cls.game_sessions: 
+            if gameSession["Locked"]: 
+                continue #If game instance is locked due to all players joined, skip that session. 
+
             gameInfo += "Session ID: " + gameSession["Session"] + "\t# of Players: " + str(len(gameSession["Player"]))+"\n"
             print(gameSession["Active"])
             if (gameSession["Active"]):
@@ -77,7 +80,10 @@ class Controller:
                 #Check if the player's ID is not in the list for this session.
                 #If player's ID is already in list, user just needs to join the game
                 if (playerID in game["Player"]):
-                    return #Player already in list, exit to previous caller
+                    return False #Player already in list, exit to previous caller
+                elif (game["Locked"]): 
+                    print ("You cannot join this game.")
+                    return False  #Game instance has been created, and it is closed to the public. 
                 elif (len(game["Player"]) <= 8): #If player in game is less than 8 players available 
                     game["Player"].append(playerID)
                     game["Usernames"].append(username)
@@ -98,6 +104,12 @@ class Controller:
             if (str(gameID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameID) >= 2):
                 gameSession["Active"] = True #This means enough players are available to start playing new game
                 gameSession["Game Instance"] = Game()
+    
+    @classmethod 
+    def lockGame(cls, gameID): 
+        for gameSession in cls.game_sessions: 
+            if (str(gameID) == str(gameSession["Session"])):
+                gameSession["Locked"] = True #This means all players have joined and game must be locked to the public. 
 
     #Get the game instance to controller
     @classmethod
@@ -162,7 +174,7 @@ class Controller:
 
         #Add session ID with player 
         players = [sessionID]
-        Controller.game_sessions.append({"Session": gameID, "Player": players, "Usernames": [self.user],  "Active": False, "Game Instance": None})
+        Controller.game_sessions.append({"Session": gameID, "Player": players, "Usernames": [self.user],  "Active": False, "Game Instance": None, "Locked": False})
         
         self.gameSession = gameID  #Is this needed? 
         print(gameID)
@@ -172,12 +184,13 @@ class Controller:
     #Join an existing game 
     def __joinExistingGame(self, playerID, gameID): 
         print("You got here congrats.1@#!@#!@")
-        Controller.joinExistingSession(playerID, gameID, self.user)
-        self.gameSession = gameID
-        print("Joining Existing Game")
+        gameAvailable = Controller.joinExistingSession(playerID, gameID, self.user)
+        if (gameAvailable): 
+            self.gameSession = gameID
+            print("Joining Existing Game")
 
-        if (Controller.checkGameActive()): 
-            self.setGameInstance(Controller.getGameInstance(self.gameSession))
+            if (Controller.checkGameActive(gameID)): 
+                self.setGameInstance(Controller.getGameInstance(self.gameSession))
 
     #Check if game can be created
     def __startGame(self, gameID): 
@@ -199,6 +212,7 @@ class Controller:
 
         #Run the game automatically once the sufficient number of players join 
         if (self.game.getNumberOfPlayers() == Controller.numberOfPlayers(self.gameSession)): 
+            Controller.lockGame(self.gameSession)  #All players have joined, lock the game for others from entering. 
             self.game.run() 
 
         #self.game.addPlayers(Controller.getUsernamesOfGameSessionID(self.gameSession))

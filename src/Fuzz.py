@@ -26,7 +26,7 @@ def fuzz(case,  inp):
 		with open(f"./corpus/crashes/tmp{case}", "w") as crash_file:
 			crash_file.write(str(base64.b64encode(inp).decode('utf-8')))
 			crash_file.write("\n\n\n\n"+str(e)+"\n")
-			print("EXCEPTION, oh fuckkkkk!!!!")
+			print("EXCEPTION")
 
 
 '''

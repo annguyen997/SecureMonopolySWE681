@@ -107,7 +107,7 @@ class Driver:
         return True
 
     def __checkUser(self, user):
-        with open('./plEAzeDAddyNOO.txt', 'r') as file:
+        with open('./credentials.txt', 'r') as file:
             data = file.readlines()
             for user_data in data:
                 # find user in list
@@ -148,7 +148,7 @@ class Driver:
         #print(b)
         #store
         try:
-            with open("./plEAzeDAddyNOO.txt", 'a+') as file:
+            with open("./credentials.txt", 'a+') as file:
                     #print("aaa")
                     file.writelines(str(
                             user) + ':' 
@@ -173,7 +173,7 @@ class Driver:
         sessionID = self.__generateSessionID()
         #print(sessionID)
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "a+") as file:
+            with open("./sessionIDs.txt", "a+") as file:
 
                 file.writelines(str(user)
                                 + ":"
@@ -192,7 +192,7 @@ class Driver:
         user = str(user).strip("\n")
         
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "r+") as file:
+            with open("./sessionIDs.txt", "r+") as file:
                 lines = file.readlines()
                 file.seek(0)
 
@@ -213,7 +213,7 @@ class Driver:
         encodedSessionID = str(encodedSessionID).strip("\n")
 
         try:
-            with open("./Fuq_M3_uP_DazDy.txt", "r") as file:
+            with open("./sessionIDs.txt", "r") as file:
                 data = file.readlines()
             
                 for user_data in data:
@@ -269,8 +269,8 @@ class Driver:
             return False
 
         try:
-            with open('./plEAzeDAddyNOO.txt', 'r') as file:
-                data = file.readlines()
+            with open('./credentials.txt', 'r') as file:
+                data = file.readlines() 
             
                 for user_data in data:
                     # find user in list
@@ -283,15 +283,13 @@ class Driver:
 
                         # need to check compability
                         if (self.__calcHash(password, salt_from_storage) == stored_hash[32:]):
-                            print("[!] LOG: User '%s' successful logged in"
-                                % (str(user)))
-
-                            # NEED SESSION ID
+                            print("[!] LOG: User '%s' successful logged in" % (str(user)))
                             
+                            # NEED SESSION ID
                             return self.__StartSession(str(user))
+
                         else:
-                            print("[!] LOG: User - '%s' authentication failed - user auth FAILED"
-                                % (str(user)))
+                            print("[!] LOG: User - '%s' authentication failed - user auth FAILED" % (str(user)))
                             return False  #Should this be None? 
                 print("[!] LOG: User '%s' doesn't exist." % (str(user)))
 
