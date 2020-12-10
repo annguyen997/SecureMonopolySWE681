@@ -61,7 +61,7 @@ class Games:
 
     #Call the appropriate function call to process the user input
     def routeInput(self): 
-        if (self.functionCallName == "Purchase/Auction"): 
+        if (self.functionCallName() == "Purchase/Auction"): 
             data = self.supportingData
             SupportingUtility.purchaseOrAuction(self.currentPlayer, self.controllerInput, data["Title Deed"], data["Printed Value"]) 
 
