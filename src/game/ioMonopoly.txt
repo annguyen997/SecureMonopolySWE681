@@ -1,0 +1,441 @@
+[{'userID': 'knguye15', 'order': 5}, {'userID': 'anguy03', 'order': 6}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 5
+Dice 2: 2
+Dice Roll Total: 7
+
+Player Anh Nguyen is now at Chance.
+
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: 
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 193, in turn
+    self.handleExistingTitleDeeds(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 461, in handleExistingTitleDeeds
+    optionSelection = input(displayOptions + "\n\n Enter your choice: ")
+KeyboardInterrupt
+>>> 
+======== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =======
+[{'userID': 'knguye15', 'order': 3}, {'userID': 'anguy03', 'order': 7}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 3
+Dice 2: 5
+Dice Roll Total: 8
+
+Player Anh Nguyen is now at Vermont Avenue.
+
+Title Type: Property
+Name: Vermont Avenue
+Printed Purchase Value: 100
+Rent Amount: 6
+Mortgage Amount: 50
+Color Group of Property: LIGHT_BLUE
+
+Rental Costs of Property
+With One House: 30
+With Two Houses: 90
+With Threee Houses: 270
+With Four Houses: 400
+With Hotel (no homes): 550
+
+Building Costs for Property
+Houses Cost: 50 each house
+Hotel Cost: 50 each plus 4 houses
+Remember: You can build houses only when you purchase all properties of a color group. 
+Do you wish to purchase to this property at the printed value of 100 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Purchase
+None
+The title deed Vermont Avenue has been added.
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: 1
+
+You have entered an invalid choice. Please try again.
+
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: 1
+
+You have entered an invalid choice. Please try again.
+
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: Mortgage a Property
+You may need to scroll if you own a large number of title deeds.
+Enter name of title deed you wish to mortgage: Vermont Avenue
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 193, in turn
+    self.handleExistingTitleDeeds(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 466, in handleExistingTitleDeeds
+    util.getMortgage(player, titleDeedsNames, titleDeedsOwned, self.bank)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\util.py", line 99, in getMortgage
+    for titleDeed in titleDeedsOwned:
+TypeError: 'Bank' object is not iterable
+>>> 
+======== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =======
+[{'userID': 'anguy03', 'order': 5}, {'userID': 'knguye15', 'order': 7}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 4
+Dice 2: 1
+Dice Roll Total: 5
+
+Player Anh Nguyen is now at Reading Railroad.
+
+Title Type: Transports
+Name: Reading Railroad
+Printed Purchase Value: 200
+Rent Amount: [25, 50, 100, 200]
+Mortgage Amount: 100
+Do you wish to purchase to this property at the printed value of 200 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Auction
+Please supply the starting price for auction: 15
+An auction has started for Reading Railroad, started by Khanh Nguyen.
+The starting bid for this auction is: 15
+Please enter your bidding bid for Reading Railroad. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 34
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 158, in turn
+    self.checkTitleDeed(player, boardTile)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 258, in checkTitleDeed
+    self.auctionProperty(startingPrice, titleDeed, player.getName())
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 334, in auctionProperty
+    biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Player.py", line 1064, in provideAmount
+    if (amount < 0 or amount == None):
+TypeError: '<' not supported between instances of 'str' and 'int'
+>>> 
+======== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =======
+[{'userID': 'knguye15', 'order': 7}, {'userID': 'anguy03', 'order': 11}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 1
+Dice 2: 5
+Dice Roll Total: 6
+
+Player Anh Nguyen is now at Oriental Avenue.
+
+Title Type: Property
+Name: Oriental Avenue
+Printed Purchase Value: 100
+Rent Amount: 6
+Mortgage Amount: 50
+Color Group of Property: LIGHT_BLUE
+
+Rental Costs of Property
+With One House: 30
+With Two Houses: 90
+With Threee Houses: 270
+With Four Houses: 400
+With Hotel (no homes): 550
+
+Building Costs for Property
+Houses Cost: 50 each house
+Hotel Cost: 50 each plus 4 houses
+Remember: You can build houses only when you purchase all properties of a color group. 
+Do you wish to purchase to this property at the printed value of 100 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.
+======== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =======
+[{'userID': 'anguy03', 'order': 3}, {'userID': 'knguye15', 'order': 9}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 5
+Dice 2: 2
+Dice Roll Total: 7
+
+Player Anh Nguyen is now at Chance.
+
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: End Turn
+End processing of making changes to user's title deeds.
+It is now Khanh Nguyen's turn.
+
+Dice 1: 4
+Dice 2: 2
+Dice Roll Total: 6
+
+Player Khanh Nguyen is now at Oriental Avenue.
+
+Title Type: Property
+Name: Oriental Avenue
+Printed Purchase Value: 100
+Rent Amount: 6
+Mortgage Amount: 50
+Color Group of Property: LIGHT_BLUE
+
+Rental Costs of Property
+With One House: 30
+With Two Houses: 90
+With Threee Houses: 270
+With Four Houses: 400
+With Hotel (no homes): 550
+
+Building Costs for Property
+Houses Cost: 50 each house
+Hotel Cost: 50 each plus 4 houses
+Remember: You can build houses only when you purchase all properties of a color group. 
+Do you wish to purchase to this property at the printed value of 100 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Purchase
+None
+The title deed Oriental Avenue has been added.
+Type in one of the following options exactly as shown: 
+ 1. Mortgage a Property
+ 2. Repay a Mortgaged Property
+ 3. Purchase a House
+ 4. Purchase a Hotel
+ 5. Sell a House
+ 6. Sell a Hotel
+ 7. Sell a Property
+ 8. Sell a Utility
+ 9. Sell a Transport
+ 10. End Turn 
+
+Note for options 7, 8, and 9 - you can also sell mortgaged title deeds.
+
+ Enter your choice: Mortgage a Property
+{'Title Deed': <Title.Title object at 0x0000027CE9B33EB0>, 'Mortgaged': False, 'Houses': 0, 'Hotels': 0, 'Color Group': 'LIGHT_BLUE'}
+You may need to scroll if you own a large number of title deeds.
+Enter name of title deed you wish to mortgage: Oriental Avenue
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 193, in turn
+    self.handleExistingTitleDeeds(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 466, in handleExistingTitleDeeds
+    util.getMortgage(player, titleDeedsNames, titleDeedsOwned, self.bank)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\util.py", line 99, in getMortgage
+    for titleDeed in titleDeedsOwned:
+TypeError: 'Bank' object is not iterable
+>>> 
+========================== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =========================
+[{'userID': 'knguye15', 'order': 4}, {'userID': 'anguy03', 'order': 10}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 2
+Dice 2: 3
+Dice Roll Total: 5
+
+Player Anh Nguyen is now at Reading Railroad.
+
+Title Type: Transports
+Name: Reading Railroad
+Printed Purchase Value: 200
+Rent Amount: [25, 50, 100, 200]
+Mortgage Amount: 100
+Do you wish to purchase to this property at the printed value of 200 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Auction
+Please supply the starting price for auction: 15
+An auction has started for Reading Railroad, started by Khanh Nguyen.
+The starting bid for this auction is: 15
+Please enter your bidding bid for Reading Railroad. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 30
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 158, in turn
+    self.checkTitleDeed(player, boardTile)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 258, in checkTitleDeed
+    self.auctionProperty(startingPrice, titleDeed, player.getName())
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 334, in auctionProperty
+    biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Player.py", line 1066, in provideAmount
+    elif (currentPlayStatus == "Auction" and int(amount) < bidAmount):
+TypeError: '<' not supported between instances of 'int' and 'str'
+>>> 
+========================== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =========================
+[{'userID': 'anguy03', 'order': 5}, {'userID': 'knguye15', 'order': 6}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 4
+Dice 2: 1
+Dice Roll Total: 5
+
+Player Anh Nguyen is now at Reading Railroad.
+
+Title Type: Transports
+Name: Reading Railroad
+Printed Purchase Value: 200
+Rent Amount: [25, 50, 100, 200]
+Mortgage Amount: 100
+Do you wish to purchase to this property at the printed value of 200 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Auction
+Please supply the starting price for auction: 15
+An auction has started for Reading Railroad, started by Khanh Nguyen.
+The starting bid for this auction is: 15
+Please enter your bidding bid for Reading Railroad. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 30
+Traceback (most recent call last):
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 29, in <module>
+    main()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py", line 19, in main
+    monopoly_instance.run()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 98, in run
+    self.round()
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 111, in round
+    self.turn(player)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 158, in turn
+    self.checkTitleDeed(player, boardTile)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 258, in checkTitleDeed
+    self.auctionProperty(startingPrice, titleDeed, player.getName())
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Game.py", line 334, in auctionProperty
+    biddingPrice = player.provideAmount("Auction", titleDeed.getName(), startingPrice)
+  File "C:\Users\An\Desktop\Source Files\MonopolyLocal\Player.py", line 1066, in provideAmount
+    elif (currentPlayStatus == "Auction" and int(amount) < str(bidAmount)):
+TypeError: '<' not supported between instances of 'int' and 'str'
+>>> 
+========================== RESTART: C:\Users\An\Desktop\Source Files\MonopolyLocal\main.py =========================
+[{'userID': 'knguye15', 'order': 5}, {'userID': 'anguy03', 'order': 7}]
+It is now Anh Nguyen's turn.
+
+Dice 1: 3
+Dice 2: 3
+Dice Roll Total: 6
+
+Player Anh Nguyen is now at Oriental Avenue.
+
+Title Type: Property
+Name: Oriental Avenue
+Printed Purchase Value: 100
+Rent Amount: 6
+Mortgage Amount: 50
+Color Group of Property: LIGHT_BLUE
+
+Rental Costs of Property
+With One House: 30
+With Two Houses: 90
+With Threee Houses: 270
+With Four Houses: 400
+With Hotel (no homes): 550
+
+Building Costs for Property
+Houses Cost: 50 each house
+Hotel Cost: 50 each plus 4 houses
+Remember: You can build houses only when you purchase all properties of a color group. 
+Do you wish to purchase to this property at the printed value of 100 or do you wish to auction? 
+If you want to purchase, please type the word 'Purchase'. 
+If you wish to auction, please type 'Auction'.Auction
+Please supply the starting price for auction: 15
+An auction has started for Oriental Avenue, started by Khanh Nguyen.
+The starting bid for this auction is: 15
+Please enter your bidding bid for Oriental Avenue. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 30
+The second round of this auction has started for Oriental Avenue.
+The new starting bid for this round is: 30
+Please enter your bidding bid for Oriental Avenue. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 45
+Please enter your bidding bid for Oriental Avenue. If you wish to skip the bid, please enter amount as '0'.
+
+Enter bid here: 90
+The winner of this auction is Khanh Nguyen, who bid for 90. Congratulations!That player now owns this property, paying the specified amount.
+None
