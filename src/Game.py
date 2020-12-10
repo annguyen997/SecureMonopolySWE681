@@ -7,7 +7,7 @@ from TwoDice import *
 from Player import *
 from Card import *
 
-class Game:
+class Games:
     #Instiates a new game
     def __init__(self):
         self.players = []

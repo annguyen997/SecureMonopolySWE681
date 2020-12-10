@@ -5,7 +5,7 @@ import uuid
 import base64
 import json
 
-from Game import * 
+import Game
 from Driver import Driver
 
 class Controller:
@@ -23,7 +23,7 @@ class Controller:
     @classmethod
     def sufficientNumberPlayers(cls, gameID): 
         print("Get to sufficient number player")
-        gamePlayers = None 
+        #gamePlayers = None 
         print("Get to sufficient number player2")
         for gameSession in cls.game_sessions: 
             if (str(gameID) == str(gameSession["Session"]) and len(gameSession["Player"]) >= 2):
@@ -42,6 +42,7 @@ class Controller:
         for gameSession in cls.game_sessions: 
             if gameSession["Locked"]: 
                 continue #If game instance is locked due to all players joined, skip that session. 
+
             gameInfo += "Session ID: " + gameSession["Session"] + "\t# of Players: " + str(len(gameSession["Player"]))+"\n"
             print(gameSession["Active"])
             if (gameSession["Active"]):
@@ -79,7 +80,7 @@ class Controller:
                 #Check if the player's ID is not in the list for this session.
                 #If player's ID is already in list, user just needs to join the game
                 if (playerID in game["Player"]):
-                    return #Player already in list, exit to previous caller
+                    return False #Player already in list, exit to previous caller
                 elif (game["Locked"]): 
                     print ("You cannot join this game.")
                     return False  #Game instance has been created, and it is closed to the public. 
@@ -99,22 +100,18 @@ class Controller:
     #Create a new game once there is sufficient number of players - asynchronous 
     @classmethod
     def createNewGame(cls, gameID): 
-        print("entering createNewGame")
         for gameSession in cls.game_sessions: 
-            print(str(gameID))
-            print(str(gameSession["Session"]))
-            print(Controller.numberOfPlayers(gameID))
             if (str(gameID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameID) >= 2):
                 gameSession["Active"] = True #This means enough players are available to start playing new game
-                gameSession["Game Instance"] = Game()
-                print(gameSession["Game Instance"])
-
-#Get the game instance to controller
+                gameSession["Game Instance"] = Game.Games()
+    
     @classmethod 
     def lockGame(cls, gameID): 
         for gameSession in cls.game_sessions: 
             if (str(gameID) == str(gameSession["Session"])):
                 gameSession["Locked"] = True #This means all players have joined and game must be locked to the public. 
+
+    #Get the game instance to controller
     @classmethod
     def getGameInstance(cls, gameID): 
         for gameSession in cls.game_sessions: 
@@ -128,9 +125,6 @@ class Controller:
     #Game information would need to be displayed to web client.... 
     def __incomingUser(self, username, password, mode):
         print("Incoming...")
-        print(username)
-        print(password)
-        print(mode)
         
         if (mode == "Authenticate"): 
             #session Ids will be returned as base-64
@@ -180,13 +174,10 @@ class Controller:
 
         #Add session ID with player 
         players = [sessionID]
-        Controller.game_sessions.append({"Session": gameID, "Player": players, "Usernames": [self.user],  "Active": False, "Game Instance": None,"Locked": False})
+        Controller.game_sessions.append({"Session": gameID, "Player": players, "Usernames": [self.user],  "Active": False, "Game Instance": None, "Locked": False})
         
         self.gameSession = gameID  #Is this needed? 
         print(gameID)
-        f = open("audit.txt", "a+")
-        f.write("New Game Session Being Created - "+gameID+"\n")
-        f.close()
 
         return gameID
 
@@ -200,7 +191,6 @@ class Controller:
 
             if (Controller.checkGameActive(gameID)): 
                 self.setGameInstance(Controller.getGameInstance(self.gameSession))
-    
 
     #Check if game can be created
     def __startGame(self, gameID): 
@@ -212,7 +202,6 @@ class Controller:
             run = Controller.sufficientNumberPlayers(gameID)
             print("asdasdqw")
             if (run):
-                print("got after if")
                 Controller.createNewGame(gameID) 
                 print("after __startGame")
         #else: 
@@ -238,8 +227,6 @@ class Controller:
     
     #Display the current game information to the web browser (i.e. client) of players and any messages of game's current state.  
     def __getCurrentGameState(self): 
-        print("at __getCurrentGameState")
-        print(self.game)
         currentGameInfo = None 
 
         #Get the game messages 
@@ -253,7 +240,6 @@ class Controller:
 
         #Display the current stats of all players
         currentGameInfo += self.game.displayPlayersStats() 
-        print(currentGameInfo)
 
         return currentGameInfo
 
@@ -279,7 +265,8 @@ class Controller:
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
-        #inp=str(inp)
+        if not isinstance (inp, str):
+            return False
         #Regex parts here 
 
         # this will see what to call and interpret the api calls
@@ -293,7 +280,7 @@ class Controller:
         # dict {'mana_': [data], 'username_': username, 'sessionID_': data} - management stuff such as sessionID
         # dict {'game_': [data], 'username_': username, 'sessionID_': data} - game data
         # 
-
+    
         #user stuff
         # within [data] -> FIRST FIELD ALWAYS BE WHAT TO DO aka Authenticate/Create
         # [data] [1] = user, [data] [2] = password 
@@ -364,14 +351,8 @@ class Controller:
                         % (str(inp['username_'])) )
                 return False
             if (str(inp['game_'][0]) == 'listExistingGame'):
-                print("Go to list games")
-                return Controller.printCurrentGameSessionIDs()  
-            if (str(inp['game_'][0]) == 'getCurrentGameState'):
-                print("getCurrentGameState")
-                return Controller.__getCurrentGameState()    
-            if (str(inp['game_'][0]) == 'getCurrentGameState2'):
-                print("getCurrentGameState")
-                return self.__getCurrentGameState()        # game session id
+                print("Got to list")
+                return Controller.printCurrentGameSessionIDs()        # game session id
 
             #If player is in the session and in the game itself, then call the game 
             #if 
