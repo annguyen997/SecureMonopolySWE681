@@ -720,9 +720,3 @@ def makeSellTitleDeedDeal(self, playerOwner, playerReceiver, titleDeedName = "")
     else: 
         print("The owner did not accept the amount offered.")
         return 0
-
-""" Information sent to and being retrieved from Controller.py """ 
-@staticmethod 
-def dataHandling(dataInput):
-    #Post the data to 
-    pass

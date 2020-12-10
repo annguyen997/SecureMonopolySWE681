@@ -2,7 +2,6 @@ from Board import *
 from Bank import *
 from Title import Property, Utility
 import math 
-import util
 
 class Player():
     #Dual means both Regular and Banker, used only if there are less than 5 players; Bank can be automated
@@ -1051,13 +1050,6 @@ class Player():
 
         while (not inputValid): 
             if (currentPlayStatus == "Auction"): 
-                
-                #auctionMessage = "Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'."
-                #auctionMessage += "\nEnter bid here: "
-
-                #name of some function to send to Controller....
-                #util.
-
                 print("Please enter your bidding bid for " + titleDeedName + ". If you wish to skip the bid, please enter amount as '0'.") 
 
                 #Validate the input 
@@ -1069,11 +1061,11 @@ class Player():
                 #Validate the input 
                 amount = input("\nEnter bid here: ") 
             
-            if (amount < 0 or amount == None): 
+            if (int(amount) < 0 or amount == None): 
                 print("This is not an acceptable value. Please try again.")
-            elif (currentPlayStatus == "Auction" and amount < bidAmount):
+            elif (currentPlayStatus == "Auction" and int(amount) < int(bidAmount)):
                 print("You must enter a bid amount higher than or equal to the starting amount. Please enter a higher value.")
-            elif (currentPlayStatus == "Selling" and amount <= 0):
+            elif (currentPlayStatus == "Selling" and int(amount) <= 0):
                 print("You must enter a non-zero positive value for selling. Please enter a higher value.")
             else: 
                 inputValid = True
