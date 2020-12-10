@@ -99,10 +99,15 @@ class Controller:
     #Create a new game once there is sufficient number of players - asynchronous 
     @classmethod
     def createNewGame(cls, gameID): 
+        print("entering createNewGame")
         for gameSession in cls.game_sessions: 
+            print(str(gameID))
+            print(str(gameSession["Session"]))
+            print(Controller.numberOfPlayers(gameID))
             if (str(gameID) == str(gameSession["Session"]) and Controller.numberOfPlayers(gameID) >= 2):
                 gameSession["Active"] = True #This means enough players are available to start playing new game
                 gameSession["Game Instance"] = Game()
+                print(gameSession["Game Instance"])
 
 #Get the game instance to controller
     @classmethod 
@@ -123,6 +128,9 @@ class Controller:
     #Game information would need to be displayed to web client.... 
     def __incomingUser(self, username, password, mode):
         print("Incoming...")
+        print(username)
+        print(password)
+        print(mode)
         
         if (mode == "Authenticate"): 
             #session Ids will be returned as base-64
@@ -204,6 +212,7 @@ class Controller:
             run = Controller.sufficientNumberPlayers(gameID)
             print("asdasdqw")
             if (run):
+                print("got after if")
                 Controller.createNewGame(gameID) 
                 print("after __startGame")
         #else: 
@@ -270,8 +279,7 @@ class Controller:
     #Validate the input of the player 
     #ResponseType corresponds to the context of the input in relation to the game
     def parseInput(self, inp):
-        if not isinstance (inp, str):
-            return False
+        #inp=str(inp)
         #Regex parts here 
 
         # this will see what to call and interpret the api calls
